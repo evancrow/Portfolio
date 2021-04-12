@@ -1,0 +1,435 @@
+body {
+	width: calc(100% - 60px);
+	height: 100%;
+	padding: 30px;
+	padding-top: 0px;
+	margin: 0px;
+	overflow-x: hidden;
+}
+
+header {
+	margin-top: -25px;
+	display: flex;
+	width: 100%;
+}
+
+#headerTitle {
+	font-family: filson-pro, sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	font-size: 40px;
+	width: 50%;
+}
+
+nav {
+	width: 50%;
+	display: inline-block;
+  	vertical-align: middle;
+}
+
+nav li {
+ 	display: inline-block;
+  	vertical-align: middle;
+}
+
+nav ul {
+  	height: 6em;
+  	display: flex;
+  	justify-content: flex-end;
+  	align-items: center;
+	vertical-align: top;
+}
+
+nav a {
+	font-family: filson-pro, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 20px;
+	background-color: white;
+	color: black;
+  	display: block;
+	vertical-align: middle;
+	text-decoration: none;
+	margin-left: 50px;
+	margin-right: 5px;
+	transition: all 0.3s ease-in-out 0s;
+}
+
+nav a:hover {
+	cursor: pointer;
+	border-bottom: 5px solid #FCC056;
+}
+
+.menuNav {
+	width: 50%;
+	display: none;
+  	vertical-align: middle;
+}
+
+.menuNav li {
+ 	font-family: filson-pro, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 20px;
+	background-color: white;
+	color: black;
+  	display: block;
+	vertical-align: middle;
+	text-decoration: none;
+	margin-left: 50px;
+	margin-right: 5px;
+	transition: all 0.3s ease-in-out 0s;
+}
+
+.menuNav ul {
+  	height: 6em;
+  	display: flex;
+  	justify-content: flex-end;
+  	align-items: center;
+	vertical-align: top;
+}
+
+.menuNav li:hover {
+	cursor: pointer;
+	border-bottom: 5px solid #FCC056;
+}
+
+.sidenav {
+  	height: 100%;
+  	width: 0; 
+  	position: fixed; 
+  	z-index: 1; 
+  	top: 0; 
+  	right: 0;
+  	background-color: white;
+  	overflow-x: hidden; 
+  	padding-top: 60px; 
+  	transition: 0.5s; 
+}
+
+.sidenav a {
+	align-content: center;
+  	padding: 8px 8px 8px 32px;
+  	text-decoration: none;
+  	color: black;
+  	display: block;
+	font-family: filson-pro, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 10vw;
+	text-align: left;
+	margin-left: 20px;
+	transition: all 0.3s linear;
+}
+
+.sidenav a:hover {
+ 	color: #FCC056;
+	cursor: pointer;
+}
+
+.sidenav .closebtn {
+	color: black;
+  	position: absolute;
+  	top: 0;
+  	left: 0px;
+  	font-size: 36px;
+  	margin-left: 20px;
+}
+
+#colorSquares {
+	width: 100%;
+	height: 100%;
+	margin-top: -20px;
+	background-color: #f0f0f0;
+	display: flex;
+}
+
+.adjective {
+	font-family: filson-pro, sans-serif;
+	font-weight: 1000;
+	font-style: normal;
+	font-size: 10vw;
+	word-break: break-all;
+	margin: 0px auto;
+	margin-top: 13%;
+	margin-bottom: 13%;
+	width: 100%;
+}
+
+#developer {
+	width: 70%;
+}
+
+backward {
+  	display: inline-block;
+  	-moz-transform: scale(-1, 1);
+  	-webkit-transform: scale(-1, 1);
+  	transform: scale(-1, 1);
+}
+
+#designerNoBreak {
+	display: none;
+}
+
+#leftSquare {
+	background-color: #FCC056;
+	color: #f0f0f0;
+	width: 50%;
+	height: 100%;
+	text-align: center;
+	align-content: center;
+	align-items: center;
+	display: inline-block;
+}
+
+#rightSquare {
+	background-color: #f0f0f0;
+	color: #FCC056;
+	width: 50%;
+	height: 100%;
+	text-align: center;
+	align-content: center;
+	align-items: center;
+	display: inline-block;
+}
+
+.title {
+	font-family: filson-pro, sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	font-size: 15vw;
+	color: #f0f0f0;
+	margin-bottom: -14vw;
+}
+
+.sectionTitle {
+	font-family: filson-pro, sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	font-size: 2vw;
+	color: black;
+	margin-bottom: -20px;
+}
+
+.sectionText {
+	font-family: filson-pro, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 2.5vw;
+	color: black;
+}
+
+#resumeButton {
+	height: 10vw;
+	width: 40vw;
+	border: 10px solid #ededed;
+	font-family: filson-pro, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 3.5vw;
+	color: #FCC056;
+	background-color: white;
+	transition: all 0.3s ease-in-out 0s;
+	margin-top: 30px;
+}
+
+#resumeButton:hover {
+	cursor: pointer;
+	border: 10px solid #FCC056;
+}
+
+.workButton {
+	position: relative;
+	display: block;
+	width: auto;
+	height: 100%;
+	border: 10px solid #f0f0f0;
+	text-align: center;
+	align-content: center;
+	margin-top: 5vw;
+	margin-bottom: 50px;
+	transition: all 0.3s ease-in-out 0s;
+}
+
+.workButtonTitle {
+	width: 100%;
+	font-family: filson-pro, sans-serif;
+	font-weight: 700;
+	font-style: normal;
+	font-size: 10vw;
+	color: #FCC056;
+	text-align: center;
+	margin-top: 0px;
+	margin-bottom: -50px;
+	transition: all 0.3s ease-in-out 0s;
+}
+
+.workButtonSubtitle {
+	width: calc(100% - 60px);
+	font-family: filson-pro, sans-serif;
+	font-weight: 500;
+	font-style: normal;
+	font-size: 4vw;
+	color: #fcd690;
+	text-align: center;
+	padding: 30px;
+	margin-top: 0px;
+	margin-bottom: 0px;
+	visibility: hidden;
+ 	opacity: 0;
+	height: 0;
+	overflow: hidden;
+	transition: opacity 0.3s ease-in-out 0s;
+}
+
+#nome:hover {
+	cursor: pointer;
+	border: 10px solid #FCC056;
+}
+
+#nome:hover #nomeTitle {
+	margin-top: 0px;
+}
+
+#nome:hover #nomeSubtitle {
+	visibility: visible;
+ 	opacity: 1;
+	height: auto;
+}
+
+#ferdasoft:hover, element.hover_effect {
+	cursor: pointer;
+	border: 10px solid #FCC056;
+}
+
+#ferdasoft:hover #ferdasoftTitle, element.hover_effect {
+	margin-top: 0px;
+}
+
+#ferdasoft:hover #ferdasoftSubtitle, element.hover_effect {
+	visibility: visible;
+ 	opacity: 1;
+	height: auto;
+}
+
+#tutorstand:hover, element.hover_effect {
+	cursor: pointer;
+	border: 10px solid #FCC056;
+}
+
+#tutorstand:hover #tutorstandTitle, element.hover_effect {
+	margin-top: 0px;
+}
+
+#tutorstand:hover #tutorstandSubtitle, element.hover_effect {
+	visibility: visible;
+ 	opacity: 1;
+	height: auto;
+}
+
+#emailTitle, #phoneTitle {
+	font-size: 7vw;
+	margin-top: 0px;
+	margin-bottom: 20px;
+}
+
+#email:hover {
+	cursor: pointer;
+	border: 10px solid #FCC056;
+}
+
+@media screen and (max-width: 850px) {
+	body {
+		padding: 15px;
+		width: calc(100% - 30px);
+	}
+	
+	section {
+		margin-top: 150px;
+	}
+	
+	.menuNav {
+		display: inline-block;
+	}
+	
+	nav {
+		display: none;
+		visibility:hidden;
+	}
+	
+	#colorSquares {
+		margin-top: 30px;
+		display: block;
+		height: auto;
+	}
+	
+	.adjective {
+		font-size: 9vw;
+		width: 100%;
+		text-align: center;
+	}
+	
+	#designer {
+		display: none;
+	}
+	
+	#designerNoBreak {
+		display: block;
+	}
+	
+	#leftSquare {
+		width: 100%;
+		height: auto;
+	}
+	
+	#rightSquare {
+		width: 100%;
+		height: 0%;
+	}
+	
+	.sectionTitle {
+		font-size: 3vw;
+	}
+	
+	.sectionText {
+		font-size: 5vw;
+	}
+	
+	#resumeButton {
+		width: 45vw;
+		height: 20vw;
+		font-size: 5.5vw;
+	}
+	
+	.workButtonTitle {
+		margin-top: 10px;
+		font-size: 8vw;
+	}
+	
+	#nome:hover #nomeSubtitle {
+		margin-top: 30px;
+		margin-bottom: -15px;
+	}
+
+	#ferdasoft:hover #ferdasoftSubtitle, element.hover_effect {
+		visibility: visible;
+	 	opacity: 1;
+		height: auto;
+	}
+	
+	#tutorstand:hover #tutorstandSubtitle, element.hover_effect {
+		visibility: visible;
+	 	opacity: 1;
+		height: auto;
+	}
+	
+	#emailTitle {
+		margin-top: 10px;
+		margin-bottom: 10px;
+	}
+}
+
+.hover {
+	-webkit-user-select: none;
+	-webkit-touch-callout: none;        
+}

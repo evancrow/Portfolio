@@ -1,0 +1,154 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Evan Crow</title>
+    
+    <link rel="stylesheet" href="style.css">
+	<link rel="stylesheet" href="https://use.typekit.net/sgc4dre.css">
+	
+	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+	<script>
+		$(document).ready(function(){
+			// Add smooth scrolling to all links
+			$("a").on('click', function(event) {
+				
+				// Make sure this.hash has a value before overriding default behavior
+				if (this.hash !== "") {
+					// Prevent default anchor click behavior
+					event.preventDefault();
+					
+					// Store hash
+					var hash = this.hash;
+					
+					// Using jQuery's animate() method to add smooth page scroll
+					// The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
+					$('html, body').animate({
+						scrollTop: $(hash).offset().top
+					}, 800, function(){
+						
+						// Add hash (#) to URL when done scrolling (default click behavior)
+						window.location.hash = hash;
+					});
+				} // End if
+			});
+		});
+		
+		function openNav() {
+  			document.getElementById("mySidenav").style.width = "100%";
+		};
+	
+		function closeNav() {
+  			document.getElementById("mySidenav").style.width = "0";
+		};
+	</script>
+</head>
+	
+<body>
+	<div id="mySidenav" class="sidenav">
+	  	<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
+	  	<a href="#about" onclick="closeNav()">about</a>
+	  	<a href="#skills" onclick="closeNav()">skills</a>
+	 	<a href="#work" onclick="closeNav()">work</a>
+		<a href="#contact" onclick="closeNav()">contact</a>
+	</div>
+	
+	<header>
+		<p id = "headerTitle">EVAN CROW</p>
+		
+		<nav>
+			<ul>
+        	    <li><a href="#about">about</a></li>
+        	    <li><a href="#skills">skills</a></li>
+        	    <li><a href="#work">work</a></li>
+				<li><a href="#contact">contact</a></li>
+        	</ul>
+		</nav>
+	
+		<div class = "menuNav">
+			<ul>
+        	    <li onclick="openNav()">menu</li>
+        	</ul>
+		</div>
+	</header>
+	
+	<div id = "colorSquares">
+		<div id = "leftSquare">
+			<p class = "adjective" id = "designer">DESI<br>GNER</p>
+			<p class = "adjective" id = "designerNoBreak">DESIGNER</p>
+		</div>
+		
+		<div id = "rightSquare">
+			<p class = "adjective" id = "developer"><backward>DEVELOPER</backward></p>
+		</div>
+	</div>
+	
+	<section id = "about">
+		<p class="title">ABOUT</p>
+		<p class = "sectionText">
+			Hello, I'm Evan Crow. I'm a high honors student at Ida B. Wells High School in Portland, Oregon. I did not sit out during the disruptive times of the Covid-19 virus. Instead, I co-founded Ferdasoft LLC and continue to develop websites for people in my community. Ferdasoft is an indie software company, where I develop, design, and manage the iOS app, "Nome". I also created and maintain the companies website. Also, I developed tutorstand.com, a free math tutoring website for middle-schoolers.  While I'm enthusiastic about designing and developing websites and mobile apps, I am also constantly looking to learn new things and take on new challenges.
+		</p>
+		
+		<a href="Resume.pdf" download="Evan_Crow_Resume.pdf"><button id = "resumeButton">download resume</button></a>
+	</section>
+	
+	<section id = "skills">
+		<p class="title">SKILLS</p>
+		<p class = "sectionTitle">WEB DEVELOPMENT/DESIGN</p>
+		<p class = "sectionText">HTML, CSS, Javascript, React.JS</p>
+		
+		<p class = "sectionTitle">iOS DEVELOPMENT/DESIGN</p>
+		<p class = "sectionText">Swift, iOS, WatchOS, CarPlay, MVC, Agile/Scrum</p>
+		
+		<p class = "sectionTitle">TOOLS</p>
+		<p class = "sectionText">Xcode, GitHub, Adobe Suite</p>
+		
+		<p class = "sectionTitle">TRAITS</p>
+		<p class = "sectionText">Quick-learner, self-reliant, flexible</p>
+	</section>
+		
+	<section id = "work">
+		<p class="title">WORK</p>
+		<div class = "workButton" id = "nome" onclick = "window.open('https://apps.apple.com/us/app/nome-music-maps/id1529202939', '_blank'); ">
+			<p class = "workButtonTitle" id = "nomeTitle">Nome</p>
+			<p class = "workButtonSubtitle" id = "nomeSubtitle">Designed UI and Icon, programmed in Swift. Developed turn-by-turn directions and queue creation algorithms.</p>
+		</div>
+		
+		<div class = "workButton" id = "ferdasoft" onclick = "window.open('https://ferdasoft.com', '_blank');">
+			<p class = "workButtonTitle" id = "ferdasoftTitle">ferdasoft.com</p>
+			<p class = "workButtonSubtitle" id = "ferdasoftSubtitle">Designed UI and Logo, programmed in HTML, CSS,  and Javascript. Setup hosting and universal URLS.</p>
+		</div>
+		
+		<div class = "workButton" id = "tutorstand" onclick = "window.open('https://tutorstand.com', '_blank');">
+			<p class = "workButtonTitle" id = "tutorstandTitle">tutorstand.com</p>
+			<p class = "workButtonSubtitle" id = "tutorstandSubtitle">Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
+		</div>
+		
+		<p class = "workButtonTitle">& this website</p>
+	</section>
+	
+	<section id = "contact"> 
+		<p class="title">CONTACT</p>
+		
+		<a href = "mailto:evanwcrow@gmail.com?" style = "text-decoration: none">
+			<div class = "workButton" id = "email">
+				<p class = "workButtonTitle" id = "emailTitle">evanwcrow@gmail.com</p>
+			</div>
+		</a>
+		
+		<p class = "workButtonTitle" id = "phoneTitle">+1 (971) 413-3950</p>
+	</section>
+	
+	<!-- The core Firebase JS SDK is always required and must be listed first -->
+	<script src="/__/firebase/8.2.9/firebase-app.js"></script>
+	
+	<!-- TODO: Add SDKs for Firebase products that you want to use
+	     https://firebase.google.com/docs/web/setup#available-libraries -->
+	<script src="/__/firebase/8.2.9/firebase-analytics.js"></script>
+	
+	<!-- Initialize Firebase -->
+	<script src="/__/firebase/init.js"></script>
+</body>
+</html>
+            
