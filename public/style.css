@@ -1,9 +1,11 @@
+html {
+	overflow-x: hidden;
+}
+
 body {
-	width: calc(100% - 60px);
-	height: 100%;
 	padding: 30px;
 	padding-top: 0px;
-	margin: 0px;
+
 	overflow-x: hidden;
 }
 
@@ -48,7 +50,6 @@ nav a {
 	background-color: white;
 	color: black;
   	display: block;
-	vertical-align: middle;
 	text-decoration: none;
 	margin-left: 50px;
 	margin-right: 5px;
@@ -216,17 +217,18 @@ backward {
 	font-weight: 500;
 	font-style: normal;
 	font-size: 2.5vw;
-	color: black;
+	color: #353a3e;
+	opacity: 0.8;
 }
 
 #resumeButton {
-	height: 10vw;
-	width: 40vw;
+	height: 9vw;
+	width: 35vw;
 	border: 10px solid #ededed;
 	font-family: filson-pro, sans-serif;
 	font-weight: 500;
 	font-style: normal;
-	font-size: 3.5vw;
+	font-size: 3vw;
 	color: #FCC056;
 	background-color: white;
 	transition: all 0.3s ease-in-out 0s;
@@ -238,110 +240,96 @@ backward {
 	border: 10px solid #FCC056;
 }
 
+.workSection {
+	display: inline-flex;
+	gap: calc(4vw);
+}
+
 .workButton {
+	height: 100%;
+	width: calc(48vw - 70px);
+	padding: 10px;
+	margin-top: 5vw;
+	margin-bottom: 50px;
+
 	position: relative;
 	display: block;
-	width: auto;
-	height: 100%;
+	
 	border: 10px solid #f0f0f0;
 	text-align: center;
 	align-content: center;
-	margin-top: 5vw;
-	margin-bottom: 50px;
+	
 	transition: all 0.3s ease-in-out 0s;
 }
 
 .workButtonTitle {
 	width: 100%;
+
 	font-family: filson-pro, sans-serif;
 	font-weight: 700;
 	font-style: normal;
-	font-size: 10vw;
+	font-size: 3.5vw;
 	color: #FCC056;
 	text-align: center;
-	margin-top: 0px;
-	margin-bottom: -50px;
+
 	transition: all 0.3s ease-in-out 0s;
 }
 
 .workButtonSubtitle {
-	width: calc(100% - 60px);
+	width: 100%;
+
 	font-family: filson-pro, sans-serif;
 	font-weight: 500;
 	font-style: normal;
-	font-size: 4vw;
+	font-size: 2.5vw;
 	color: #fcd690;
 	text-align: center;
-	padding: 30px;
-	margin-top: 0px;
-	margin-bottom: 0px;
-	visibility: hidden;
- 	opacity: 0;
-	height: 0;
-	overflow: hidden;
+	
 	transition: opacity 0.3s ease-in-out 0s;
 }
 
-#nome:hover {
+@media(hover: hover) and (pointer: fine) {
+    .workButtonSubtitle {
+		display: none;
+	}
+}
+
+.workButton:hover {
 	cursor: pointer;
 	border: 10px solid #FCC056;
 }
 
-#nome:hover #nomeTitle {
-	margin-top: 0px;
+.workButton:hover .workButtonSubtitle {
+	display: block;
 }
 
-#nome:hover #nomeSubtitle {
-	visibility: visible;
- 	opacity: 1;
-	height: auto;
+#email {
+	width: auto;
 }
 
-#ferdasoft:hover, element.hover_effect {
-	cursor: pointer;
-	border: 10px solid #FCC056;
-}
-
-#ferdasoft:hover #ferdasoftTitle, element.hover_effect {
-	margin-top: 0px;
-}
-
-#ferdasoft:hover #ferdasoftSubtitle, element.hover_effect {
-	visibility: visible;
- 	opacity: 1;
-	height: auto;
-}
-
-#tutorstand:hover, element.hover_effect {
-	cursor: pointer;
-	border: 10px solid #FCC056;
-}
-
-#tutorstand:hover #tutorstandTitle, element.hover_effect {
-	margin-top: 0px;
-}
-
-#tutorstand:hover #tutorstandSubtitle, element.hover_effect {
-	visibility: visible;
- 	opacity: 1;
-	height: auto;
-}
-
-#emailTitle, #phoneTitle {
+#emailTitle {
 	font-size: 7vw;
 	margin-top: 0px;
 	margin-bottom: 20px;
 }
 
-#email:hover {
-	cursor: pointer;
-	border: 10px solid #FCC056;
+.socials {
+	width: 100%;
+	gap: 3vw;
+
+	display: flex;
+  	justify-content: center;
+}
+
+.socialIcon {
+	height: 3vw;
+	width: 3vw;
+	opacity: 0.7;
 }
 
 @media screen and (max-width: 850px) {
 	body {
 		padding: 15px;
-		width: calc(100% - 30px);
 	}
 	
 	section {
@@ -388,7 +376,7 @@ backward {
 	}
 	
 	.sectionTitle {
-		font-size: 3vw;
+		font-size: 4vw;
 	}
 	
 	.sectionText {
@@ -396,36 +384,80 @@ backward {
 	}
 	
 	#resumeButton {
-		width: 45vw;
-		height: 20vw;
-		font-size: 5.5vw;
-	}
-	
-	.workButtonTitle {
-		margin-top: 10px;
-		font-size: 8vw;
-	}
-	
-	#nome:hover #nomeSubtitle {
-		margin-top: 30px;
-		margin-bottom: -15px;
+		width: 35vw;
+		height: 12vw;
+		font-size: 3vw;
+
+		border: 7px solid #ededed;
 	}
 
-	#ferdasoft:hover #ferdasoftSubtitle, element.hover_effect {
-		visibility: visible;
-	 	opacity: 1;
-		height: auto;
+	.workSection {
+		display: block;
 	}
-	
-	#tutorstand:hover #tutorstandSubtitle, element.hover_effect {
-		visibility: visible;
-	 	opacity: 1;
-		height: auto;
+
+	.workButton {
+		width: auto;
 	}
-	
+
+	.workButtonTitle {
+		font-size: 4vw;
+	}
+
+	.workButtonSubtitle {
+		font-size: 3.5vw;
+	}
+
 	#emailTitle {
 		margin-top: 10px;
 		margin-bottom: 10px;
+	}
+
+	.socials {
+		gap: 5vw;
+	}
+
+	.socialIcon {
+		width: 5vw;
+		height: 5vw;
+	}
+}
+
+@media screen and (max-width: 500px) {
+	.title {
+		margin-bottom: -15vw;
+	}
+
+	#resumeButton {
+		width: 40vw;
+		height: 18vw;
+		font-size: 4vw;
+
+		border: 7px solid #ededed;
+	}
+
+	.sectionTitle {
+		font-size: 5vw;
+	}
+
+	.sectionText {
+		font-size: 6vw;
+	}
+
+	.workButtonTitle {
+		font-size: 5vw;
+	}
+
+	.workButtonSubtitle {
+		font-size: 4.5vw;
+	}
+
+	.socials {
+		gap: 7vw;
+	}
+
+	.socialIcon {
+		width: 7vw;
+		height: 7vw;
 	}
 }
 

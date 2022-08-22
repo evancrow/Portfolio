@@ -11,7 +11,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
 	<script>
 		$(document).ready(function(){
-			// Add smooth scrolling to all links
+			// Adds smooth scrolling to all links.
 			$("a").on('click', function(event) {
 				
 				// Make sure this.hash has a value before overriding default behavior
@@ -31,7 +31,7 @@
 						// Add hash (#) to URL when done scrolling (default click behavior)
 						window.location.hash = hash;
 					});
-				} // End if
+				}
 			});
 		});
 		
@@ -80,64 +80,97 @@
 		</div>
 		
 		<div id = "rightSquare">
-			<p class = "adjective" id = "developer"><backward>DEVELOPER</backward></p>
+			<p class = "adjective" id = "developer"><backward>ENGINEER</backward></p>
 		</div>
 	</div>
 	
 	<section id = "about">
 		<p class="title">ABOUT</p>
 		<p class = "sectionText">
-			Hello, I'm Evan Crow. I'm a high honors student at Ida B. Wells High School in Portland, Oregon. I did not sit out during the disruptive times of the Covid-19 virus. Instead, I co-founded Ferdasoft LLC and continue to develop websites for people in my community. Ferdasoft is an indie software company, where I develop, design, and manage the iOS app, "Nome". I also created and maintain the companies website. Also, I developed tutorstand.com, a free math tutoring website for middle-schoolers.  While I'm enthusiastic about designing and developing websites and mobile apps, I am also constantly looking to learn new things and take on new challenges.
+			Hey, I'm Evan. I'm an iOS Engineer and Designer, proficient in Swift, SwiftUI, and all things Apple development. I've worked on multiple featured App Store apps, and have earned a WWDC Student Scholarship. When not working on apps, I also design and build websites with HTML, CSS, JavaScript and TypeScript.
 		</p>
 		
 		<a href="Resume.pdf" download="Evan_Crow_Resume.pdf"><button id = "resumeButton">download resume</button></a>
 	</section>
+
+	<section id="work">
+		<p class="title">WORK</p>
+
+		<div class="workSection">
+			<div class="workButton" onclick="window.open('https://apps.apple.com/us/app/neeva-browser-search-engine/id1543288638', '_blank');">
+				<p class = "workButtonTitle">Neeva - iOS, iPadOS, Mac Catalyst</p>
+				<p class = "workButtonSubtitle">Develop cutting edge search features to drive user acquisition. Helped lead transition from UIKit to SwiftUI, and continue to develop regression tests.</p>
+			</div>
+	
+			<div class = "workButton" onclick="window.open('https://apps.apple.com/us/app/nome-music-maps/id1529202939', '_blank');">
+				<p class = "workButtonTitle">Nome - iOS, WatchOS, CarPlay</p>
+				<p class = "workButtonSubtitle">Designed UI and Icon, programmed in Swift. Developed turn-by-turn directions and music queue creation algorithms.</p>
+			</div>
+		</div>
+		
+		<div class="workSection">
+			<div class="workButton" onclick="window.open('https://github.com/evancrow/Oculi', '_blank');">
+				<p class="workButtonTitle">Oculi - SwiftUI</p>
+				<p class="workButtonSubtitle">Accepted WWDC22 Student Swift Challenge Project. Accessibility framework which enables motor impared people to navigate SwiftUI apps with their head and eyes.</p>
+			</div>
+
+			<div class="workButton" onclick="window.open('https://apps.apple.com/us/app/travsolo-solo-travel-easier/id1459854419', '_blank');">
+				<p class="workButtonTitle">TravSolo - iOS</p>
+				<p class="workButtonSubtitle">Built new user engagment features and revenue generating streams (subscriptions). Met with investors to raise funding.</p>
+			</div>
+		</div>
+		
+		<div class="workSection">
+			<div class="workButton" onclick="window.open('https://ferdasoft.com', '_blank');">
+				<p class="workButtonTitle">ferdasoft.com - Web</p>
+				<p class="workButtonSubtitle">Designed UI and Logo, programmed in HTML, CSS, and Javascript. Setup WebKitJS, hosting, and universal URLS.</p>
+			</div>
+
+			<div class="workButton" onclick="window.open('https://tutorstand.com', '_blank');">
+				<p class="workButtonTitle">tutorstand.com - Web</p>
+				<p class="workButtonSubtitle">Free math tutor scheduling for middle schoolers. Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
+			</div>
+		</div>
+
+		<div class="workSection">
+			<div class="workButton" onclick="window.open('https://mcogpdx.com', '_blank');">
+				<p class="workButtonTitle">mcogpdx.com - Web</p>
+				<p class="workButtonSubtitle">Community benefit organization. Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
+			</div>
+		</div>
+		
+		<p class="workButtonTitle">& this website</p>
+	</section>
 	
 	<section id = "skills">
 		<p class="title">SKILLS</p>
-		<p class = "sectionTitle">WEB DEVELOPMENT/DESIGN</p>
-		<p class = "sectionText">HTML, CSS, Javascript, React.JS</p>
+
+		<p class = "sectionTitle">iOS Development</p>
+		<p class = "sectionText">Swift, SwiftUI, Combine, iOS/iPadOS, WatchOS, CarPlay, XCTest</p>
+
+		<p class = "sectionTitle">Web Develop/Design</p>
+		<p class = "sectionText">HTML, CSS, Javascript, React, TypeScript</p>
+
+		<p class = "sectionTitle">Tools</p>
+		<p class = "sectionText">Xcode, GitHub, CircleCI, Firebase, Adobe Suite</p>
 		
-		<p class = "sectionTitle">iOS DEVELOPMENT/DESIGN</p>
-		<p class = "sectionText">Swift, iOS, WatchOS, CarPlay, MVC, Agile/Scrum</p>
-		
-		<p class = "sectionTitle">TOOLS</p>
-		<p class = "sectionText">Xcode, GitHub, Adobe Suite</p>
-		
-		<p class = "sectionTitle">TRAITS</p>
+		<p class = "sectionTitle">Soft-Skills</p>
 		<p class = "sectionText">Quick-learner, self-reliant, flexible</p>
 	</section>
-		
-	<section id = "work">
-		<p class="title">WORK</p>
-		<div class = "workButton" id = "nome" onclick = "window.open('https://apps.apple.com/us/app/nome-music-maps/id1529202939', '_blank'); ">
-			<p class = "workButtonTitle" id = "nomeTitle">Nome</p>
-			<p class = "workButtonSubtitle" id = "nomeSubtitle">Designed UI and Icon, programmed in Swift. Developed turn-by-turn directions and queue creation algorithms.</p>
-		</div>
-		
-		<div class = "workButton" id = "ferdasoft" onclick = "window.open('https://ferdasoft.com', '_blank');">
-			<p class = "workButtonTitle" id = "ferdasoftTitle">ferdasoft.com</p>
-			<p class = "workButtonSubtitle" id = "ferdasoftSubtitle">Designed UI and Logo, programmed in HTML, CSS,  and Javascript. Setup hosting and universal URLS.</p>
-		</div>
-		
-		<div class = "workButton" id = "tutorstand" onclick = "window.open('https://tutorstand.com', '_blank');">
-			<p class = "workButtonTitle" id = "tutorstandTitle">tutorstand.com</p>
-			<p class = "workButtonSubtitle" id = "tutorstandSubtitle">Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
-		</div>
-		
-		<p class = "workButtonTitle">& this website</p>
-	</section>
 	
-	<section id = "contact"> 
+	<section id="contact" style="margin-bottom: 25px;"> 
 		<p class="title">CONTACT</p>
 		
 		<a href = "mailto:evanwcrow@gmail.com?" style = "text-decoration: none">
-			<div class = "workButton" id = "email">
+			<div class = "workButton" id="email">
 				<p class = "workButtonTitle" id = "emailTitle">evanwcrow@gmail.com</p>
 			</div>
 		</a>
-		
-		<p class = "workButtonTitle" id = "phoneTitle">+1 (971) 413-3950</p>
+
+		<div class="socials">
+			<img src="icons/github.png" alt="github"  class="socialIcon" onclick="window.open('https://github.com/evancrow', '_blank');">
+			<img src="icons/linkedin.png" alt="linkedin" class="socialIcon" onclick="window.open('https://www.linkedin.com/in/evan-crow/', '_blank');">
+		</div>
 	</section>
 	
 	<!-- The core Firebase JS SDK is always required and must be listed first -->
