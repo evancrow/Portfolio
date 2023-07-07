@@ -1,201 +1,43 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <meta charset="utf-8">
-	<meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Evan Crow</title>
-    
-    <link rel="stylesheet" href="style.css">
-	<link rel="stylesheet" href="https://use.typekit.net/sgc4dre.css">
-	
-	<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
-	<script>
-		$(document).ready(function(){
-			// Adds smooth scrolling to all links.
-			$("a").on('click', function(event) {
-				
-				// Make sure this.hash has a value before overriding default behavior
-				if (this.hash !== "") {
-					// Prevent default anchor click behavior
-					event.preventDefault();
-					
-					// Store hash
-					var hash = this.hash;
-					
-					// Using jQuery's animate() method to add smooth page scroll
-					// The optional number (800) specifies the number of milliseconds it takes to scroll to the specified area
-					$('html, body').animate({
-						scrollTop: $(hash).offset().top
-					}, 800, function(){
-						
-						// Add hash (#) to URL when done scrolling (default click behavior)
-						window.location.hash = hash;
-					});
-				}
-			});
-		});
-		
-		function openNav() {
-  			document.getElementById("mySidenav").style.width = "100%";
-		};
-	
-		function closeNav() {
-  			document.getElementById("mySidenav").style.width = "0";
-		};
-	</script>
-</head>
-	
-<body>
-	<div id="mySidenav" class="sidenav">
-	  	<a href="javascript:void(0)" class="closebtn" onclick="closeNav()">&times;</a>
-	  	<a href="#about" onclick="closeNav()">about</a>
-	  	<a href="#skills" onclick="closeNav()">skills</a>
-	 	<a href="#work" onclick="closeNav()">work</a>
-		<a href="#contact" onclick="closeNav()">contact</a>
-	</div>
-	
-	<header>
-		<p id = "headerTitle">EVAN CROW</p>
-		
-		<nav>
-			<ul>
-        	    <li><a href="#about">about</a></li>
-        	    <li><a href="#skills">skills</a></li>
-        	    <li><a href="#work">work</a></li>
-				<li><a href="#contact">contact</a></li>
-        	</ul>
-		</nav>
-	
-		<div class = "menuNav">
-			<ul>
-        	    <li onclick="openNav()">menu</li>
-        	</ul>
-		</div>
-	</header>
-	
-	<div id = "colorSquares">
-		<div id = "leftSquare">
-			<p class = "adjective" id = "designer">DESI<br>GNER</p>
-			<p class = "adjective" id = "designerNoBreak">DESIGNER</p>
-		</div>
-		
-		<div id = "rightSquare">
-			<p class = "adjective" id = "developer"><backward>ENGINEER</backward></p>
-		</div>
-	</div>
-	
-	<section id = "about">
-		<p class="title">ABOUT</p>
-		<p class = "sectionText">
-			Experienced Engineer with multiple apps on the Apple App Store. Skilled self-starter with a proven ability to complete tasks quickly and effectively while adapting to new technologies on the fly.
-		</p>
-		
-		<a href="Resume.pdf" download="Evan_Crow_Resume.pdf"><button id = "resumeButton">download resume</button></a>
-	</section>
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%PUBLIC_URL%/favicon.ico" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="theme-color" content="#000000" />
+    <meta
+      name="description"
+      content="Web site created using create-react-app"
+    />
+    <link rel="apple-touch-icon" href="%PUBLIC_URL%/logo192.png" />
+    <!--
+      manifest.json provides metadata used when your web app is installed on a
+      user's mobile device or desktop. See https://developers.google.com/web/fundamentals/web-app-manifest/
+    -->
+    <link rel="manifest" href="%PUBLIC_URL%/manifest.json" />
+    <!--
+      Notice the use of %PUBLIC_URL% in the tags above.
+      It will be replaced with the URL of the `public` folder during the build.
+      Only files inside the `public` folder can be referenced from the HTML.
 
-	<section id="work">
-		<p class="title">WORK</p>
+      Unlike "/favicon.ico" or "favicon.ico", "%PUBLIC_URL%/favicon.ico" will
+      work correctly both with client-side routing and a non-root public URL.
+      Learn how to configure a non-root public URL by running `npm run build`.
+    -->
+    <title>React App</title>
+  </head>
+  <body>
+    <noscript>You need to enable JavaScript to run this app.</noscript>
+    <div id="root"></div>
+    <!--
+      This HTML file is a template.
+      If you open it directly in the browser, you will see an empty page.
 
-		<div class="workSection">
-			<div class="workButton" onclick="window.open('https://apps.apple.com/us/app/neeva-browser-search-engine/id1543288638', '_blank');">
-				<p class = "workButtonTitle">Neeva - iOS, iPadOS, Mac Catalyst</p>
-				<p class = "workButtonSubtitle">Develop cutting edge search features to drive user acquisition. Helped lead transition from UIKit to SwiftUI, and continue to develop regression tests.</p>
-			</div>
-	
-			<div class = "workButton" onclick="window.open('https://apps.apple.com/us/app/nome-music-maps/id1529202939', '_blank');">
-				<p class = "workButtonTitle">Nome - iOS, WatchOS, CarPlay</p>
-				<p class = "workButtonSubtitle">Designed UI and Icon, programmed in Swift. Developed turn-by-turn directions and music queue creation algorithms.</p>
-			</div>
-		</div>
-		
-		<div class="workSection">
-			<div class="workButton" onclick="window.open('https://github.com/evancrow/Oculi', '_blank');">
-				<p class="workButtonTitle">Oculi - SwiftUI</p>
-				<p class="workButtonSubtitle">Accepted WWDC22 Student Swift Challenge Project. Accessibility framework which enables motor impared people to navigate SwiftUI apps with their head and eyes.</p>
-			</div>
+      You can add webfonts, meta tags, or analytics to this file.
+      The build step will place the bundled scripts into the <body> tag.
 
-			<div class="workButton" onclick="window.open('https://apps.apple.com/us/app/travsolo-solo-travel-easier/id1459854419', '_blank');">
-				<p class="workButtonTitle">TravSolo - iOS</p>
-				<p class="workButtonSubtitle">Built new user engagment features and revenue generating streams (subscriptions). Met with investors to raise funding.</p>
-			</div>
-		</div>
-		
-		<div class="workSection">
-			<div class="workButton" onclick="window.open('https://ferdasoft.com', '_blank');">
-				<p class="workButtonTitle">ferdasoft.com - Web</p>
-				<p class="workButtonSubtitle">Designed UI and Logo, programmed in HTML, CSS, and Javascript. Setup WebKitJS, hosting, and universal URLS.</p>
-			</div>
-
-			<div class="workButton" onclick="window.open('https://tutorstand.com', '_blank');">
-				<p class="workButtonTitle">tutorstand.com - Web</p>
-				<p class="workButtonSubtitle">Free math tutor scheduling for middle schoolers. Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
-			</div>
-		</div>
-
-		<div class="workSection">
-			<div class="workButton" onclick="window.open('https://mcogpdx.org', '_blank');">
-				<p class="workButtonTitle">mcogpdx.com - Web</p>
-				<p class="workButtonSubtitle">Community benefit organization. Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
-			</div>
-		</div>
-		
-		<p class="workButtonTitle">& this website</p>
-	</section>
-	
-	<section id = "skills">
-		<p class="title">SKILLS</p>
-
-		<p class = "sectionTitle">iOS Development</p>
-		<p class = "sectionText">Swift, SwiftUI, Combine, iOS/iPadOS, WatchOS, CarPlay, XCTest</p>
-
-		<p class = "sectionTitle">Web Develop/Design</p>
-		<p class = "sectionText">HTML, CSS, Javascript, React, TypeScript</p>
-
-		<p class = "sectionTitle">Tools</p>
-		<p class = "sectionText">Xcode, GitHub, CircleCI, Firebase, Adobe Suite</p>
-		
-		<p class = "sectionTitle">Soft-Skills</p>
-		<p class = "sectionText">Quick-learner, self-reliant, flexible</p>
-	</section>
-	
-	<section id="contact" style="margin-bottom: 25px;"> 
-		<p class="title">CONTACT</p>
-		
-		<a href = "mailto:evanwcrow@gmail.com?" style = "text-decoration: none">
-			<div class = "workButton" id="email">
-				<p class = "workButtonTitle" id = "emailTitle">evanwcrow@gmail.com</p>
-			</div>
-		</a>
-
-		<div class="socials">
-			<img src="icons/github.png" alt="github"  class="socialIcon" onclick="window.open('https://github.com/evancrow', '_blank');">
-			<img src="icons/linkedin.png" alt="linkedin" class="socialIcon" onclick="window.open('https://www.linkedin.com/in/evan-crow/', '_blank');">
-		</div>
-	</section>
-	
-	<script type="module">
-		// Import the functions you need from the SDKs you need
-		import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
-		import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics.js";
-		// TODO: Add SDKs for Firebase products that you want to use
-		// https://firebase.google.com/docs/web/setup#available-libraries
-	  
-		// Your web app's Firebase configuration
-		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
-		const firebaseConfig = {
-		  apiKey: "AIzaSyBa4_2yh50qhwpYGkkFGYqgj1ZSp0C0eeM",
-		  authDomain: "portfolio-3414e.firebaseapp.com",
-		  projectId: "portfolio-3414e",
-		  storageBucket: "portfolio-3414e.appspot.com",
-		  messagingSenderId: "59725206581",
-		  appId: "1:59725206581:web:cdb8bb145fd7acc968cd7c",
-		  measurementId: "G-TTB4HP10P2"
-		};
-	  
-		// Initialize Firebase
-		const app = initializeApp(firebaseConfig);
-		const analytics = getAnalytics(app);
-	  </script>
-</body>
+      To begin the development, run `npm start` or `yarn start`.
+      To create a production bundle, use `npm run build` or `yarn build`.
+    -->
+  </body>
 </html>
-            
