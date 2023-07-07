@@ -87,7 +87,7 @@
 	<section id = "about">
 		<p class="title">ABOUT</p>
 		<p class = "sectionText">
-			Hey, I'm Evan. I'm an iOS Engineer and Designer, proficient in Swift, SwiftUI, and all things Apple development. I've worked on multiple featured App Store apps, and have earned a WWDC Student Scholarship. When not working on apps, I also design and build websites with HTML, CSS, JavaScript and TypeScript.
+			Experienced Engineer with multiple apps on the Apple App Store. Skilled self-starter with a proven ability to complete tasks quickly and effectively while adapting to new technologies on the fly.
 		</p>
 		
 		<a href="Resume.pdf" download="Evan_Crow_Resume.pdf"><button id = "resumeButton">download resume</button></a>
@@ -133,7 +133,7 @@
 		</div>
 
 		<div class="workSection">
-			<div class="workButton" onclick="window.open('https://mcogpdx.com', '_blank');">
+			<div class="workButton" onclick="window.open('https://mcogpdx.org', '_blank');">
 				<p class="workButtonTitle">mcogpdx.com - Web</p>
 				<p class="workButtonSubtitle">Community benefit organization. Designed UI, programmed in HTML, CSS, Javascript and JQuery. Setup hosting and backend services.</p>
 			</div>
@@ -173,15 +173,29 @@
 		</div>
 	</section>
 	
-	<!-- The core Firebase JS SDK is always required and must be listed first -->
-	<script src="/__/firebase/8.2.9/firebase-app.js"></script>
-	
-	<!-- TODO: Add SDKs for Firebase products that you want to use
-	     https://firebase.google.com/docs/web/setup#available-libraries -->
-	<script src="/__/firebase/8.2.9/firebase-analytics.js"></script>
-	
-	<!-- Initialize Firebase -->
-	<script src="/__/firebase/init.js"></script>
+	<script type="module">
+		// Import the functions you need from the SDKs you need
+		import { initializeApp } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-app.js";
+		import { getAnalytics } from "https://www.gstatic.com/firebasejs/9.15.0/firebase-analytics.js";
+		// TODO: Add SDKs for Firebase products that you want to use
+		// https://firebase.google.com/docs/web/setup#available-libraries
+	  
+		// Your web app's Firebase configuration
+		// For Firebase JS SDK v7.20.0 and later, measurementId is optional
+		const firebaseConfig = {
+		  apiKey: "AIzaSyBa4_2yh50qhwpYGkkFGYqgj1ZSp0C0eeM",
+		  authDomain: "portfolio-3414e.firebaseapp.com",
+		  projectId: "portfolio-3414e",
+		  storageBucket: "portfolio-3414e.appspot.com",
+		  messagingSenderId: "59725206581",
+		  appId: "1:59725206581:web:cdb8bb145fd7acc968cd7c",
+		  measurementId: "G-TTB4HP10P2"
+		};
+	  
+		// Initialize Firebase
+		const app = initializeApp(firebaseConfig);
+		const analytics = getAnalytics(app);
+	  </script>
 </body>
 </html>
             
