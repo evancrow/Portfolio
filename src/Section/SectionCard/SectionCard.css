@@ -19,7 +19,7 @@
 
   color: var(--primary, #1e1e1e);
   text-align: left;
-  font-family: Neuzeit Grotesk;
+  font-family: "neuzeit-grotesk", sans-serif;
   font-size: 2em;
   font-style: normal;
   line-height: 100%;
@@ -85,7 +85,7 @@
   margin-top: 10px;
 
   text-align: left;
-  font-family: Neuzeit Grotesk;
+  font-family: "neuzeit-grotesk", sans-serif;
   font-size: 1.5em;
   font-style: normal;
   font-weight: 300;
@@ -110,7 +110,7 @@
   padding: 10px 0px 0px 0px;
 
   text-align: left;
-  font-family: Neuzeit Grotesk;
+  font-family: "neuzeit-grotesk", sans-serif;
   font-size: 1em;
   font-style: normal;
   font-weight: 300;
@@ -157,6 +157,7 @@
   height: 100%;
 
   margin: 0;
+  padding: 0;
   display: flex;
   flex-wrap: wrap;
   gap: 50px;
@@ -170,6 +171,7 @@
 
   .sectionCardTitle {
     font-size: 2em;
+    padding-bottom: 24px;
   }
 
   .valueTitle {

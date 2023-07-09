@@ -7,7 +7,7 @@
   justify-content: center;
   align-items: left;
   vertical-align: middle;
-  gap: 75px;
+  gap: 55px;
 }
 
 .sectionTitle {
@@ -18,7 +18,7 @@
 
   color: var(--primary, #1e1e1e);
   text-align: left;
-  font-family: Neuzeit Grotesk;
+  font-family: "neuzeit-grotesk", sans-serif;
   font-size: 3em;
   font-style: normal;
   line-height: 100%;
@@ -36,6 +36,9 @@
 }
 
 @media only screen and (max-width: 600px) {
+  .section {
+    gap: 35px;
+  }
   .sectionTitle {
     width: calc(100% - 50px);
 

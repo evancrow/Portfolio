@@ -17,6 +17,7 @@ root.render(
       <meta property="og:description" content="Software Engineer & Designer" />
       <link rel="icon" type="image/png" href="./static/Favicon.png" />
       <link rel="apple-touch-icon" href="./static/Favicon.png" />
+      <link rel="stylesheet" href="https://use.typekit.net/cwc5yzo.css"></link>
     </Helmet>
 
     <App />
