@@ -1,13 +1,31 @@
+html,
 body {
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-    sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+  width: 100%;
+  height: 100%;
+
+  font-family: Neuzeit Grotesk;
+
+  background-image: linear-gradient(
+      135deg,
+      hsl(0deg 0% 99%) 0%,
+      hsl(246deg 67% 96%) 48%,
+      hsl(246deg 73% 93%) 66%,
+      hsl(245deg 75% 90%) 77%,
+      hsl(244deg 76% 86%) 83%,
+      hsl(243deg 76% 83%) 88%,
+      hsl(241deg 76% 80%) 92%,
+      hsl(240deg 76% 77%) 94%,
+      hsl(238deg 76% 73%) 96%,
+      hsl(235deg 76% 69%) 97%,
+      hsl(233deg 77% 65%) 98%,
+      hsl(229deg 77% 59%) 99%,
+      hsl(222deg 79% 50%) 100%
+    ),
+    url(https://grainy-gradients.vercel.app/noise.svg);
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+/* Variables */
+html {
+  --header-height: 120px;
 }

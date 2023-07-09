@@ -1,0 +1,16 @@
+.Header {
+  height: var(--header-height);
+  padding: 0 50px;
+
+  display: flex;
+  align-self: stretch;
+  justify-content: space-between;
+  align-items: center;
+  display: inline-flex;
+}
+
+.Nav {
+  display: flex;
+  align-items: center;
+  gap: 30px;
+}

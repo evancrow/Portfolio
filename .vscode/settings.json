@@ -9,6 +9,9 @@
     "node_modules": true,
     "build": true,
     ".firebaserc": true,
-    ".gitignore": true
+    ".gitignore": true,
+    ".storybook": true,
+    "package.json": true,
+    "yarn.lock": true
   }
 }

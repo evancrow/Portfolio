@@ -1,0 +1,14 @@
+.Home {
+  /* View height minus the header height */
+  height: calc(100vh - var(--header-height));
+  width: 100%;
+
+  margin: auto;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+  gap: 75px;
+}
