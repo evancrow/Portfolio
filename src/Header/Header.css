@@ -7,10 +7,46 @@
   justify-content: space-between;
   align-items: center;
   display: inline-flex;
+  vertical-align: center;
 }
 
 .Nav {
   display: flex;
   align-items: center;
   gap: 30px;
+}
+
+.NavItem {
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 12px;
+
+  color: var(--primary, #1e1e1e);
+  text-align: center;
+  font-family: Neuzeit Grotesk;
+  font-size: 1.5em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  background: none;
+  border: none;
+}
+
+.NavItem:hover {
+  cursor: pointer;
+  text-decoration: underline;
+}
+
+@media only screen and (max-width: 600px) {
+  .Header {
+    padding: 0 25px;
+  }
+
+  .NavItem {
+    font-size: 1em;
+  }
 }

@@ -1,0 +1,182 @@
+.sectionCard {
+  min-width: 300px;
+  width: calc(100% - 100px);
+  height: 100%;
+
+  margin: 0;
+  padding: 0px 50px;
+
+  border-radius: 10px;
+  flex: 1;
+}
+
+.sectionCardTitle {
+  width: 100%;
+
+  margin: 0;
+  padding: 0;
+  padding-bottom: 8px;
+
+  color: var(--primary, #1e1e1e);
+  text-align: left;
+  font-family: Neuzeit Grotesk;
+  font-size: 2em;
+  font-style: normal;
+  line-height: 100%;
+  font-weight: 700;
+}
+
+/* Value Title */
+.values {
+  display: flex;
+  flex-direction: column;
+  gap: 22px;
+}
+
+.values a {
+  text-decoration: none;
+  max-width: 400px;
+}
+
+.valueRow {
+  width: 100%;
+  max-width: 400px;
+
+  display: flex;
+  flex-direction: column;
+  vertical-align: top;
+  align-items: center;
+  justify-content: center;
+}
+
+.tappable:hover {
+  cursor: pointer;
+  background: linear-gradient(
+    90deg,
+    rgba(255, 255, 255, 0) 0%,
+    rgba(205, 205, 205, 0.25) 100%
+  );
+  border-radius: 10px;
+}
+
+.valueHeader {
+  width: 100%;
+
+  display: flex;
+  flex-direction: row;
+  vertical-align: center;
+  align-items: center;
+  justify-content: center;
+
+  gap: 24px;
+}
+
+.valueCopy {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+}
+
+.valueTitle {
+  width: 100%;
+
+  margin: auto;
+  margin-top: 10px;
+
+  text-align: left;
+  font-family: Neuzeit Grotesk;
+  font-size: 1.5em;
+  font-style: normal;
+  font-weight: 300;
+
+  color: var(--primary, #1e1e1e);
+}
+
+.valueSubheader {
+  margin: 0;
+  margin-top: -1px;
+  padding: 0px 0px 8px 0px;
+
+  color: #949494;
+  font-size: 1.1em;
+  font-variant: all-small-caps;
+}
+
+.valueDescription {
+  width: 100%;
+
+  margin: auto;
+  padding: 10px 0px 0px 0px;
+
+  text-align: left;
+  font-family: Neuzeit Grotesk;
+  font-size: 1em;
+  font-style: normal;
+  font-weight: 300;
+
+  color: var(--primary, #1e1e1e);
+}
+
+/* Metadata */
+.valueRowMetadata {
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  gap: 0px;
+}
+
+.valueRowMetadataHeader {
+  margin: 0;
+  padding: 10px 0px 0px 0px;
+
+  color: #949494;
+  font-size: 1em;
+  font-variant: all-small-caps;
+}
+
+.metadataValues {
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  gap: 8px;
+}
+
+.metadataValue {
+  margin: 0;
+  padding: 0;
+
+  font-size: 1.25em;
+  font-variant: all-small-caps;
+}
+
+/* Grid */
+.sectionCardGrid {
+  height: 100%;
+
+  margin: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 50px;
+}
+
+@media only screen and (max-width: 600px) {
+  .sectionCard {
+    width: calc(100% - 100px);
+    padding: 0px 25px;
+  }
+
+  .sectionCardTitle {
+    font-size: 2em;
+  }
+
+  .valueTitle {
+    font-size: 1.25em;
+  }
+
+  .valueSubheader {
+    font-size: 1em;
+  }
+}

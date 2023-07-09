@@ -3,12 +3,22 @@ import ReactDOM from "react-dom/client";
 import "./index.css";
 import App from "./App/App";
 import reportWebVitals from "./Setup/reportWebVitals";
+import { Helmet } from "react-helmet";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 root.render(
   <React.StrictMode>
+    <Helmet>
+      <title>Evan Crow</title>
+      <meta name="description" content="Software Engineer & Designer" />
+      <meta property="og:title" content="Evan Crow" />
+      <meta property="og:description" content="Software Engineer & Designer" />
+      <link rel="icon" type="image/png" href="./static/Favicon.png" />
+      <link rel="apple-touch-icon" href="./static/Favicon.png" />
+    </Helmet>
+
     <App />
   </React.StrictMode>
 );

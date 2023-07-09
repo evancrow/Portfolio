@@ -1,0 +1,10 @@
+.footer {
+  color: #949494;
+  font-size: 1em;
+}
+
+@media only screen and (max-width: 600px) {
+  .footer {
+    font-size: 0.8em;
+  }
+}

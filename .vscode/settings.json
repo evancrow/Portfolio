@@ -12,6 +12,7 @@
     ".gitignore": true,
     ".storybook": true,
     "package.json": true,
-    "yarn.lock": true
+    "yarn.lock": true,
+    "src/stories": true
   }
 }

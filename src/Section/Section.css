@@ -1,0 +1,47 @@
+.section {
+  min-height: 500px;
+  width: 100%;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: left;
+  vertical-align: middle;
+  gap: 75px;
+}
+
+.sectionTitle {
+  width: calc(100% - 100px);
+
+  margin: 0;
+  padding: 100px 50px 0px 50px;
+
+  color: var(--primary, #1e1e1e);
+  text-align: left;
+  font-family: Neuzeit Grotesk;
+  font-size: 3em;
+  font-style: normal;
+  line-height: 100%;
+}
+
+.sectionSpacer {
+  margin-bottom: 50px;
+
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  vertical-align: middle;
+}
+
+@media only screen and (max-width: 600px) {
+  .sectionTitle {
+    width: calc(100% - 50px);
+
+    margin: 0;
+    padding: 100px 25px 0px 25px;
+
+    font-size: 2.5em;
+  }
+}

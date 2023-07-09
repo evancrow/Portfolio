@@ -1,6 +1,6 @@
 import React from "react";
 import Copy from "./Copy";
-import "../../../index.css";
+import "../../index.css";
 
 export default {
   title: "Home/Copy",

@@ -1,31 +1,51 @@
-html,
+html {
+  margin: 0;
+  padding: 0;
+
+  width: 100%;
+  min-height: 100%;
+  height: auto;
+
+  overflow-x: hidden;
+
+  background-color: hsl(33deg 56% 93%);
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-image: linear-gradient(
+    180deg,
+    hsl(33deg 56% 93%) 0%,
+    hsl(32deg 43% 93%) 16%,
+    hsl(32deg 32% 92%) 31%,
+    hsl(31deg 22% 92%) 44%,
+    hsl(31deg 13% 91%) 55%,
+    hsl(30deg 4% 91%) 65%,
+    hsl(30deg 4% 92%) 74%,
+    hsl(30deg 4% 94%) 82%,
+    hsl(30deg 4% 96%) 89%,
+    hsl(30deg 3% 97%) 95%,
+    hsl(0deg 0% 99%) 100%
+  );
+}
+
 body {
   margin: 0;
   width: 100%;
   height: 100%;
 
   font-family: Neuzeit Grotesk;
-
-  background-image: linear-gradient(
-      135deg,
-      hsl(0deg 0% 99%) 0%,
-      hsl(246deg 67% 96%) 48%,
-      hsl(246deg 73% 93%) 66%,
-      hsl(245deg 75% 90%) 77%,
-      hsl(244deg 76% 86%) 83%,
-      hsl(243deg 76% 83%) 88%,
-      hsl(241deg 76% 80%) 92%,
-      hsl(240deg 76% 77%) 94%,
-      hsl(238deg 76% 73%) 96%,
-      hsl(235deg 76% 69%) 97%,
-      hsl(233deg 77% 65%) 98%,
-      hsl(229deg 77% 59%) 99%,
-      hsl(222deg 79% 50%) 100%
-    ),
-    url(https://grainy-gradients.vercel.app/noise.svg);
 }
 
 /* Variables */
 html {
   --header-height: 120px;
+}
+
+/* Hide Scrollbar */
+html::-webkit-scrollbar {
+  display: none;
+}
+
+html {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }

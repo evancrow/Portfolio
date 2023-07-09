@@ -1,13 +1,20 @@
 import "./App.css";
 import Header from "../Header/Header";
-import "../Header/Header.css";
 import Home from "../Home/Home";
+import { About } from "../About/About";
+import { Work } from "../Work/Work";
+import { Contact } from "../Contact/Contact";
+import Footer from "../Footer/Footer";
 
 function App() {
   return (
     <div className="App">
       <Header />
       <Home />
+      <About />
+      <Work />
+      <Contact />
+      <Footer />
     </div>
   );
 }

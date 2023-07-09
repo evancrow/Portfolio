@@ -1,9 +1,10 @@
 .Home {
   /* View height minus the header height */
-  height: calc(100vh - var(--header-height));
-  width: 100%;
+  min-height: calc(100vh - var(--header-height));
+  width: calc(100% - 100px);
 
   margin: auto;
+  padding: 0 50px;
 
   display: flex;
   flex-direction: column;
@@ -11,4 +12,24 @@
   align-items: center;
   vertical-align: middle;
   gap: 75px;
+
+  position: relative;
+}
+
+.shapeBG {
+  position: absolute;
+  scale: 50%;
+  opacity: 80%;
+}
+
+@media only screen and (max-width: 600px) {
+  .Profile {
+    width: calc(100% - 50px);
+    padding: 0 25px;
+  }
+
+  .shapeBG {
+    scale: 20%;
+    opacity: 70%;
+  }
 }
