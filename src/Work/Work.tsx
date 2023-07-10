@@ -82,7 +82,7 @@ export const Work = () => {
               {
                 title: "Oculi",
                 description:
-                  "Accessibility framework for SwiftUI that enabled visually impared users to navigate iOS using only their head and eyes. Accepted into WWDC 2022 Swift Student Challenge.",
+                  "Accessibility framework for SwiftUI that enabled visually impared users to navigate iOS using only their head and eyes. Winner of the Apple WWDC 2022 Swift Student Challenge.",
                 languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
                 link: "https://github.com/evancrow/Oculi",
               },
@@ -103,7 +103,7 @@ export const Work = () => {
               {
                 title: "ML Stock Analyzer",
                 description:
-                  "Python ML model that can suggest whether to buy/sell stocks.",
+                  "Python neural net model that can suggest whether to buy/sell stocks based on a 5-day trading period.",
                 languages: ["Python"],
                 link: "https://github.com/evancrow/stock-analyzer",
               },
