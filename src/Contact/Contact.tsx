@@ -41,7 +41,13 @@ export const Contact = () => {
           }}
         />
       </div>
-      <div className="sectionSpacer"></div>
+      <div
+        className="sectionSpacer"
+        style={{
+          marginTop: 20,
+          marginBottom: 20,
+        }}
+      ></div>
     </Section>
   );
 };
