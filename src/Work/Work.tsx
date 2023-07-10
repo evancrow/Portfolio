@@ -26,7 +26,7 @@ export const Work = () => {
                 title: "Neeva",
                 subheader: "Mobile Engineer",
                 description:
-                  "Developed multiple web browser applications and desktop browser extensions.",
+                  "Developed mobile browser and AI search applications as well as desktop browser extensions.",
                 platforms: ["iOS", "iPadOS", "MacOS", "Android"],
                 languages: [
                   "Swift",
@@ -51,7 +51,7 @@ export const Work = () => {
                 title: "Ferdasoft",
                 subheader: "Founder & Head of Engineering",
                 description:
-                  "Founded the company as well as built and launched Nome - Music & Maps to the Apple App Store.",
+                  "Founded the company and managed development, marketing, and communication. Built and launched Nome - Music & Maps to the Apple App Store.",
                 platforms: ["iOS", "WatchOS", "Apple CarPlay", "Web"],
                 languages: ["Swift", "SwiftUI", "UIKit", "JavaScript"],
                 link: "https://ferdasoft.com",
@@ -61,7 +61,7 @@ export const Work = () => {
                 title: "TravSolo",
                 subheader: "Co-Founder & Head of Engineering",
                 description:
-                  "Led app development and built revenue generating features. Worked with CEO on capital fundraising.",
+                  "Led app development and built revenue generating features. Worked with the CEO on capital fundraising over $100k.",
                 platforms: ["iOS"],
                 languages: ["Swift", "UIKit"],
                 link: "https://travsolo.com",
