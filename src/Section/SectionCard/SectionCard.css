@@ -15,7 +15,7 @@
 
   margin: 0;
   padding: 0;
-  padding-bottom: 8px;
+  padding-bottom: 18px;
 
   color: var(--primary, #1e1e1e);
   text-align: left;
@@ -82,7 +82,6 @@
   width: 100%;
 
   margin: auto;
-  margin-top: 10px;
 
   text-align: left;
   font-family: "neuzeit-grotesk", sans-serif;

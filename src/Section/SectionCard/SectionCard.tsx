@@ -58,7 +58,12 @@ export const ValueRow = (props: Value) => {
           />
         )}
 
-        <div className="valueCopy">
+        <div
+          className="valueCopy"
+          style={{
+            marginTop: props.subheader ? 11 : 1,
+          }}
+        >
           <p className="valueTitle">{props.title}</p>
           {props.subheader && (
             <p className="valueSubheader">{props.subheader}</p>
