@@ -61,7 +61,7 @@ export const Work = () => {
                 title: "TravSolo",
                 subheader: "Co-Founder & Head of Engineering",
                 description:
-                  "Led app development and built revenue generating features. Worked with the CEO on capital fundraising over $100k.",
+                  "Led app development and built revenue generating features. Worked with the CEO to raise over $100k in capital.",
                 platforms: ["iOS"],
                 languages: ["Swift", "UIKit"],
                 link: "https://travsolo.com",
