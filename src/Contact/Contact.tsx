@@ -6,7 +6,7 @@ import { ValueRow } from "../Section/SectionCard/SectionCard";
 
 export const Contact = () => {
   return (
-    <Section primary="Contact" secondary="Me" id="Contact">
+    <Section primary="Reach" secondary="Out" id="Contact">
       <div className="contact values">
         <ValueRow
           {...{
@@ -41,13 +41,6 @@ export const Contact = () => {
           }}
         />
       </div>
-      <div
-        className="sectionSpacer"
-        style={{
-          marginTop: 20,
-          marginBottom: 20,
-        }}
-      ></div>
     </Section>
   );
 };

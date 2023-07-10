@@ -1,5 +1,5 @@
 .footer {
-  padding: 0 50px;
+  padding: 40px 50px 10px 50px;
   text-align: center;
 
   color: #949494;
@@ -9,7 +9,7 @@
 
 @media only screen and (max-width: 600px) {
   .footer {
-    padding: 0 25px;
+    padding: 10px 25px;
     font-size: 0.8em;
   }
 }
