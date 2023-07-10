@@ -49,16 +49,6 @@
   justify-content: center;
 }
 
-.tappable:hover {
-  cursor: pointer;
-  background: linear-gradient(
-    90deg,
-    rgba(255, 255, 255, 0) 0%,
-    rgba(205, 205, 205, 0.25) 100%
-  );
-  border-radius: 10px;
-}
-
 .valueHeader {
   width: 100%;
 
@@ -160,6 +150,18 @@
   display: flex;
   flex-wrap: wrap;
   gap: 50px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .tappable:hover {
+    cursor: pointer;
+    background: linear-gradient(
+      90deg,
+      rgba(255, 255, 255, 0) 0%,
+      rgba(205, 205, 205, 0.25) 100%
+    );
+    border-radius: 10px;
+  }
 }
 
 @media only screen and (max-width: 600px) {

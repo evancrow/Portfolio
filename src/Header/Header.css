@@ -36,9 +36,11 @@
   border: none;
 }
 
-.NavItem:hover {
-  cursor: pointer;
-  text-decoration: underline;
+@media (hover: hover) and (pointer: fine) {
+  .NavItem:hover {
+    cursor: pointer;
+    text-decoration: underline;
+  }
 }
 
 @media only screen and (max-width: 600px) {
