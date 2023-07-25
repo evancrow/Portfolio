@@ -16,7 +16,7 @@ export const Work = () => {
                 title: "Snowflake",
                 subheader: "Software Engineer Intern",
                 description:
-                  "Worked with LLM teams to build features that make it easy to use natural languague to query data in Snowflake. Also worked with the data marketplace team to build data preview features and UI components.",
+                  "Worked on the data marketplace team to build data preview features and UI components. Frontend development on the Terms and Conditions flow for the entire Snowflake Data Marketplace.",
                 platforms: ["Web"],
                 languages: ["React", "TypeScript", "GOLANG", "NODE.JS", "SQL"],
                 link: "https://www.snowflake.com/",
