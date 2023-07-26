@@ -139,6 +139,8 @@
 
   font-size: 1.25em;
   font-variant: all-small-caps;
+
+  color: var(--primary, #1e1e1e);
 }
 
 /* Grid */
