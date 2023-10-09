@@ -58,7 +58,7 @@
     "eslint-plugin-storybook": "^0.6.12",
     "prettier": "3.0.0",
     "prop-types": "^15.8.1",
-    "storybook": "^7.0.26",
+    "storybook": "^7.4.6",
     "webpack": "^5.88.1"
   }
 }

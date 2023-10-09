@@ -9,9 +9,9 @@ function Copy() {
       </p>
 
       <p className="Profile">
-        Software engineer and designer driven by a relentless pursuit of
-        innovation, crafting exceptional digital products that seamlessly blend
-        functionality, aesthetics, and user experience.
+        Founder, Software Engineer, and Designer driven by a relentless pursuit
+        of innovation, with experience across Search, AI & ML, Data, and
+        Application Development.
       </p>
     </div>
   );
