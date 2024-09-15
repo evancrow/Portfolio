@@ -18,15 +18,23 @@ export const About = () => {
               },
               {
                 icon: Icons.ReactIcon,
-                title: "React.js & TypeScript",
+                title: "React.js",
+              },
+              {
+                icon: Icons.TypeScriptIcon,
+                title: "TypeScript",
+              },
+              {
+                icon: Icons.NodeIcon,
+                title: "Node.js",
               },
               {
                 icon: Icons.GolangIcon,
-                title: "Golang & Node.js",
+                title: "Golang",
               },
               {
                 icon: Icons.PythonIcon,
-                title: "SQL & Python",
+                title: "Python & SQL",
               },
               {
                 icon: Icons.GitIcon,
@@ -44,6 +52,18 @@ export const About = () => {
               {
                 icon: Icons.FigmaIcon,
                 title: "Figma",
+              },
+              {
+                icon: Icons.VercelIcon,
+                title: "Vercel",
+              },
+              {
+                icon: Icons.SupabaseIcon,
+                title: "Supabase",
+              },
+              {
+                icon: Icons.FirebaseIcon,
+                title: "Firebase",
               },
               {
                 icon: Icons.DockerIcon,

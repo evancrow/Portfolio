@@ -16,6 +16,7 @@ export const Work = () => {
                 icon: Icons.AppleIcon,
                 title: "Apple",
                 subheader: "Software Engineer",
+                platforms: ["iOS", "iPadOS", "visionOS", "macOS"],
                 link: "https://apple.com/",
               },
               {
@@ -77,7 +78,7 @@ export const Work = () => {
             ],
           },
           {
-            title: "Projects",
+            title: "Releases",
             values: [
               {
                 icon: Icons.NomeIcon,
@@ -88,18 +89,19 @@ export const Work = () => {
                 link: "https://ferdasoft.com/Nome.html",
               },
               {
+                title: "NUPact",
+                description:
+                  "Application providing real-time analytics and weekly predictions on the usage patterns of Northeastern University gyms. Deployed with Vercel using a Supabase backend.",
+                platforms: ["iOS", "Web"],
+                languages: ["Swift", "SwiftUI", "React", "TypeScript", "SQL"],
+                link: "https://nupact.vercel.app/",
+              },
+              {
                 title: "Oculi",
                 description:
                   "Accessibility framework for SwiftUI that enabled visually impared users to navigate Apple devices using only their head and eyes. Winner of the Apple WWDC 2022 Swift Student Challenge.",
                 languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
                 link: "https://github.com/evancrow/Oculi",
-              },
-              {
-                title: "ML Stock Analyzer",
-                description:
-                  "Python neural net model that can suggest whether to buy/sell stocks based on a 5-day trading period.",
-                languages: ["Python"],
-                link: "https://github.com/evancrow/stock-analyzer",
               },
               {
                 title: "Tutorstand",
@@ -113,7 +115,6 @@ export const Work = () => {
                 description:
                   "Landing page for a community volunteer group in Portland, OR.",
                 platforms: ["Web"],
-                link: "https://mcogpdx.org/",
               },
             ],
           },
