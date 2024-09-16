@@ -9,9 +9,9 @@ function Copy() {
       </p>
 
       <p className="Profile">
-        Software Engineer @ Apple, Startup Founder, and UX Designer driven by a
-        relentless pursuit of innovation, with experience across Search, AI &
-        ML, Data, and Application Development.
+        Software Engineer @ Apple, Startup Founder, and Designer driven by a
+        relentless pursuit of innovation, with experience across AI & ML,
+        Application Development, Search, and Data.
       </p>
     </div>
   );
