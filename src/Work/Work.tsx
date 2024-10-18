@@ -34,8 +34,8 @@ export const Work = () => {
                 title: "Neeva",
                 subheader: "Software Engineer",
                 description:
-                  "Acquired by Snowflake. Developed mobile browser and AI search applications as well as desktop browser extensions.",
-                platforms: ["iOS", "iPadOS", "MacOS", "Android"],
+                  "Acquired by Snowflake. Developed the first generative AI search application and led development for Apple platforms.",
+                platforms: ["iOS", "iPadOS", "MacOS", "Web", "Android"],
                 languages: [
                   "Swift",
                   "SwiftUI",
