@@ -20,6 +20,12 @@ export const Work = () => {
                 link: "https://apple.com/",
               },
               {
+                icon: Icons.ExaIcon,
+                title: "Exa",
+                subheader: "Software Engineer",
+                link: "https://exa.ai/",
+              },
+              {
                 icon: Icons.SnowflakeIcon,
                 title: "Snowflake",
                 subheader: "Software Engineer",
