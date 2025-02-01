@@ -21,8 +21,10 @@ export const Work = () => {
               },
               {
                 icon: Icons.ExaIcon,
-                title: "Exa",
+                title: "Exa.ai",
                 subheader: "Software Engineer",
+                description:
+                  "Created the /answer endpoint for RAG-based search result summarization, scoring over 90% in the SimpleQA benchmark—outperforming all market solutions including those from OpenAI, DeepSeek, and Perplexity. Developed large-scale crawling frameworks to index billions of URLs and led infrastructure initiatives to handle massive data ingestion and high-speed retrieval.",
                 link: "https://exa.ai/",
               },
               {
@@ -30,9 +32,9 @@ export const Work = () => {
                 title: "Snowflake",
                 subheader: "Software Engineer",
                 description:
-                  "Continued my work from Neeva as the youngest intern at Snowflake. Full stack development across teams in machine learning, data marketplace, data distribution, and data query.",
+                  "Became the youngest software engineering intern at Snowflake, contributing across teams in Machine Learning, Data Marketplace, Data Modeling, and Data Query. Served as a founding engineer on the Snowflake Notebooks team, playing a pivotal role in client and server-side development for an innovative ML + data analysis platform.",
                 platforms: ["Web"],
-                languages: ["React", "TypeScript", "GOLANG", "NODE.JS", "SQL"],
+                languages: ["React", "TypeScript", "Golang", "Node.js", "SQL"],
                 link: "https://www.snowflake.com/",
               },
               {
@@ -40,8 +42,8 @@ export const Work = () => {
                 title: "Neeva",
                 subheader: "Software Engineer",
                 description:
-                  "Acquired by Snowflake. Developed the first generative-AI search application and led development for Apple platforms.",
-                platforms: ["iOS", "iPadOS", "MacOS", "Web", "Android"],
+                  "Developed the world’s first generative-AI search application leveraging RAG for seamless AI-driven search experiences. Led the iOS development team to launch a mobile browser app with over 1000 5-star reviews, and spearheaded a comprehensive UIKit-to-SwiftUI refactor that boosted test coverage to over 90% while halving test run times.",
+                platforms: ["iOS", "iPadOS", "macOS", "Web", "Android"],
                 languages: [
                   "Swift",
                   "SwiftUI",
@@ -56,15 +58,14 @@ export const Work = () => {
                 title: "Ferdasoft",
                 subheader: "Founder & Head of Engineering",
                 description:
-                  "Founded the company and managed development, marketing, and communication. Built and launched Nome - Music & Maps to the Apple App Store. Featured by Apple on the App Store for over a year, and other media outlets such as Product Hunt, iMore and others.",
+                  "Founded and led Ferdasoft, developing Nome—Music & Maps, a multifaceted application for iOS, WatchOS, CarPlay, and Web. Nome was featured in Apple’s 'Our Favorites' and 'Hot New Apps' and received significant media coverage from outlets like Product Hunt and iMore.",
                 platforms: ["iOS", "WatchOS", "Apple CarPlay", "Web"],
                 languages: ["Swift", "SwiftUI", "UIKit", "JavaScript"],
-                link: "https://ferdasoft.com",
               },
               {
                 icon: Icons.TrivoryIcon,
                 title: "Trivory",
-                subheader: "Sofware Engineer & Designer",
+                subheader: "Software Engineer & Designer",
                 description:
                   "Designed and developed applications for Apple platforms for 20k+ users across Portland Public Schools.",
                 platforms: ["iOS"],
@@ -76,7 +77,7 @@ export const Work = () => {
                 title: "TravSolo",
                 subheader: "Co-Founder & Head of Engineering",
                 description:
-                  "Led app development and built revenue generating features. Worked with the CEO to raise over $100k in capital.",
+                  "Led app development and built revenue-generating features while collaborating with the CEO to raise over $100k in capital.",
                 platforms: ["iOS"],
                 languages: ["Swift", "UIKit"],
                 link: "https://travsolo.com",
@@ -90,14 +91,13 @@ export const Work = () => {
                 icon: Icons.NomeIcon,
                 title: "Nome - Music & Maps",
                 description:
-                  'Navigation app that integrates with your music library to build a queue that is synced to the duration of your trip. Named as "Our Favorites", "Hot New App" by Apple on the App Store and featured for over a year. Covered by other media outlets such as Product Hunt, iMore and others.',
+                  'Navigation app that integrates with your music library to build a queue synced to your trip duration. Recognized by Apple in "Our Favorites" and "Hot New Apps" and featured by media outlets such as Product Hunt and iMore.',
                 platforms: ["iOS", "WatchOS", "CarPlay", "Web"],
-                link: "https://ferdasoft.com/Nome.html",
               },
               {
                 title: "NUPact",
                 description:
-                  "Application providing real-time analytics and weekly predictions on the usage patterns of Northeastern University gyms. Deployed with Vercel using a Supabase backend.",
+                  "Application providing real-time analytics and weekly predictions on Northeastern University gym usage patterns. Deployed with Vercel using a Supabase backend.",
                 platforms: ["iOS", "Web"],
                 languages: ["Swift", "SwiftUI", "React", "TypeScript", "SQL"],
                 link: "https://nupact.vercel.app/",
@@ -105,7 +105,7 @@ export const Work = () => {
               {
                 title: "Oculi",
                 description:
-                  "Accessibility framework for SwiftUI that enabled visually impared users to navigate Apple devices using only their head and eyes. Winner of the Apple WWDC 2022 Swift Student Challenge.",
+                  "Accessibility framework for SwiftUI that enabled visually impaired users to navigate Apple devices using only their head and eyes. Winner of the Apple WWDC 2022 Swift Student Challenge.",
                 languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
                 link: "https://github.com/evancrow/Oculi",
               },
@@ -131,7 +131,7 @@ export const Work = () => {
                 icon: Icons.AppleIcon,
                 title: "Apple Swift Student Challenge 2022",
                 description:
-                  "Invented a novel accessebility software, Oculi, using Vision and ML that enabled motor impared users to control Apple devices using only their head and eyes",
+                  "Invented an innovative accessibility software, Oculi, using Vision and CoreML—enabling motor-impaired users to control Apple devices using only their head and eyes.",
                 languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
                 link: "https://github.com/evancrow/Oculi",
               },
