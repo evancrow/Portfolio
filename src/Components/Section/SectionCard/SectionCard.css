@@ -19,7 +19,7 @@
   font-size: 2em;
   font-style: normal;
   line-height: 100%;
-  font-weight: 700;
+  font-weight: 600;
 }
 
 /* Value Title */
@@ -70,7 +70,7 @@
   text-align: left;
   font-size: 1.25em;
   font-style: normal;
-  font-weight: 400;
+  font-weight: 500;
 
   color: var(--primary-color, #110f42);
 }
@@ -81,6 +81,7 @@
   padding: 0px 0px 8px 0px;
 
   color: #949494;
+  font-weight: 500;
   font-size: 0.95em;
   font-variant: all-small-caps;
 }
@@ -97,26 +98,25 @@
   text-align: left;
   font-size: 1em;
   font-style: normal;
-  font-weight: 300;
+  font-weight: 400; /* Changed from 300 to 400 for standard text */
   color: var(--primary-color, #110f42);
 }
 
 .valueDescription.truncated {
-  max-height: 63px;
+  max-height: 68px;
   overflow: hidden;
   display: -webkit-box;
   line-clamp: 3;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   text-overflow: ellipsis;
-  margin-bottom: 5px;
 }
 
 .viewMoreButton {
   background-color: transparent;
   border: none;
   color: var(--primary-color, #110f42);
-  font-weight: 400;
+  font-weight: 500;
   padding: 0px;
   cursor: pointer;
   font-size: 0.85em;
@@ -166,6 +166,7 @@
   color: #949494;
   font-size: 0.95em;
   font-variant: all-small-caps;
+  font-weight: 500; /* Already correct */
 }
 
 .metadataValues {
@@ -182,6 +183,7 @@
 
   font-size: 1em;
   font-variant: all-small-caps;
+  font-weight: 400; /* Added to explicitly define standard weight */
 
   color: var(--primary-color, #110f42);
 }

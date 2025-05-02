@@ -30,7 +30,7 @@
 
 @media only screen and (max-width: 600px) {
   .Copy {
-    margin-top: calc(-1.5 * var(--header-height));
+    margin-top: calc(-1.1 * var(--header-height));
   }
 
   .Title {

@@ -374,10 +374,7 @@
   }
 
   .blob3 {
-    width: 300px;
-    height: 300px;
-    top: 8%;
-    left: 10%;
+    display: none;
   }
 
   .blob4 {

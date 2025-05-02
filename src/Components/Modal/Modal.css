@@ -27,7 +27,7 @@
   border-radius: 10px;
   width: 500px;
   max-width: 80vw;
-  max-height: 75vh;
+  max-height: 65vh;
   margin: 0 20px;
   overflow: auto;
   box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
@@ -68,14 +68,16 @@
 .modalHeader h2 {
   color: var(--primary-color, #110f42);
   font-size: 1.5em;
-  font-weight: 700;
+  font-weight: 500;
   margin: 0;
   padding: 0;
   line-height: 100%;
+  padding-top: 4px;
 }
 
 .modalHeader h3 {
   color: #949494;
+  font-weight: 500;
   font-size: 0.95em;
   font-variant: all-small-caps;
   margin: 0.15rem 0 0 0;
@@ -127,8 +129,8 @@
 
 @media only screen and (max-width: 600px) {
   .modalOverlay {
-    max-width: 85%; /* Reduced from 90% */
-    margin: 0 15px; /* Added margins for mobile */
+    max-width: 85%;
+    margin: 0 15px;
     padding: 1.5rem 20px;
   }
 
