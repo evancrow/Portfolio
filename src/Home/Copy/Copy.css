@@ -3,6 +3,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: calc(-0.5 * var(--header-height));
 }
 
 .Title {
@@ -28,6 +29,10 @@
 }
 
 @media only screen and (max-width: 600px) {
+  .Copy {
+    margin-top: calc(-1.5 * var(--header-height));
+  }
+
   .Title {
     font-size: 5em;
   }

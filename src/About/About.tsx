@@ -56,19 +56,15 @@ export const About = () => {
                 disableModal: true,
               },
               {
+                title: "Fullstack",
+                disableModal: true,
+              },
+              {
                 title: "AI/ML",
                 disableModal: true,
               },
               {
-                title: "Search Systems",
-                disableModal: true,
-              },
-              {
-                title: "Large-Scale Infrastructure",
-                disableModal: true,
-              },
-              {
-                title: "Architecture Design",
+                title: "Search",
                 disableModal: true,
               },
               {
@@ -81,10 +77,6 @@ export const About = () => {
               },
               {
                 title: "Problem-Solving",
-                disableModal: true,
-              },
-              {
-                title: "VC Fundraising",
                 disableModal: true,
               },
             ],
