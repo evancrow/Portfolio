@@ -1,0 +1,81 @@
+.Header {
+  height: var(--header-height);
+  padding: 0 50px;
+
+  display: flex;
+  align-self: stretch;
+  justify-content: center;
+  align-items: center;
+  vertical-align: center;
+}
+
+.Nav {
+  display: flex;
+  align-items: center;
+  gap: 70px;
+}
+
+.NavItem {
+  margin: 0;
+  padding: 0;
+
+  display: flex;
+  justify-content: center;
+  align-items: baseline;
+  gap: 12px;
+
+  color: var(--primary-color, #110f42);
+  text-align: center;
+  font-size: 1.25em;
+  font-style: normal;
+  font-weight: 400;
+  line-height: normal;
+  background: none;
+  border: none;
+  position: relative; /* Ensure this is added for proper positioning */
+}
+
+.NavItem p {
+  position: relative; /* Position the p element to contain the underline */
+  margin: 0;
+  padding: 0;
+}
+
+.NavItem p::after {
+  content: "";
+  position: absolute;
+  bottom: -4px; /* Adjust distance below text */
+  left: 0;
+  width: 100%;
+  height: 2px;
+  background-color: var(--primary-color, #110f42);
+  transform: scaleX(0);
+  transition: transform 0.3s ease;
+  transform-origin: left;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .NavItem:hover {
+    cursor: pointer;
+  }
+
+  .NavItem:hover p::after {
+    transform: scaleX(1);
+    transform-origin: left;
+  }
+
+  .NavItem:not(:hover) p::after {
+    transform: scaleX(0);
+    transform-origin: right;
+  }
+}
+
+@media only screen and (max-width: 600px) {
+  .Header {
+    padding: 0 25px;
+  }
+
+  .NavItem {
+    font-size: 1em;
+  }
+}

@@ -2,7 +2,6 @@
   "files.exclude": {
     ".firebase": true,
     ".vscode": true,
-    "package-lock.json": true,
     "tsconfig.json": true,
     "firebase.json": true,
     "Portfolio.code-workspace": true,
@@ -11,8 +10,8 @@
     ".firebaserc": true,
     ".gitignore": true,
     ".storybook": true,
-    "package.json": true,
     "yarn.lock": true,
-    "src/stories": true
+    "src/stories": true,
+    "package-lock.json": true
   }
 }

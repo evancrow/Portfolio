@@ -1,6 +1,9 @@
 .App {
   height: 100%;
   width: 100%;
+  overflow-x: hidden;
+  position: relative;
+  min-height: 100vh;
 
   flex-direction: column;
   justify-content: center;

@@ -1,8 +1,8 @@
 import React from "react";
 import "./Work.css";
-import Section from "../Section/Section";
-import { SectionCardGrid } from "../Section/SectionCard/SectionCard";
-import { Icons } from "../Shared/Icons";
+import Section from "../Components/Section/Section";
+import { SectionCardGrid } from "../Components/Section/SectionCard/SectionCard";
+import { Icons } from "../Icons/Icons";
 
 export const Work = () => {
   return (
@@ -17,15 +17,18 @@ export const Work = () => {
                 title: "Apple",
                 subheader: "Software Engineer",
                 platforms: ["iOS", "iPadOS", "visionOS", "macOS"],
+                languages: ["Swift", "SwiftUI", "Objective-C", "C++"],
                 link: "https://apple.com/",
               },
               {
                 icon: Icons.ExaIcon,
                 title: "Exa.ai",
-                subheader: "Software Engineer",
+                subheader: "Member of Technical Staff",
                 description:
-                  "Created the /answer endpoint for RAG-based search result summarization, scoring over 90% in the SimpleQA benchmark—outperforming all market solutions including those from OpenAI, DeepSeek, and Perplexity. Developed large-scale crawling frameworks to index billions of URLs and led infrastructure initiatives to handle massive data ingestion and high-speed retrieval.",
+                  "Built Exa’s /answer endpoint for RAG-based search result generation, achieving the first 90%+ score on the SimpleQA benchmark—surpassing solutions from OpenAI, DeepSeek, and Perplexity. Engineered scalable crawling and spidering systems to index billions of URLs, enabling Exa’s AI-powered search capabilities. Led infrastructure work for high-throughput data ingestion and retrieval. Collaborated directly with enterprise customers on multi-million dollar deals, shaping architecture and delivering tailored data and search products. Also contributed fullstack development to Exa Websets, a new AI-driven platform for sourcing and verifying high-quality lists of people, companies, and research using enrichment, filtering, and real-time validation.",
                 link: "https://exa.ai/",
+                platforms: ["Web", "Cloud"],
+                languages: ["Python", "TypeScript", "Rust", "Next.js"],
               },
               {
                 icon: Icons.SnowflakeIcon,
@@ -51,7 +54,6 @@ export const Work = () => {
                   "Kotlin",
                   "TypeScript",
                 ],
-                link: "https://neeva.com",
               },
               {
                 icon: Icons.FerdasoftIcon,
@@ -85,7 +87,20 @@ export const Work = () => {
             ],
           },
           {
-            title: "Releases",
+            title: "Leadership",
+            values: [
+              {
+                icon: Icons.KaleidoscopeIcon,
+                title: "Khoury College of Computer Sciences Kaleidoscope",
+                description:
+                  "Run operations for Khoury College’s club council, managing funding, approving events, and supporting 40+ student organizations. Liaise between clubs and the Dean’s Office to coordinate resources, promote events, and improve student engagement.",
+                subheader: "Operations Lead",
+                link: "https://markefontenot.notion.site/Welcome-to-Kaleidoscope-30ff5648b2344623bb5a9c7a7e3dc674",
+              },
+            ],
+          },
+          {
+            title: "Freelance",
             values: [
               {
                 icon: Icons.NomeIcon,
@@ -95,12 +110,12 @@ export const Work = () => {
                 platforms: ["iOS", "WatchOS", "CarPlay", "Web"],
               },
               {
-                title: "NUPact",
+                title: "NUMacro",
                 description:
-                  "Application providing real-time analytics and weekly predictions on Northeastern University gym usage patterns. Deployed with Vercel using a Supabase backend.",
-                platforms: ["iOS", "Web"],
-                languages: ["Swift", "SwiftUI", "React", "TypeScript", "SQL"],
-                link: "https://nupact.vercel.app/",
+                  "Responsive, beautifully designed website for NU Macro, a global macro investing club I co-founded and lead. Built from scratch to showcase research, strategy, and community—deployed with Vercel and optimized for clarity, speed, and accessibility.",
+                platforms: ["Web", "Cloud"],
+                languages: ["Next.js", "TypeScript"],
+                link: "https://numacro.vercel.app/",
               },
               {
                 title: "Oculi",
@@ -110,17 +125,20 @@ export const Work = () => {
                 link: "https://github.com/evancrow/Oculi",
               },
               {
+                title: "NUPact",
+                description:
+                  "Application providing real-time analytics and weekly predictions on Northeastern University gym usage patterns. Deployed with Vercel using a Supabase backend.",
+                platforms: ["iOS", "Web"],
+                languages: ["Swift", "SwiftUI", "React", "TypeScript", "SQL"],
+                link: "https://nupact.vercel.app/",
+              },
+
+              {
                 title: "Tutorstand",
                 description:
                   "Scheduling application that connects students with free volunteer tutors.",
                 platforms: ["Web"],
                 link: "https://tutorstand.com",
-              },
-              {
-                title: "MCOG",
-                description:
-                  "Landing page for a community volunteer group in Portland, OR.",
-                platforms: ["Web"],
               },
             ],
           },
@@ -152,7 +170,7 @@ export const Work = () => {
             opacity="0.365565"
             d="M55.6125 71.6768C49.3367 5.43628 13.4366 58.285 1.5 36.7501C57.1509 16.9673 63.8397 73.9128 64.6842 68.5751C62.3129 15.5205 29.0442 12.2206 42.2187 54.5983C53.3661 52.2521 59.329 79.4606 76.5 67.2826C13.5003 65.7398 72.9431 4.71678 67.8817 0.963256"
             stroke="#1E1E1E"
-            stroke-width="1.5"
+            strokeWidth="1.5"
           />
         </svg>
       </div>
