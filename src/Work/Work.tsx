@@ -28,7 +28,7 @@ export const Work = () => {
                   "Built Exa’s /answer endpoint for RAG-based search result generation, achieving the first 90%+ score on the SimpleQA benchmark—surpassing solutions from OpenAI, DeepSeek, and Perplexity. Engineered scalable crawling and spidering systems to index billions of URLs, enabling Exa’s AI-powered search capabilities. Led infrastructure work for high-throughput data ingestion and retrieval. Collaborated directly with enterprise customers on multi-million dollar deals, shaping architecture and delivering tailored data and search products. Also contributed fullstack development to Exa Websets, a new AI-driven platform for sourcing and verifying high-quality lists of people, companies, and research using enrichment, filtering, and real-time validation.",
                 link: "https://exa.ai/",
                 platforms: ["Web", "Cloud"],
-                languages: ["Python", "TypeScript", "Rust", "Next.js"],
+                languages: ["Python", "TypeScript", "Rust"],
               },
               {
                 icon: Icons.SnowflakeIcon,
@@ -36,8 +36,8 @@ export const Work = () => {
                 subheader: "Software Engineer",
                 description:
                   "Became the youngest software engineering intern at Snowflake, contributing across teams in Machine Learning, Data Marketplace, Data Modeling, and Data Query. Served as a founding engineer on the Snowflake Notebooks team, playing a pivotal role in client and server-side development for an innovative ML + data analysis platform.",
-                platforms: ["Web"],
-                languages: ["React", "TypeScript", "Golang", "Node.js", "SQL"],
+                platforms: ["Web", "Cloud"],
+                languages: ["TypeScript", "Golang", "Node.js", "Python", "SQL"],
                 link: "https://www.snowflake.com/",
               },
               {

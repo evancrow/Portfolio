@@ -10,6 +10,7 @@ export interface Value {
   time?: string;
   platforms?: string[];
   languages?: string[];
+  skills?: string[];
   link?: string;
   download?: string;
   disableModal?: boolean;
@@ -139,6 +140,10 @@ export const ValueRow = (props: Value) => {
 
       {props.languages && (
         <ValueRowMetadata header="Languages" values={props.languages} />
+      )}
+
+      {props.skills && (
+        <ValueRowMetadata header="Skills" values={props.skills} />
       )}
     </div>
   );

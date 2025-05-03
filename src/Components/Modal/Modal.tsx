@@ -70,6 +70,10 @@ function Modal({
             <ValueRowMetadata header="Languages" values={data.languages} />
           )}
 
+          {data.skills && (
+            <ValueRowMetadata header="Skills" values={data.skills} />
+          )}
+
           {data.link && (
             <a
               href={data.link}
