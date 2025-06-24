@@ -149,7 +149,7 @@ export const Work = () => {
                 icon: Icons.AppleIcon,
                 title: "Apple Swift Student Challenge 2022",
                 description:
-                  "Invented an innovative accessibility software, Oculi, using Vision and CoreML—enabling motor-impaired users to control Apple devices using only their head and eyes.",
+                  "Invented an innovative accessibility software, Oculi, using Vision and CoreML—enabling motor-impaired users to control Apple devices using only their head and eyes. Publicly released with iOS & iPadOS 18.",
                 languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
                 link: "https://github.com/evancrow/Oculi",
               },
