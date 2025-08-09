@@ -9,36 +9,38 @@ html {
   overflow-x: hidden;
   overscroll-behavior: none;
 
-  background-color: hsl(33deg 56% 93%);
-  background-size: cover;
-  background-repeat: no-repeat;
-  background-image: linear-gradient(
-    180deg,
-    hsl(33deg 56% 93%) 0%,
-    hsl(32deg 43% 93%) 16%,
-    hsl(32deg 32% 92%) 31%,
-    hsl(31deg 22% 92%) 44%,
-    hsl(31deg 13% 91%) 55%,
-    hsl(30deg 4% 91%) 65%,
-    hsl(30deg 4% 92%) 74%,
-    hsl(30deg 4% 94%) 82%,
-    hsl(30deg 4% 96%) 89%,
-    hsl(30deg 3% 97%) 95%,
-    hsl(0deg 0% 99%) 100%
-  );
+  background-color: white;
 }
 
 body {
   margin: 0;
   width: 100%;
   height: 100%;
-  font-family: "fagun", sans-serif;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
 }
 
 /* Variables */
 html {
   --header-height: 120px;
-  --primary-color: #110f42;
+  --primary-color: #08081d;
+
+  /* Font Scale Variables */
+  --font-size-xs: 0.75rem;
+  --font-size-sm: 0.875rem;
+  --font-size-base: 1rem;
+  --font-size-lg: 1.125rem;
+  --font-size-xl: 1.25rem;
+  --font-size-2xl: 1.5rem;
+  --font-size-3xl: 1.875rem;
+  --font-size-4xl: 2.25rem;
+  --font-size-5xl: 3rem;
+
+  /* Font Weight Variables */
+  --font-weight-normal: 400;
+  --font-weight-medium: 500;
+  --font-weight-semibold: 600;
 }
 
 /* Hide Scrollbar */

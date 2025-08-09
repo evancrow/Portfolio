@@ -1,5 +1,4 @@
 import React from "react";
-import "./Work.css";
 import Section from "../Components/Section/Section";
 import { SectionCardGrid } from "../Components/Section/SectionCard/SectionCard";
 import { Icons } from "../Icons/Icons";
@@ -25,7 +24,11 @@ export const Work = () => {
                 title: "Exa.ai",
                 subheader: "Member of Technical Staff",
                 description:
-                  "Built Exa’s /answer endpoint for RAG-based search result generation, achieving the first 90%+ score on the SimpleQA benchmark—surpassing solutions from OpenAI, DeepSeek, and Perplexity. Engineered scalable crawling and spidering systems to index billions of URLs, enabling Exa’s AI-powered search capabilities. Led infrastructure work for high-throughput data ingestion and retrieval. Collaborated directly with enterprise customers on multi-million dollar deals, shaping architecture and delivering tailored data and search products. Also contributed fullstack development to Exa Websets, a new AI-driven platform for sourcing and verifying high-quality lists of people, companies, and research using enrichment, filtering, and real-time validation.",
+                  "Built Exa's /answer endpoint for RAG-based search result generation, achieving the first 90%+ score on the SimpleQA benchmark—surpassing solutions from OpenAI, DeepSeek, and Perplexity. " +
+                  "Engineered scalable crawling and spidering systems to index billions of URLs, enabling Exa's AI-powered search capabilities. " +
+                  "Led infrastructure work for high-throughput data ingestion and retrieval. " +
+                  "Collaborated directly with enterprise customers on multi-million dollar deals, shaping architecture and delivering tailored data and search products. " +
+                  "Also contributed fullstack development to Exa Websets, a new AI-driven platform for sourcing and verifying high-quality lists of people, companies, and research using enrichment, filtering, and real-time validation.",
                 link: "https://exa.ai/",
                 platforms: ["Web", "Cloud"],
                 languages: ["Python", "TypeScript", "Rust"],
@@ -94,7 +97,7 @@ export const Work = () => {
                 title: "Khoury College of Computer Sciences Kaleidoscope",
                 description:
                   "Run operations for Khoury College’s club council, managing funding, approving events, and supporting 40+ student organizations. Liaise between clubs and the Dean’s Office to coordinate resources, promote events, and improve student engagement.",
-                subheader: "Operations Lead",
+                subheader: "Incoming President",
                 link: "https://markefontenot.notion.site/Welcome-to-Kaleidoscope-30ff5648b2344623bb5a9c7a7e3dc674",
               },
             ],

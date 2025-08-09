@@ -8,14 +8,10 @@ export const About = () => {
   return (
     <Section primary="About" id="About">
       <div className="bodyText">
-        Hi there! I’m Evan Crow, a software engineer and founder passionate
-        about building thoughtful, high-impact technology. I’m especially
-        interested in the future of AI, search, distributed systems, and design.
-        Outside of work, I spend my time skiing, hiking, making music, exploring
-        financial systems, and digging into economic theory. I'm always looking
-        to collaborate with others who are curious, driven, and working on
-        interesting problems. Please feel free to reach out if you’d like to
-        connect, or discuss interesting opportunities.
+        I’m Evan Crow, a software engineer and founder passionate about building
+        thoughtful, high-impact technology. I’m especially interested in the
+        future of AI, and design. Outside of work, I spend my time skiing,
+        hiking, exploring financial systems, and digging into economic theory.
       </div>
 
       <SectionCardGrid
@@ -31,7 +27,7 @@ export const About = () => {
               },
             ],
           },
-          {
+          /*{
             title: "Skills",
             values: [
               {
@@ -80,7 +76,7 @@ export const About = () => {
                 disableModal: true,
               },
             ],
-          },
+          },*/
         ]}
       />
 

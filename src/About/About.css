@@ -3,12 +3,17 @@
   padding: 0px 50px 0px 50px;
   color: var(--primary-color, #110f42);
   text-align: left;
-  font-size: 1.25em;
+  font-family: "dm-sans", sans-serif;
+  font-size: 1.3em;
+  font-weight: 400;
+  font-style: normal;
+  line-height: 1.4;
 }
 
 @media only screen and (max-width: 600px) {
   .bodyText {
     padding: 0px 25px 0px 25px;
-    font-size: 1em;
+    font-size: 1.1em;
+    line-height: 1.3;
   }
 }

@@ -1,0 +1,598 @@
+.animated-blobs {
+  position: absolute;
+  top: -200px;
+  left: -300px;
+  width: calc(100% + 600px);
+  height: calc(100% + 800px);
+  z-index: -10;
+  pointer-events: none;
+  overflow: visible;
+}
+
+.blob {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(100px);
+  opacity: 0.7;
+  animation-iteration-count: infinite;
+  animation-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  animation-direction: normal;
+  will-change: transform, filter;
+  mix-blend-mode: multiply;
+  transform: translateZ(0);
+}
+
+/* Add color shifting animations */
+.blob1 {
+  animation:
+    blob1-traverse 50s infinite linear,
+    blob1-color-shift 50s infinite linear;
+}
+
+.blob2 {
+  animation:
+    blob2-sweep 55s infinite linear,
+    blob2-color-shift 55s infinite linear;
+}
+
+.blob4 {
+  animation:
+    blob4-glide 60s infinite linear,
+    blob4-color-shift 60s infinite linear;
+}
+
+.blob3 {
+  animation:
+    blob3-flow 56s infinite linear,
+    blob3-color-shift 56s infinite linear;
+}
+
+.blob5 {
+  animation:
+    blob5-drift 48s infinite linear,
+    blob5-color-shift 48s infinite linear;
+}
+
+.blob1 {
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(
+    circle at center,
+    rgba(99, 102, 241, 0.6) 0%,
+    rgba(139, 92, 246, 0.4) 40%,
+    rgba(165, 180, 252, 0.2) 70%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  top: -15%;
+  left: -20%;
+  animation-delay: 0s;
+}
+
+.blob2 {
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(
+    circle at center,
+    rgba(139, 92, 246, 0.55) 0%,
+    rgba(167, 139, 250, 0.4) 40%,
+    rgba(196, 181, 253, 0.2) 70%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  top: 20%;
+  right: -25%;
+  animation-delay: -8s;
+}
+
+.blob3 {
+  width: 650px;
+  height: 650px;
+  background: radial-gradient(
+    circle at center,
+    rgba(244, 114, 182, 0.5) 0%,
+    rgba(251, 146, 60, 0.4) 40%,
+    rgba(252, 165, 165, 0.2) 70%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  top: 40%;
+  left: -25%;
+  animation-delay: -12s;
+}
+
+.blob4 {
+  width: 550px;
+  height: 550px;
+  background: radial-gradient(
+    circle at center,
+    rgba(251, 113, 133, 0.55) 0%,
+    rgba(252, 165, 165, 0.4) 40%,
+    rgba(254, 202, 202, 0.2) 70%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  top: 25%;
+  right: -20%;
+  animation-delay: -15s;
+}
+
+.blob5 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(
+    circle at center,
+    rgba(44, 122, 156, 0.5) 0%,
+    rgba(99, 102, 241, 0.35) 40%,
+    rgba(147, 197, 253, 0.2) 70%,
+    rgba(255, 255, 255, 0) 90%
+  );
+  top: 30%;
+  left: -15%;
+  animation-delay: -5s;
+}
+
+/* Cross-screen traversing animations with color shifts */
+@keyframes blob1-traverse {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(400px, 100px, 0) scale(1.1) rotate(90deg);
+  }
+  50% {
+    transform: translate3d(800px, -50px, 0) scale(0.9) rotate(180deg);
+  }
+  75% {
+    transform: translate3d(400px, 150px, 0) scale(1.05) rotate(270deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob1-color-shift {
+  0% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+  50% {
+    filter: blur(95px) brightness(1.1) saturate(1.2);
+  }
+  100% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+}
+
+@keyframes blob2-sweep {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  30% {
+    transform: translate(-300px, 150px) scale(0.85) rotate(108deg);
+  }
+  60% {
+    transform: translate(-600px, -100px) scale(1.15) rotate(216deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob2-color-shift {
+  0% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+  33% {
+    filter: blur(90px) brightness(1.15) saturate(1.3);
+  }
+  66% {
+    filter: blur(105px) brightness(0.95) saturate(1.1);
+  }
+  100% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+}
+
+@keyframes blob4-glide {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translate(-300px, -100px) scale(0.9) rotate(72deg);
+  }
+  40% {
+    transform: translate(-800px, 0px) scale(1.1) rotate(144deg);
+  }
+  60% {
+    transform: translate(-1200px, 100px) scale(0.95) rotate(216deg);
+  }
+  80% {
+    transform: translate(-600px, -150px) scale(1.05) rotate(288deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob4-color-shift {
+  0% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+  25% {
+    filter: blur(95px) brightness(1.05) saturate(1.2);
+  }
+  75% {
+    filter: blur(105px) brightness(1.1) saturate(1.15);
+  }
+  100% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+}
+
+@keyframes blob5-drift {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  35% {
+    transform: translate(600px, -100px) scale(1.1) rotate(126deg);
+  }
+  70% {
+    transform: translate(1200px, 100px) scale(0.9) rotate(252deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob5-color-shift {
+  0% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+  40% {
+    filter: blur(90px) brightness(1.2) saturate(1.25);
+  }
+  80% {
+    filter: blur(110px) brightness(0.9) saturate(1.1);
+  }
+  100% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+}
+
+@keyframes blob3-flow {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  30% {
+    transform: translate(400px, -80px) scale(1.05) rotate(108deg);
+  }
+  60% {
+    transform: translate(800px, -160px) scale(0.95) rotate(216deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob3-color-shift {
+  0% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+  35% {
+    filter: blur(95px) brightness(1.1) saturate(1.3);
+  }
+  70% {
+    filter: blur(105px) brightness(1.05) saturate(1.15);
+  }
+  100% {
+    filter: blur(100px) brightness(1) saturate(1);
+  }
+}
+
+/* Responsive adjustments */
+@media only screen and (max-width: 768px) {
+  .animated-blobs {
+    top: -200px;
+    left: -250px;
+    width: calc(100% + 500px);
+    height: calc(100% + 600px);
+    overflow: visible;
+  }
+
+  /* Better tablet layout with 4 blobs */
+  .blob1 {
+    width: 500px;
+    height: 500px;
+    top: 0%;
+    left: -25%;
+  }
+  .blob2 {
+    width: 450px;
+    height: 450px;
+    top: 25%;
+    right: -25%;
+  }
+  .blob3 {
+    width: 480px;
+    height: 480px;
+    top: 35%;
+    left: -20%;
+  }
+  .blob4 {
+    width: 420px;
+    height: 420px;
+    top: 15%;
+    right: -30%;
+    display: block;
+  }
+
+  /* Hide only blob5 on tablet */
+  .blob5 {
+    display: none;
+  }
+}
+
+@media only screen and (max-width: 480px) {
+  .animated-blobs {
+    top: -200px;
+    left: -200px;
+    width: calc(100% + 400px);
+    height: calc(100% + 600px);
+    overflow: visible;
+  }
+
+  /* Larger, more overlapping blobs for better blending */
+  .blob1 {
+    width: 650px;
+    height: 650px;
+    top: -10%;
+    left: -35%;
+  }
+
+  .blob2 {
+    width: 600px;
+    height: 600px;
+    top: 20%;
+    right: -45%;
+  }
+
+  .blob3 {
+    width: 500px;
+    height: 600px;
+    top: 35%;
+    left: -30%;
+    background: radial-gradient(
+      circle at center,
+      rgba(244, 114, 182, 0.7) 0%,
+      rgba(251, 146, 60, 0.6) 30%,
+      rgba(252, 165, 165, 0.4) 60%,
+      rgba(255, 255, 255, 0) 90%
+    );
+    animation: blob3-mobile 28s infinite ease-in-out;
+    display: block;
+  }
+
+  .blob4 {
+    display: none;
+  }
+
+  /* Hide blob5 on mobile */
+  .blob5 {
+    display: none;
+  }
+}
+
+/* Smoother mobile animations with better blending */
+@keyframes blob1-mobile {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate(80px, -60px) scale(1.15) rotate(90deg);
+  }
+  50% {
+    transform: translate(-40px, 120px) scale(0.9) rotate(180deg);
+  }
+  75% {
+    transform: translate(120px, 80px) scale(1.1) rotate(270deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob2-mobile {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translate(-100px, 50px) scale(1.2) rotate(72deg);
+  }
+  40% {
+    transform: translate(-180px, -30px) scale(0.85) rotate(144deg);
+  }
+  60% {
+    transform: translate(-120px, 100px) scale(1.1) rotate(216deg);
+  }
+  80% {
+    transform: translate(-60px, -70px) scale(0.95) rotate(288deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob3-mobile {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translate3d(120px, -100px, 0) scale(1.2) rotate(72deg);
+  }
+  40% {
+    transform: translate3d(200px, 20px, 0) scale(0.85) rotate(144deg);
+  }
+  60% {
+    transform: translate3d(140px, 120px, 0) scale(1.15) rotate(216deg);
+  }
+  80% {
+    transform: translate3d(80px, -140px, 0) scale(1.05) rotate(288deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(360deg);
+  }
+}
+
+@keyframes blob4-mobile {
+  0% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(0deg);
+  }
+  25% {
+    transform: translate3d(-100px, -120px, 0) scale(1.25) rotate(90deg);
+  }
+  50% {
+    transform: translate3d(-180px, 80px, 0) scale(0.8) rotate(180deg);
+  }
+  75% {
+    transform: translate3d(-60px, 160px, 0) scale(1.1) rotate(270deg);
+  }
+  100% {
+    transform: translate3d(0, 0, 0) scale(1) rotate(360deg);
+  }
+}
+
+/* Reduced motion support */
+@media (prefers-reduced-motion: reduce) {
+  .blob {
+    animation: none;
+    opacity: 0.3;
+    transform: scale(0.9);
+    filter: blur(80px);
+  }
+}
+
+/* Performance optimizations for mobile */
+@media only screen and (max-width: 480px) {
+  .animated-blobs {
+    transform: translateZ(0);
+    will-change: transform;
+  }
+
+  .blob {
+    will-change: transform, filter;
+    transform: translateZ(0);
+  }
+}
+
+/* Smooth transitions for orientation changes */
+@media screen and (orientation: landscape) and (max-width: 768px) {
+  .animated-blobs {
+    height: calc(100% + 500px);
+  }
+
+  .blob {
+    filter: blur(60px);
+    opacity: 0.45;
+  }
+}
+
+/* Large desktop screens (1440px and up) */
+@media only screen and (min-width: 1440px) {
+  .animated-blobs {
+    top: -300px;
+    left: -400px;
+    width: calc(100% + 800px);
+    height: calc(100% + 1000px);
+  }
+
+  .blob1 {
+    width: 1000px;
+    height: 1000px;
+  }
+
+  .blob2 {
+    width: 800px;
+    height: 800px;
+  }
+
+  .blob3 {
+    width: 850px;
+    height: 850px;
+  }
+
+  .blob4 {
+    width: 750px;
+    height: 750px;
+  }
+
+  .blob5 {
+    width: 650px;
+    height: 650px;
+  }
+}
+
+/* Extra large desktop screens (1920px and up) */
+@media only screen and (min-width: 1920px) {
+  .animated-blobs {
+    top: -400px;
+    left: -500px;
+    width: calc(100% + 1000px);
+    height: calc(100% + 1200px);
+  }
+
+  .blob1 {
+    width: 1200px;
+    height: 1200px;
+  }
+
+  .blob2 {
+    width: 1000px;
+    height: 1000px;
+  }
+
+  .blob3 {
+    width: 1050px;
+    height: 1050px;
+  }
+
+  .blob4 {
+    width: 950px;
+    height: 950px;
+  }
+
+  .blob5 {
+    width: 850px;
+    height: 850px;
+  }
+}
+
+/* Ultra-wide and 4K screens (2560px and up) */
+@media only screen and (min-width: 2560px) {
+  .animated-blobs {
+    top: -500px;
+    left: -600px;
+    width: calc(100% + 1200px);
+    height: calc(100% + 1400px);
+  }
+
+  .blob1 {
+    width: 1500px;
+    height: 1500px;
+  }
+
+  .blob2 {
+    width: 1300px;
+    height: 1300px;
+  }
+
+  .blob3 {
+    width: 1350px;
+    height: 1350px;
+  }
+
+  .blob4 {
+    width: 1200px;
+    height: 1200px;
+  }
+
+  .blob5 {
+    width: 1100px;
+    height: 1100px;
+  }
+}

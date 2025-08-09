@@ -18,6 +18,7 @@ root.render(
       <link rel="icon" type="image/png" href="./static/Favicon.png" />
       <link rel="apple-touch-icon" href="./static/Favicon.png" />
       <link rel="stylesheet" href="https://use.typekit.net/cwc5yzo.css"></link>
+      <link rel="stylesheet" href="https://use.typekit.net/vdt7wnc.css"></link>
     </Helmet>
 
     <App />

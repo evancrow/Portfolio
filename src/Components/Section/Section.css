@@ -19,6 +19,8 @@
 
   color: var(--primary-color, #110f42);
   text-align: left;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 600;
   font-size: 3em;
   font-style: normal;
   line-height: 100%;

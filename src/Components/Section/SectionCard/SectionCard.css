@@ -12,10 +12,12 @@
 
   margin: 0;
   padding: 0;
-  padding-bottom: 18px;
+  padding-bottom: 25px;
 
   color: var(--primary-color, #110f42);
   text-align: left;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 600;
   font-size: 2em;
   font-style: normal;
   line-height: 100%;
@@ -68,6 +70,8 @@
   margin: auto;
 
   text-align: left;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 500;
   font-size: 1.25em;
   font-style: normal;
   font-weight: 500;
@@ -81,8 +85,10 @@
   padding: 0px 0px 8px 0px;
 
   color: #949494;
-  font-weight: 500;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 400;
   font-size: 0.95em;
+  font-style: normal;
   font-variant: all-small-caps;
 }
 
@@ -96,7 +102,9 @@
   margin: auto;
   padding: 10px 0px 0px 0px;
   text-align: left;
-  font-size: 1em;
+  font-family: "dm-sans", sans-serif;
+  font-size: 0.9em;
+  line-height: 1.3em;
   font-style: normal;
   font-weight: 400; /* Changed from 300 to 400 for standard text */
   color: var(--primary-color, #110f42);
@@ -116,7 +124,9 @@
   background-color: transparent;
   border: none;
   color: var(--primary-color, #110f42);
-  font-weight: 500;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 400;
+  font-style: normal;
   padding: 0px;
   cursor: pointer;
   font-size: 0.85em;
@@ -164,9 +174,11 @@
   padding: 10px 0px 0px 0px;
 
   color: #949494;
+  font-family: "dm-sans", sans-serif;
   font-size: 0.95em;
+  font-style: normal;
   font-variant: all-small-caps;
-  font-weight: 500; /* Already correct */
+  font-weight: 400;
 }
 
 .metadataValues {
@@ -181,9 +193,11 @@
   margin: 0;
   padding: 0;
 
+  font-family: "dm-sans", sans-serif;
   font-size: 1em;
+  font-style: normal;
   font-variant: all-small-caps;
-  font-weight: 400; /* Added to explicitly define standard weight */
+  font-weight: 300;
 
   color: var(--primary-color, #110f42);
 }
@@ -197,7 +211,7 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  gap: 25px;
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -220,7 +234,7 @@
 
   .sectionCardTitle {
     font-size: 2em;
-    padding-bottom: 24px;
+    padding-bottom: 20px;
   }
 
   .values {
@@ -234,5 +248,14 @@
 
   .valueSubheader {
     font-size: 1em;
+  }
+
+  .valueDescription {
+    font-size: 0.85em;
+    line-height: 1.25em;
+  }
+
+  .viewMoreButton {
+    font-size: 0.8em;
   }
 }

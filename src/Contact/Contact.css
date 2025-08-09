@@ -3,6 +3,10 @@
   padding: 0 50px;
 }
 
+.section {
+  min-height: 0;
+}
+
 @media only screen and (max-width: 600px) {
   .contact.values {
     padding: 0 25px;

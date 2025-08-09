@@ -11,21 +11,23 @@
 
   color: var(--primary-color, #110f42);
   text-align: center;
-  font-weight: 700;
-  font-size: 7em;
+  font-family: "dm-sans", sans-serif;
+  font-weight: 600;
+  font-size: 4.5em;
   font-style: normal;
   line-height: 100%;
 }
 
 .Profile {
-  width: 65%;
+  width: 60%;
 
   color: var(--primary-color, #110f42);
   text-align: center;
-  font-size: 1.5em;
+  font-family: "dm-sans", sans-serif;
+  font-size: 1.3em;
   font-style: normal;
-  font-weight: 300;
-  line-height: normal;
+  font-weight: 400;
+  line-height: 1.4;
 }
 
 @media only screen and (max-width: 600px) {
@@ -38,7 +40,8 @@
   }
 
   .Profile {
-    width: 100%;
-    font-size: 1.3em;
+    width: 95%;
+    font-size: 1.1em;
+    line-height: 1.3;
   }
 }
