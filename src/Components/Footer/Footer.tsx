@@ -7,7 +7,7 @@ function Footer() {
       <p>
         Designed & Developed by Evan Crow.
         <br />
-        Copyright © 2024 Evan Crow. All Rights Reserved.
+        Copyright © {new Date().getFullYear()} Evan Crow. All Rights Reserved.
       </p>
     </div>
   );

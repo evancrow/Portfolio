@@ -12,9 +12,9 @@ root.render(
   <React.StrictMode>
     <Helmet>
       <title>Evan Crow</title>
-      <meta name="description" content="Software Engineer & Designer" />
+      <meta name="description" content="Founder & Software Engineer" />
       <meta property="og:title" content="Evan Crow" />
-      <meta property="og:description" content="Software Engineer & Designer" />
+      <meta property="og:description" content="Founder & Software Engineer" />
       <link rel="icon" type="image/png" href="./static/Favicon.png" />
       <link rel="apple-touch-icon" href="./static/Favicon.png" />
       <link rel="stylesheet" href="https://use.typekit.net/cwc5yzo.css"></link>

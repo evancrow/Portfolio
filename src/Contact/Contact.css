@@ -1,6 +1,11 @@
 .contact.values {
   margin: 0;
   padding: 0 50px;
+  width: 100%;
+  box-sizing: border-box;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 25px;
 }
 
 .section {

@@ -1,5 +1,9 @@
 import { useEffect, useRef, useState } from "react";
-import { Value, ValueRowMetadata } from "../Section/SectionCard/SectionCard";
+import {
+  Value,
+  ValueRowMetadata,
+  parseDescription,
+} from "../Section/SectionCard/SectionCard";
 import "./Modal.css";
 import "../Section/SectionCard/SectionCard.css";
 
@@ -48,7 +52,13 @@ function Modal({
       <div className="modalOverlay" onClick={(e) => e.stopPropagation()}>
         <div className="modalHeader">
           <div className="modalHeaderContent">
-            {data.icon && <img src={data.icon} className="modalIcon" alt="" />}
+            {data.iconComponent ? (
+              <div className="modalIcon" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                {data.iconComponent}
+              </div>
+            ) : data.icon ? (
+              <img src={data.icon} className="modalIcon" alt="" />
+            ) : null}
             <div>
               <h2>{data.title}</h2>
               {data.subheader && <h3>{data.subheader}</h3>}
@@ -60,7 +70,7 @@ function Modal({
         </div>
 
         <div className="modalBody">
-          {data.description && <p>{data.description}</p>}
+          {data.description && <p>{parseDescription(data.description)}</p>}
 
           {data.platforms && (
             <ValueRowMetadata header="Platforms" values={data.platforms} />

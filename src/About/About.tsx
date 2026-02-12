@@ -8,10 +8,11 @@ export const About = () => {
   return (
     <Section primary="About" id="About">
       <div className="bodyText">
-        I’m Evan Crow, a software engineer and founder passionate about building
-        thoughtful, high-impact technology. I’m especially interested in the
-        future of AI, and design. Outside of work, I spend my time skiing,
-        hiking, exploring financial systems, and digging into economic theory.
+        I'm Evan Crow, a founder and engineer passionate about building
+        thoughtful, high-impact technology. I'm especially interested in the
+        future of AI, and design — and I'm always curious to learn something
+        new. Outside of work, I spend my time skiing, hiking, and digging into
+        economics.
       </div>
 
       <SectionCardGrid
@@ -22,8 +23,8 @@ export const About = () => {
               {
                 icon: Icons.NortheasternIcon,
                 title: "Northeastern University",
-                subheader: "Graduating 2027",
-                description: "Computer Science & Economics",
+                subheader: "Graduating December 2026",
+                description: "B.S. Computer Science & Economics",
               },
             ],
           },
@@ -34,7 +35,7 @@ export const About = () => {
                 icon: Icons.AppleIcon,
                 title: "Apple Swift Student Challenge 2022",
                 description:
-                  "Invented an innovative accessibility software, Oculi, using Vision and CoreML—enabling motor-impaired users to control Apple devices using only their head and eyes. Publicly released with iOS & iPadOS 18.",
+                  "Built Oculi, an accessibility framework enabling motor-impaired users to control Apple devices with head and eye movements. Publicly released with **iOS & iPadOS 18**.",
                 languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
                 link: "https://github.com/evancrow/Oculi",
               },

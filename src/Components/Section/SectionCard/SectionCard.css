@@ -21,7 +21,6 @@
   font-size: 2em;
   font-style: normal;
   line-height: 100%;
-  font-weight: 600;
 }
 
 /* Value Title */
@@ -74,7 +73,6 @@
   font-weight: 500;
   font-size: 1.25em;
   font-style: normal;
-  font-weight: 500;
 
   color: var(--primary-color, #110f42);
 }
@@ -110,8 +108,12 @@
   color: var(--primary-color, #110f42);
 }
 
+.valueDescription strong {
+  font-weight: 600;
+}
+
 .valueDescription.truncated {
-  max-height: 68px;
+  max-height: 4.2em;
   overflow: hidden;
   display: -webkit-box;
   line-clamp: 3;
