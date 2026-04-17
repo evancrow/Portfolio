@@ -8,11 +8,10 @@ export const About = () => {
   return (
     <Section primary="About" id="About">
       <div className="bodyText">
-        I'm Evan Crow, a founder and engineer passionate about building
-        thoughtful, high-impact technology. I'm especially interested in the
-        future of AI, and design — and I'm always curious to learn something
-        new. Outside of work, I spend my time skiing, hiking, and digging into
-        economics.
+        I'm Evan Crow, working on AI to push frontier technology and science
+        forward and to improve how we live and work. Outside of work, I spend my
+        time skiing, hiking, and reading about economics, policy, science,
+        philosophy, and how it all connects.
       </div>
 
       <SectionCardGrid
@@ -25,6 +24,19 @@ export const About = () => {
                 title: "Northeastern University",
                 subheader: "Graduating December 2026",
                 description: "B.S. Computer Science & Economics",
+              },
+            ],
+          },
+          {
+            title: "Leadership",
+            values: [
+              {
+                icon: Icons.KaleidoscopeIcon,
+                title: "Khoury College of Computer Sciences Kaleidoscope",
+                description:
+                  "Lead operations for Khoury College's club council, overseeing funding, event approvals, and support for 40+ student organizations across Boston, Oakland, and London. Serve as the primary liaison between clubs and the Dean's Office to coordinate resources and drive student engagement.",
+                subheader: "President",
+                link: "https://markefontenot.notion.site/Welcome-to-Kaleidoscope-30ff5648b2344623bb5a9c7a7e3dc674",
               },
             ],
           },

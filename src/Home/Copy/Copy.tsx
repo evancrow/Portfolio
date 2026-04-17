@@ -6,8 +6,8 @@ function Copy() {
       <p className="Title">Evan Crow</p>
       <p className="Profile">
         Software engineer at Apple; early at Exa.ai; startup founder; and
-        designer. Building what's next in artificial intelligence, machine
-        learning, search, infrastructure, and application development.
+        designer. Working on AI, search, and product design, and on what comes
+        next.
       </p>
     </div>
   );

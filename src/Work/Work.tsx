@@ -2,7 +2,6 @@ import React from "react";
 import Section from "../Components/Section/Section";
 import { SectionCardGrid } from "../Components/Section/SectionCard/SectionCard";
 import { Icons } from "../Icons/Icons";
-import { Rocket } from "lucide-react";
 
 export const Work = () => {
   return (
@@ -10,7 +9,7 @@ export const Work = () => {
       <SectionCardGrid
         cards={[
           {
-            title: "Professional",
+            title: "",
             values: [
               {
                 icon: Icons.AppleIcon,
@@ -19,29 +18,6 @@ export const Work = () => {
                 platforms: ["iOS", "iPadOS", "visionOS", "macOS"],
                 languages: ["Swift", "SwiftUI", "Objective-C", "C++"],
                 link: "https://apple.com/",
-              },
-              {
-                iconComponent: (
-                  <div
-                    style={{
-                      width: 40,
-                      height: 40,
-                      borderRadius: 5,
-                      backgroundColor: "#1a1a2e",
-                      display: "flex",
-                      alignItems: "center",
-                      justifyContent: "center",
-                    }}
-                  >
-                    <Rocket size={22} strokeWidth={1.5} color="white" />
-                  </div>
-                ),
-                title: "Stealth Startup",
-                subheader: "Founding Engineer",
-                description:
-                  "Building something new. More details coming soon.",
-                platforms: ["Mobile", "Web", "API", "MCP"],
-                languages: ["TypeScript", "Python", "Swift", "React Native"],
               },
               {
                 icon: Icons.ExaIcon,
@@ -109,46 +85,6 @@ export const Work = () => {
                 platforms: ["iOS"],
                 languages: ["Swift", "UIKit"],
                 link: "https://travsolo.com",
-              },
-            ],
-          },
-          {
-            title: "Leadership",
-            values: [
-              {
-                icon: Icons.KaleidoscopeIcon,
-                title: "Khoury College of Computer Sciences Kaleidoscope",
-                description:
-                  "Lead operations for Khoury College's club council, overseeing funding, event approvals, and support for 40+ student organizations across Boston, Oakland, and London. Serve as the primary liaison between clubs and the Dean's Office to coordinate resources and drive student engagement.",
-                subheader: "President",
-                link: "https://markefontenot.notion.site/Welcome-to-Kaleidoscope-30ff5648b2344623bb5a9c7a7e3dc674",
-              },
-            ],
-          },
-          {
-            title: "Freelance",
-            values: [
-              {
-                icon: Icons.NomeIcon,
-                title: "Nome - Music & Maps",
-                description:
-                  'Navigation app that integrates with your music library to build a queue synced to your trip duration. Recognized by Apple in "Our Favorites" and "Hot New Apps" and featured by media outlets such as Product Hunt and iMore.',
-                platforms: ["iOS", "WatchOS", "CarPlay", "Web"],
-              },
-              {
-                title: "NUMacro",
-                description:
-                  "Website for NUMacro, a global macro investing club I co-founded. Built from scratch to showcase research, strategy, and community. Deployed with Vercel and optimized for clarity, speed, and accessibility.",
-                platforms: ["Web", "Cloud"],
-                languages: ["Next.js", "TypeScript"],
-                link: "https://numacro.vercel.app/",
-              },
-              {
-                title: "Oculi",
-                description:
-                  "Accessibility framework for SwiftUI enabling motor-impaired users to navigate Apple devices using head and eye movements. **Winner of the Apple WWDC 2022 Swift Student Challenge.** Publicly released with **iOS and iPadOS 18**.",
-                languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
-                link: "https://github.com/evancrow/Oculi",
               },
             ],
           },

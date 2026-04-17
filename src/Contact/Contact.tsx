@@ -3,25 +3,12 @@ import "../Components/Section/Section.css";
 import Section from "../Components/Section/Section";
 import { ValueRow } from "../Components/Section/SectionCard/SectionCard";
 import { Icons } from "../Icons/Icons";
-import { Mail, Github, Download } from "lucide-react";
+import { Github, Download } from "lucide-react";
 
 export const Contact = () => {
   return (
     <Section primary="Connect" id="Connect">
       <div className="contact values">
-        <ValueRow
-          {...{
-            iconComponent: (
-              <div style={{ width: 40, height: 40, borderRadius: 5, backgroundColor: "#007AFF", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                <Mail size={22} strokeWidth={1.5} color="white" />
-              </div>
-            ),
-            title: "Email",
-            description: "evanwcrow@gmail.com",
-            link: "mailto:evanwcrow@gmail.com",
-            disableModal: true,
-          }}
-        />
         <ValueRow
           {...{
             icon: Icons.LinkedInIcon,

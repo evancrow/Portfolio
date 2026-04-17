@@ -268,7 +268,7 @@ export const ValueRow = (props: Value) => {
 export const SectionCard = (props: SectionCardProps) => {
   return (
     <div className="sectionCard">
-      <p className="sectionCardTitle">{props.title}</p>
+      {props.title && <p className="sectionCardTitle">{props.title}</p>}
       <div className="values">
         {props.values.map((value, index) => (
           <ValueRow key={index} {...value} />
