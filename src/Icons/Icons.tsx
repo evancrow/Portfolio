@@ -9,6 +9,7 @@ export class Icons {
   static TravSoloIcon: string = "/static/icons/travsolo.png";
   static NomeIcon: string = "/static/icons/nome.png";
   static NortheasternIcon: string = "/static/icons/northeastern.png";
+  static Huntington100Icon: string = "/static/icons/huntington100.png";
   static KaleidoscopeIcon: string = "/static/icons/kaleidoscope.png";
 
   // LinkedIn brand icon (SVG data URI — not available in lucide-react).
