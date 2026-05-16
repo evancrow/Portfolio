@@ -96,6 +96,18 @@
   line-height: 1.3em;
 }
 
+.modalDescription {
+  margin-top: 16px;
+}
+
+.modalDescription p {
+  margin: 0 0 10px 0;
+}
+
+.modalDescription p:last-child {
+  margin-bottom: 0;
+}
+
 .closeButton {
   background: none;
   border: none;

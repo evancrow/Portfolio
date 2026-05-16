@@ -58,8 +58,10 @@ function smartTruncateDescription(text: string, maxVisible = 250): string {
   const plainBudget = maxVisible - totalBoldVisible - separatorBudget;
   let plainUsed = 0;
   let result = "";
+  let trailingDropped = false;
 
-  for (const seg of segments) {
+  segments.forEach((seg, i) => {
+    const isLast = i === segments.length - 1;
     if (seg.isBold) {
       result += seg.raw;
     } else {
@@ -69,15 +71,19 @@ function smartTruncateDescription(text: string, maxVisible = 250): string {
         const wasTruncated = slice.length < seg.raw.length;
         result += wasTruncated ? slice.trimEnd() + " ... " : slice;
         plainUsed += slice.length;
+        if (isLast && wasTruncated) trailingDropped = true;
       } else {
         // Plain segment fully skipped — insert separator.
         result += " ... ";
+        if (isLast) trailingDropped = true;
       }
     }
-  }
+  });
 
-  // Strip any trailing separators, then add a single clean ellipsis.
-  return result.replace(/(\s*\.{3}\s*)+$/, "").trimEnd() + "...";
+  // Strip any trailing separators. Only append "..." if the tail was actually dropped —
+  // avoids the awkward "**bold**..." when truncation ends on a fully-emitted bold segment.
+  const cleaned = result.replace(/(\s*\.{3}\s*)+$/, "").trimEnd();
+  return trailingDropped ? cleaned + "..." : cleaned;
 }
 
 export interface Value {
@@ -93,6 +99,9 @@ export interface Value {
   link?: string;
   download?: string;
   disableModal?: boolean;
+  // When true, hides Time/Platforms/Languages/Skills chips on the card.
+  // Data is preserved and still shown in the popup.
+  hideMetadataOnCard?: boolean;
 }
 
 export interface SectionCardProps {
@@ -127,23 +136,31 @@ export const ValueRow = (props: Value) => {
   const [truncateLength, setTruncateLength] = useState(250);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
 
-  // Check if the description is long enough to warrant a "View more" button.
+  // Decide truncation up front from the source text (stable per description),
+  // and only recompute the budget on column-width changes. Mixing the two in
+  // one ResizeObserver callback creates a feedback loop: truncating shrinks
+  // scrollHeight, which then unsets showViewMore, which re-renders the full
+  // text, which re-triggers the observer.
   useEffect(() => {
-    if (descriptionRef.current && props.description) {
-      // If description exceeds 3 visible lines.
-      const isLongDescription =
-        props.description.replace(/\*\*/g, "").length > 180 ||
-        descriptionRef.current.scrollHeight > 75;
+    if (!descriptionRef.current || !props.description) return;
 
-      setShowViewMore(isLongDescription);
+    const isLong = props.description.replace(/\*\*/g, "").length > 180;
+    setShowViewMore(isLong);
+    if (!isLong) return;
 
-      // Compute a visible-char budget that fits 3 lines in the actual column width.
-      if (isLongDescription) {
-        const width = descriptionRef.current.clientWidth || 350;
-        const charsPerLine = Math.floor(width / 7.5);
-        setTruncateLength(charsPerLine * 3);
-      }
-    }
+    const measure = () => {
+      if (!descriptionRef.current) return;
+      const width = descriptionRef.current.clientWidth || 350;
+      // 8.5 px/char accounts for bold text rendering wider than the 7.5 estimate.
+      const charsPerLine = Math.floor(width / 8.5);
+      setTruncateLength(Math.max(140, charsPerLine * 3));
+    };
+
+    measure();
+
+    const observer = new ResizeObserver(measure);
+    observer.observe(descriptionRef.current);
+    return () => observer.disconnect();
   }, [props.description]);
 
   const openModal = (e: React.MouseEvent) => {
@@ -235,17 +252,19 @@ export const ValueRow = (props: Value) => {
         </div>
       )}
 
-      {props.time && <ValueRowMetadata header="Time" values={[props.time]} />}
+      {!props.hideMetadataOnCard && props.time && (
+        <ValueRowMetadata header="Time" values={[props.time]} />
+      )}
 
-      {props.platforms && (
+      {!props.hideMetadataOnCard && props.platforms && (
         <ValueRowMetadata header="Platforms" values={props.platforms} />
       )}
 
-      {props.languages && (
+      {!props.hideMetadataOnCard && props.languages && (
         <ValueRowMetadata header="Languages" values={props.languages} />
       )}
 
-      {props.skills && (
+      {!props.hideMetadataOnCard && props.skills && (
         <ValueRowMetadata header="Skills" values={props.skills} />
       )}
     </div>

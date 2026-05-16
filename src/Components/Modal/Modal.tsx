@@ -70,7 +70,15 @@ function Modal({
         </div>
 
         <div className="modalBody">
-          {data.description && <p>{parseDescription(data.description)}</p>}
+          {data.description && (
+            <div className="modalDescription">
+              {data.description
+                .split(/(?<=[\w*]{3,}\.)\s+(?=[A-Z])/)
+                .map((sentence, i) => (
+                  <p key={i}>{parseDescription(sentence)}</p>
+                ))}
+            </div>
+          )}
 
           {data.platforms && (
             <ValueRowMetadata header="Platforms" values={data.platforms} />

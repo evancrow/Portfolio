@@ -115,14 +115,10 @@
   font-weight: 600;
 }
 
+/* Truncation is handled entirely in JS (smartTruncateDescription) so that
+   bolded segments stay visible. No CSS clip needed. */
 .valueDescription.truncated {
-  max-height: 4.2em;
   overflow: hidden;
-  display: -webkit-box;
-  line-clamp: 3;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  text-overflow: ellipsis;
 }
 
 .viewMoreButton {
