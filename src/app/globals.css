@@ -1,0 +1,87 @@
+@import "tailwindcss";
+@import "./blobs.css";
+
+@theme {
+  /* The old stylesheets declared --primary-color: #08081d but every consumer
+     wrote var(--primary-color, #110f42). The declared value always won. */
+  --color-ink: #08081d;
+  --color-ink-hover: #080726;
+  --color-muted: #949494;
+  --color-surface: hsl(30deg 4% 96%);
+  --color-stroke: #1e1e1e;
+
+  --font-sans: var(--font-dm-sans), sans-serif;
+
+  /* Modal transitions. Radix waits on CSS animations before unmounting. */
+  --animate-fade-in: fade-in 250ms ease-out;
+  --animate-fade-out: fade-out 200ms ease-in;
+  --animate-panel-in: panel-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
+  --animate-panel-out: panel-out 200ms ease-in;
+
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+
+  @keyframes panel-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes panel-out {
+    from {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+    to {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.9);
+    }
+  }
+}
+
+:root {
+  --header-height: 120px;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overscroll-behavior: none;
+    background-color: white;
+
+    /* Hide the scrollbar without disabling scrolling. */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  html::-webkit-scrollbar {
+    display: none;
+  }
+
+  body {
+    font-family: var(--font-sans);
+    font-weight: 400;
+    color: var(--color-ink);
+  }
+}
