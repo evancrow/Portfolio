@@ -7,13 +7,11 @@ import {
   ChevronsDown,
   ChevronsUp,
   ChevronUp,
-  History,
 } from "lucide-react";
 import type { Entry } from "@/content/types";
 import { visibleLength } from "@/content/types";
 import { renderRichText } from "@/lib/rich-text";
 import { EntryIcon } from "@/components/ui/icons";
-import { Timeline } from "@/components/timeline";
 import { formatDates } from "@/components/timeline/timeline-data";
 import { work } from "@/content/work";
 
@@ -28,7 +26,7 @@ const COLLAPSED_HEIGHT = "4.2em";
 function Meta({ entry }: { entry: Entry }) {
   if (!entry.location || !entry.dates?.length) return null;
   return (
-    <p className="font-display shrink-0 text-[clamp(0.95rem,1.25vw,1.1rem)] leading-[1.4] text-mute italic sm:text-right">
+    <p className="font-display text-[0.9em] leading-[1.4] text-mute italic">
       {entry.location}. {formatDates(entry.dates)}.
     </p>
   );
@@ -49,7 +47,8 @@ export function WorkRow({
   // `mt-4` margin, which would otherwise leave the collapse a few pixels short of the last line.
   const wrapperRef = useRef<HTMLDivElement>(null);
   const isLong =
-    entry.description !== undefined && visibleLength(entry.description) > CLAMP_THRESHOLD;
+    entry.description !== undefined &&
+    visibleLength(entry.description) > CLAMP_THRESHOLD;
   const external = entry.link?.startsWith("http");
 
   /** Expand/collapse smoothly by animating `height` to a measured pixel value. Collapsing away
@@ -100,9 +99,9 @@ export function WorkRow({
             )}
           </div>
         </div>
-        {entry.description && (
-          // Indented to match the title's text, not the icon.
-          <div className={entry.icon ? "pl-12" : undefined}>
+
+        <div className={entry.icon ? "pl-12" : undefined}>
+          {entry.description && (
             <div
               ref={isLong ? wrapperRef : undefined}
               className={
@@ -125,22 +124,30 @@ export function WorkRow({
                 {renderRichText(entry.description)}
               </p>
             </div>
-            {isLong && (
-              <button
-                type="button"
-                onClick={toggle}
-                className="mt-2 inline-flex items-center gap-1 text-[0.9em] transition-colors duration-300 hover:text-mute"
-              >
-                {expanded ? "Show Less" : "Show More"}
-                {expanded ? (
-                  <ChevronUp aria-hidden="true" className="size-[0.8em]" />
-                ) : (
-                  <ChevronDown aria-hidden="true" className="size-[0.8em]" />
-                )}
-              </button>
-            )}
+          )}
+
+          <div
+            data-expanded={expanded}
+            className="mt-2 grid grid-rows-[0fr] opacity-0 transition-[grid-template-rows,opacity] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] data-[expanded=true]:grid-rows-[1fr] data-[expanded=true]:opacity-100 motion-reduce:transition-none"
+          >
+            <div className="overflow-hidden">
+              <Meta entry={entry} />
+            </div>
           </div>
-        )}
+
+          <button
+            type="button"
+            onClick={toggle}
+            className="mt-2 inline-flex items-center gap-1 text-[0.9em] transition-colors duration-300 hover:text-mute"
+          >
+            {expanded ? "Show Less" : "Show More"}
+            {expanded ? (
+              <ChevronUp aria-hidden="true" className="size-[0.8em]" />
+            ) : (
+              <ChevronDown aria-hidden="true" className="size-[0.8em]" />
+            )}
+          </button>
+        </div>
       </div>
     </div>
   );
@@ -163,8 +170,8 @@ export function WorkIntro() {
 /**
  * Typographic role list — no cards, no icons. Emphasis is what's shown by default
  * (`tier: "primary"`) versus what's behind "Show All" (`tier: "legacy"`), not card size.
- * "Open the Timeline" dissolves the page to a blank-paper view (`Timeline`); its own "Close the
- * Timeline" control dissolves back to this exact scroll position.
+ * The Timeline entry point is disabled for now — `components/timeline` is unused but kept in
+ * place rather than deleted, pending Phase 3's mobile pass.
  *
  * Every entry stays mounted regardless of `showAll`, so legacy rows collapse/expand with a smooth
  * height transition instead of popping in and out of the DOM.
@@ -174,7 +181,6 @@ export function WorkIntro() {
  */
 export function Work() {
   const [showAll, setShowAll] = useState(false);
-  const [timelineOpen, setTimelineOpen] = useState(false);
   const hasLegacy = work.some((entry) => entry.tier === "legacy");
   const visible = work.filter((entry) => entry.tier !== "legacy" || showAll);
   const firstVisibleTitle = visible[0]?.title;
@@ -202,38 +208,26 @@ export function Work() {
             </div>
           );
         })}
-        <p className="font-display pt-10 text-[clamp(1rem,1.3vw,1.15rem)] leading-[1.4]">
-          {hasLegacy ? (
-            <>
-              <em>{showAll ? "To see highlighted roles," : "To see all roles,"}</em>{" "}
-              <button
-                type="button"
-                onClick={() => setShowAll((v) => !v)}
-                className="inline-flex items-center gap-1 transition-colors duration-300 hover:text-mute"
-              >
-                {showAll ? "Show Less" : "Show All"}
-                {showAll ? (
-                  <ChevronsUp aria-hidden="true" className="size-[0.8em]" />
-                ) : (
-                  <ChevronsDown aria-hidden="true" className="size-[0.8em]" />
-                )}
-              </button>
-              , <em>or</em>{" "}
-            </>
-          ) : (
-            <em>To see the full history, </em>
-          )}
-          <button
-            type="button"
-            onClick={() => setTimelineOpen(true)}
-            className="inline-flex items-center gap-1 transition-colors duration-300 hover:text-mute"
-          >
-            Open the Timeline
-            <History aria-hidden="true" className="size-[0.8em]" />
-          </button>
-        </p>
+        {hasLegacy && (
+          <p className="font-display pt-10 text-[clamp(1rem,1.3vw,1.15rem)] leading-[1.4]">
+            <em>
+              {showAll ? "To see highlighted roles," : "To see all roles,"}
+            </em>{" "}
+            <button
+              type="button"
+              onClick={() => setShowAll((v) => !v)}
+              className="-my-2 inline-flex items-center gap-1 py-2 transition-colors duration-300 hover:text-mute"
+            >
+              {showAll ? "Show Less" : "Show All"}
+              {showAll ? (
+                <ChevronsUp aria-hidden="true" className="size-[0.8em]" />
+              ) : (
+                <ChevronsDown aria-hidden="true" className="size-[0.8em]" />
+              )}
+            </button>
+          </p>
+        )}
       </div>
-      <Timeline open={timelineOpen} onClose={() => setTimelineOpen(false)} />
     </section>
   );
 }

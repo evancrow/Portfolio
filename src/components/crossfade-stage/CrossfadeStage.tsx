@@ -148,7 +148,7 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
   return (
     <div ref={trackRef} className="relative w-full" style={{ height: `${stops.height}vh` }}>
       {/* Sticky is already a containing block, so the layers need nothing else to position against. */}
-      <div ref={pinRef} className={["sticky top-0 h-screen", className].filter(Boolean).join(" ")}>
+      <div ref={pinRef} className={["sticky top-0 h-dvh", className].filter(Boolean).join(" ")}>
         <div ref={fromRef} className="absolute inset-0" style={LAYER_FROM}>
           {from}
         </div>

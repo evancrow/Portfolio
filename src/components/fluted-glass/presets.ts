@@ -218,6 +218,47 @@ export const presets = {
     // moment the cursor settled on the thing the reader came to read.
     interaction: { pull: 0.03, reach: 1.2, shimmer: { radius: 160, gain: 0 } },
   },
+
+  // The about section's glow. Held still rather than curved and scroll-driven like `accent`: this
+  // panel sits in plain document flow, not a pinned stage, so there is no scroll progress of its
+  // own to roll it against. The pointer lean and cursor shimmer are the only motion.
+  //
+  // Centred low, behind where the copy sits, with a wide feather so the field is already faint by
+  // the panel's own top and bottom edges — the call site bleeds the canvas further still, so what
+  // little is left finishes off-panel instead of being clipped flat at the seam with its neighbours.
+  //
+  // Disabled for now — About ships without glass. Left here in case that changes.
+  // about: {
+  //   shapes: [
+  //     {
+  //       kind: "ellipse",
+  //       x: 0.5,
+  //       y: 0.62,
+  //       w: 0.7,
+  //       h: 0.38,
+  //       color: "#8ea8f5",
+  //       opacity: 0.85,
+  //       blur: 0.12,
+  //       pull: 0.05,
+  //       drift: { amp: 0.01, speed: 0.05 },
+  //     },
+  //     {
+  //       kind: "ellipse",
+  //       x: 0.28,
+  //       y: 0.56,
+  //       w: 0.34,
+  //       h: 0.24,
+  //       color: "#c48af0",
+  //       opacity: 0.5,
+  //       blur: 0.1,
+  //       pull: 0.09,
+  //       drift: { amp: 0.012, speed: 0.06 },
+  //     },
+  //   ],
+  //   glass: PANEL_GLASS,
+  //   light: { angle: 104, intensity: 0.2, sharpness: 6, ambient: 0.03 },
+  //   interaction: { pull: 0.05, shimmer: { radius: 150, gain: 0.85 } },
+  // },
 } satisfies Record<string, Omit<FlutedGlassProps, "children" | "className">>;
 
 export type PresetName = keyof typeof presets;

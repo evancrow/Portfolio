@@ -16,11 +16,11 @@ export interface TimelineSpan {
   start: Date;
   end: Date;
   lane: number;
-};
+}
 
 interface GroupTimelineSpan extends TimelineSpan {
   subspans: Omit<TimelineSpan, "lane">[];
-};
+}
 
 export type TimelineData = {
   /** One per entry, most-recent/ongoing first — the content list's reading order. */
@@ -68,7 +68,9 @@ export function parseDate(input: string | undefined): Date {
 
   const monthYear = /^([A-Za-z]+)\s+(\d{4})$/.exec(trimmed);
   if (monthYear) {
-    const monthIndex = MONTH_ABBR.indexOf(monthYear[1].slice(0, 3).toLowerCase());
+    const monthIndex = MONTH_ABBR.indexOf(
+      monthYear[1].slice(0, 3).toLowerCase()
+    );
     if (monthIndex !== -1) return new Date(Number(monthYear[2]), monthIndex, 1);
   }
 
@@ -82,14 +84,17 @@ export function parseDate(input: string | undefined): Date {
  *  being parsed twice. */
 function parseRange(d: DateRange): { start: Date; end: Date } {
   const ongoing = !d.end || d.end.trim().toLowerCase() === "present";
-  return { start: parseDate(d.start), end: ongoing ? new Date() : parseDate(d.end) };
+  return {
+    start: parseDate(d.start),
+    end: ongoing ? new Date() : parseDate(d.end),
+  };
 }
 
 /** Spans within this of each other still count as conflicting for lane assignment, even without
  *  literally overlapping — two bars butted right up against each other read as one continuous
  *  flute, so a close-but-not-quite-overlapping pair (a role ending the same month the next begins)
  *  needs its own lane too, to render as a visible side-by-side hstack rather than a seam. */
-const LANE_GAP_MS =  45 * 24 * 60 * 60;
+const LANE_GAP_MS = 45 * 24 * 60 * 60;
 
 /**
  * Greedy interval scheduling: sorted by start, each span takes the first lane whose last-placed
@@ -97,8 +102,12 @@ const LANE_GAP_MS =  45 * 24 * 60 * 60;
  * every existing one is still occupied. This is what makes overlapping — or merely adjacent —
  * stretches sit in separate columns instead of stacking illegibly in one.
  */
-export function packLanes(spans: Omit<GroupTimelineSpan, "lane">[]): TimelineSpan[] {
-  const sorted = [...spans].sort((a, b) => a.start.getTime() - b.start.getTime());
+export function packLanes(
+  spans: Omit<GroupTimelineSpan, "lane">[]
+): TimelineSpan[] {
+  const sorted = [...spans].sort(
+    (a, b) => a.start.getTime() - b.start.getTime()
+  );
   const laneEnds: number[] = [];
   const sortedSpans: TimelineSpan[] = [];
 
@@ -111,18 +120,21 @@ export function packLanes(spans: Omit<GroupTimelineSpan, "lane">[]): TimelineSpa
     } else {
       laneEnds[lane] = span.end.getTime();
     }
-    
+
     span.subspans.forEach((subspan) => {
-      sortedSpans.push({ ...subspan, lane })
-    })
-   })
+      sortedSpans.push({ ...subspan, lane });
+    });
+  });
 
   return sortedSpans;
 }
 
 /** Combines work + education, keeping only entries with `dates` populated — anything without is
  *  simply absent from the timeline rather than rendered empty. */
-export function buildTimeline(work: Entry[], education: Entry[]): TimelineData | null {
+export function buildTimeline(
+  work: Entry[],
+  education: Entry[]
+): TimelineData | null {
   const source = [
     ...work.map((entry) => ({ entry, category: "work" as const })),
     ...education.map((entry) => ({ entry, category: "education" as const })),
@@ -136,7 +148,9 @@ export function buildTimeline(work: Entry[], education: Entry[]): TimelineData |
   for (const { entry, category } of source) {
     const key = `${category}:${entry.title}`;
     const ranges = entry.dates!.map(parseRange);
-    const earliestStart = new Date(Math.min(...ranges.map((r) => r.start.getTime())));
+    const earliestStart = new Date(
+      Math.min(...ranges.map((r) => r.start.getTime()))
+    );
     const latestEnd = new Date(Math.max(...ranges.map((r) => r.end.getTime())));
 
     entries.push({
@@ -146,14 +160,16 @@ export function buildTimeline(work: Entry[], education: Entry[]): TimelineData |
       earliestStart: earliestStart,
       latestEnd: latestEnd,
     });
-    rawSpans.push(
-      { 
-        entryKey: key, 
-        start: earliestStart, 
-        end: latestEnd, 
-        subspans: ranges.map((span) => ({ entryKey: key, start: span.start, end: span.end })) 
-      }
-    )
+    rawSpans.push({
+      entryKey: key,
+      start: earliestStart,
+      end: latestEnd,
+      subspans: ranges.map((span) => ({
+        entryKey: key,
+        start: span.start,
+        end: span.end,
+      })),
+    });
   }
 
   // Most-recent/ongoing first, matching Work's own convention of leading with the current role.
@@ -171,10 +187,16 @@ export function buildTimeline(work: Entry[], education: Entry[]): TimelineData |
   };
 }
 
-const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "long", year: "numeric" });
+const MONTH_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", {
+  month: "long",
+  year: "numeric",
+});
 const YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { year: "numeric" });
 const MONTH_ONLY_FORMAT = new Intl.DateTimeFormat("en-US", { month: "long" });
-const MONTH_SHORT_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", { month: "short", year: "numeric" });
+const MONTH_SHORT_YEAR_FORMAT = new Intl.DateTimeFormat("en-US", {
+  month: "short",
+  year: "numeric",
+});
 
 /** The large centered cursor label — "August 2026" — or, once the visible span crosses into
  *  multi-decade territory, just "2026". */
@@ -185,20 +207,26 @@ export function formatCursor(date: Date, yearMode: boolean): string {
 /** A top/bottom edge label: bare year in year mode; month-only when it shares the cursor's year
  *  ("July"); month + year when it doesn't, so a span crossing a year boundary still reads
  *  unambiguously ("Dec 2025"). */
-export function formatEdge(date: Date, cursorDate: Date, yearMode: boolean): string {
+export function formatEdge(
+  date: Date,
+  cursorDate: Date,
+  yearMode: boolean
+): string {
   if (yearMode) return YEAR_FORMAT.format(date);
   return date.getFullYear() === cursorDate.getFullYear()
     ? MONTH_ONLY_FORMAT.format(date)
     : MONTH_SHORT_YEAR_FORMAT.format(date);
 }
 
-/** Formats an entry's date ranges as prose, e.g. "From Jun 2023 to Present" or, for a role held
- *  more than once, "From 2020 to 2021; from 2022 to Present". Operates on the raw authored
- *  strings, not parsed dates — this is prose for `Work`'s meta line and `TimelineDetail`, not a
- *  layout input. */
+/** Formats an entry's date ranges as prose, spanning the earliest start to the latest end rather
+ *  than listing each range — a role held twice reads as "From 2020 to Present", not "from 2020 to
+ *  2021; from 2022 to Present". Parses each range only to find the min/max; the displayed labels
+ *  are still the raw authored strings, not reformatted dates. */
 export function formatDates(dates: DateRange[]): string {
-  return dates
-    .map((d) => `from ${d.start} to ${d.end ?? "Present"}`)
-    .join("; ")
-    .replace(/^from/, "From");
+  const resolved = dates.map((d) => ({ range: d, ...parseRange(d) }));
+  const earliest = resolved.reduce((a, b) => (b.start < a.start ? b : a));
+  const latest = resolved.reduce((a, b) => (b.end > a.end ? b : a));
+  const ongoing =
+    !latest.range.end || latest.range.end.trim().toLowerCase() === "present";
+  return `From ${earliest.range.start} to ${ongoing ? "Present" : latest.range.end}`;
 }

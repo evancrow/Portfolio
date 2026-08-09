@@ -80,7 +80,7 @@ function Row({
         type="button"
         onClick={() => onActivate(index)}
         aria-current={live}
-        className="block cursor-pointer text-left"
+        className="-my-2 block cursor-pointer py-2 text-left"
       >
         <span className="font-display block text-[clamp(1.05rem,1.4vw,1.25rem)] leading-tight font-bold">
           {entry.title}
@@ -203,16 +203,17 @@ export function AwardsProjects() {
       />
 
       {/* Sticky is already a containing block, so the band needs nothing else to position against. */}
-      <div ref={pinRef} className="sticky top-0 flex h-screen items-center">
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-[46%]">
+      <div ref={pinRef} className="sticky top-0 flex h-dvh items-center">
+        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-[38%] sm:w-[46%]">
           <FlutedGlass {...presets.accent} shapes={shapes} className="h-full w-full" />
         </div>
 
         {/* Same left gutter as every other body section (Work, About), so copy lines up down the
             page regardless of which section it's in. The band's own width plus a gap on the
             right, so a long line runs out of room before it runs under the band at any window
-            size. */}
-        <div className="relative w-full pl-[var(--gutter-left)] pr-[calc(46%+2vw)]">
+            size. Narrower band share on mobile — a flat 46% left too little room for the
+            description text on a narrow phone. */}
+        <div className="relative w-full pl-[var(--gutter-left)] pr-[calc(38%+2vw)] sm:pr-[calc(46%+2vw)]">
           {GROUPS.map(({ group, items }) => (
             <div key={group} className="mt-[clamp(2.5rem,5vw,4.5rem)] first:mt-0">
               <h2 className="font-display text-[clamp(1.75rem,2.4vw,2.25rem)]">{group}</h2>

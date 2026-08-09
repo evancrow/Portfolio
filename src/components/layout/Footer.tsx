@@ -89,8 +89,8 @@ const EDGE = 1 - ((2 * (0.5 - GUTTER)) / BEAM_SPAN) ** 2;
 const BEAM_ID = "credit-beam";
 
 const CREDIT = [
-  { line: `Designed & Developed by ${site.name}.`, at: "0%", anchor: "start" },
-  { line: `${new Date().getFullYear()}`, at: "100%", anchor: "end" },
+  { line: "Designed & Developed.", at: "0%", anchor: "start" },
+  { line: `Copyright ${new Date().getFullYear()}`, at: "100%", anchor: "end" },
 ] as const;
 
 /** Everything but the résumé download — the footer's Connect column is outbound links only. */
@@ -176,7 +176,10 @@ export function Footer() {
   useOverscrollReveal(box.arc, write);
 
   return (
-    <footer ref={footerRef} className="relative isolate bg-paper text-ink">
+    <footer
+      ref={footerRef}
+      className="relative isolate bg-paper pb-[env(safe-area-inset-bottom)] text-ink"
+    >
       {/* A wrapper for the height, since the panel carries its own `relative` and the two would be
           one specificity apart with nothing to say which wins. Taller than the dome by `OVERHEAD`,
           so it reaches well up behind the name, which is why it comes first: everything after it in
@@ -208,7 +211,7 @@ export function Footer() {
                     href={entry.link}
                     target={external ? "_blank" : undefined}
                     rel={external ? "noopener noreferrer" : undefined}
-                    className="font-display inline-flex items-center gap-1 underline decoration-1 underline-offset-4"
+                    className="font-display -my-1.5 inline-flex items-center gap-1 py-1.5 underline decoration-1 underline-offset-4"
                   >
                     {entry.title}
                     <ArrowUpRight aria-hidden="true" className="size-[0.8em]" />

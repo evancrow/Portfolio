@@ -2,6 +2,20 @@ import type { Entry } from "./types";
 
 export const work: Entry[] = [
   {
+    icon: "exa",
+    title: "Exa.ai",
+    subheader: "Member of Technical Staff",
+    tier: "primary",
+    accent: "rgb(19, 52, 200)",
+    description:
+      "Built Exa's /answer endpoint, the **first RAG system to clear 90%+ on SimpleQA, beating OpenAI**, Perplexity, and DeepSeek. Engineered crawling infrastructure indexing billions of URLs. Led fullstack on Exa Websets, a platform for AI-driven sourcing and verification. Drove **multi-million-dollar** enterprise deals.",
+    link: "https://exa.ai/",
+    platforms: ["Web", "Cloud"],
+    languages: ["Python", "TypeScript", "Rust"],
+    location: "San Francisco, California",
+    dates: [{ start: "Oct 2024", end: "Apr 2025" }, { start: "Aug 2026" }],
+  },
+  {
     icon: "apple",
     title: "Apple",
     subheader: "Software Engineer",
@@ -25,20 +39,6 @@ export const work: Entry[] = [
     languages: ["TypeScript", "Python", "Swift", "Rust"],
     location: "Remote",
     dates: [{ start: "Jan 2026", end: "April 2026" }],
-  },
-  {
-    icon: "exa",
-    title: "Exa.ai",
-    subheader: "Member of Technical Staff",
-    tier: "primary",
-    accent: "rgb(19, 52, 200)",
-    description:
-      "Built Exa's /answer endpoint, the **first RAG system to clear 90%+ on SimpleQA, beating OpenAI**, Perplexity, and DeepSeek. Engineered crawling infrastructure indexing billions of URLs. Led fullstack on Exa Websets, a platform for AI-driven sourcing and verification. Drove **multi-million-dollar** enterprise deals.",
-    link: "https://exa.ai/",
-    platforms: ["Web", "Cloud"],
-    languages: ["Python", "TypeScript", "Rust"],
-    location: "San Francisco, California",
-    dates: [{ start: "Oct 2024", end: "Apr 2025" }, { start: "Aug 2026" }],
   },
   {
     icon: "snowflake",

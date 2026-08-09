@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Newsreader } from "next/font/google";
 import "./globals.css";
 import { site } from "@/content/site";
@@ -16,6 +16,13 @@ const newsreader = Newsreader({
   preload: false,
   display: "swap",
 });
+
+/** `cover` lets content reach under notches/home-indicators, with `env(safe-area-inset-*)`
+ * padding pulling anything that needs to clear of them back in — the footer's dome and credit
+ * line, in particular. */
+export const viewport: Viewport = {
+  viewportFit: "cover",
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL(site.url),

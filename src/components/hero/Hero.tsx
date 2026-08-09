@@ -17,13 +17,11 @@ export function Hero() {
     >
       <div className="flex h-full flex-col justify-center">
         <div className="fade-rise mx-auto w-full max-w-[1512px] px-[6vw] sm:px-[28.5%]">
-          <h1 className="font-display text-[clamp(2.75rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
+          <h1 className="font-display text-[clamp(3rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
             {site.name}
           </h1>
-          <p className="font-display mt-[1.6vw] text-[clamp(0.95rem,1.9vw,2.15rem)] leading-none">
-            Member of Technical Staff at Exa, builder,
-            <br />
-            and designer. Based in San Francisco, California.
+          <p className="font-display mt-[1.6vw] text-[clamp(1.05rem,1.9vw,2.15rem)] leading-none">
+            {site.hero}
           </p>
         </div>
       </div>
