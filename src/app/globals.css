@@ -1,74 +1,39 @@
 @import "tailwindcss";
-@import "./blobs.css";
 
 @theme {
-  /* The old stylesheets declared --primary-color: #08081d but every consumer
-     wrote var(--primary-color, #110f42). The declared value always won. */
-  --color-ink: #08081d;
-  --color-ink-hover: #080726;
-  --color-muted: #949494;
-  --color-surface: hsl(30deg 4% 96%);
-  --color-stroke: #1e1e1e;
+  /* ui-serif resolves to New York on Apple platforms, which is the face the design was built
+     around. Newsreader is the closest Google-hosted match and only loads where New York isn't
+     available, since it sits after it in the stack. */
+  --font-display: ui-serif, "New York", var(--font-newsreader), Iowan Old Style, Palatino, Georgia,
+    serif;
 
-  --font-sans: var(--font-dm-sans), sans-serif;
+  --color-paper: #f9f9f9;
+  --color-ink: #0a0a0c;
+  --color-ink-hover: #242428;
+  --color-mute: #6c6c76;
+  --color-hair: #e7e7ec;
 
-  /* Modal transitions. Radix waits on CSS animations before unmounting. */
-  --animate-fade-in: fade-in 250ms ease-out;
-  --animate-fade-out: fade-out 200ms ease-in;
-  --animate-panel-in: panel-in 300ms cubic-bezier(0.34, 1.56, 0.64, 1);
-  --animate-panel-out: panel-out 200ms ease-in;
-
-  @keyframes fade-in {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  @keyframes fade-out {
-    from {
-      opacity: 1;
-    }
-    to {
-      opacity: 0;
-    }
-  }
-
-  @keyframes panel-in {
-    from {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.9);
-    }
-    to {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-  }
-
-  @keyframes panel-out {
-    from {
-      opacity: 1;
-      transform: translate(-50%, -50%) scale(1);
-    }
-    to {
-      opacity: 0;
-      transform: translate(-50%, -50%) scale(0.9);
-    }
-  }
-}
-
-:root {
-  --header-height: 120px;
+  /* The hero's periwinkle. Also the Awards/Projects glass band's fallback and the Timeline's
+     current-position glow — three places now, so it's a token rather than a repeated literal. */
+  --color-accent: #8ea8f5;
+  --color-accent-soft: #bccbfa;
 }
 
 @layer base {
+  :root {
+    /* Work's left edge is a centered max-w-[72rem] box plus px-[6vw] inside it, so past 72rem of
+       viewport width its inset grows beyond a plain 6vw. Sections that don't share that centered
+       wrapper (Awards/Projects, About) read this instead, so their copy still lines up with Work's. */
+    --gutter-left: calc(6vw + max(0px, (100vw - 72rem) / 2));
+  }
+
   html {
     scroll-behavior: smooth;
     overflow-x: hidden;
+    /* Required by the footer's overscroll reveal: left on, both bounces would run at once and
+       the band would slide up the screen while it grows. */
     overscroll-behavior: none;
-    background-color: white;
+    background-color: var(--color-paper);
 
     /* Hide the scrollbar without disabling scrolling. */
     scrollbar-width: none;
@@ -80,8 +45,76 @@
   }
 
   body {
-    font-family: var(--font-sans);
+    font-family: var(--font-display), serif;
     font-weight: 400;
     color: var(--color-ink);
   }
+}
+
+/*
+ * Text drifts with the scroll while its layer crossfades: the outgoing block leaves upward, the
+ * incoming one arrives from below. Both read the `--fade` and `--rise` CrossfadeStage writes, so
+ * one value drives the whole transition. Translate only, since scaling live text re-rasterizes
+ * and goes soft on the way through.
+ */
+.fade-rise {
+  transform: translate3d(0, calc((1 - var(--fade, 1)) * var(--rise, 1) * 16px), 0);
+}
+
+/*
+ * The crossfade is scroll-position-driven, so parking the scroll parks the picture and there is
+ * no animation there to reduce. The drift is the one thing that travels without being asked for.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .fade-rise {
+    transform: none;
+  }
+}
+
+/*
+ * The page's half of the footer's overscroll bounce. Everything above the footer rides up by the
+ * pull, and the strip it vacates is what the footer's slab grows into, so the two meet exactly.
+ * `--lift` is a whole transform rather than a length, so with nothing written there is no
+ * transform at all: no containing block, no layer, nothing for a fixed header above to notice.
+ */
+.page-lift {
+  transform: var(--lift, none);
+}
+
+/* Range inputs for the dev-only glass playground, kept thin and unobtrusive. */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 1.25rem;
+  background: transparent;
+  cursor: ew-resize;
+}
+
+input[type="range"]::-webkit-slider-runnable-track {
+  height: 1px;
+  background: var(--color-hair);
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 9px;
+  height: 9px;
+  margin-top: -4px;
+  border-radius: 999px;
+  background: var(--color-ink);
+}
+
+input[type="range"]::-moz-range-track {
+  height: 1px;
+  background: var(--color-hair);
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 9px;
+  height: 9px;
+  border: none;
+  border-radius: 999px;
+  background: var(--color-ink);
 }

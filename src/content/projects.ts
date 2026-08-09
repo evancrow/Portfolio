@@ -7,6 +7,8 @@ export const projects: Entry[] = [
       "Accessibility framework for SwiftUI enabling motor-impaired users to navigate Apple devices using head and eye movements. **Winner of the Apple WWDC 2022 Swift Student Challenge.** Publicly released with **iOS and iPadOS 18**.",
     languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
     link: "https://github.com/evancrow/Oculi",
+    accent: "#c89cc8",
+    accentSoft: "#e4c6e4",
   },
   {
     icon: "nome",
@@ -14,6 +16,8 @@ export const projects: Entry[] = [
     description:
       'Navigation app that integrates with your music library to build a queue synced to your trip duration. Recognized by Apple in "Our Favorites" and "Hot New Apps" and featured by media outlets such as Product Hunt and iMore.',
     platforms: ["iOS", "WatchOS", "CarPlay", "Web"],
+    accent: "#a58ae0",
+    accentSoft: "#cbb8f0",
   },
   {
     title: "NUMacro",
@@ -22,5 +26,7 @@ export const projects: Entry[] = [
     platforms: ["Web", "Cloud"],
     languages: ["Next.js", "TypeScript"],
     link: "https://numacro.vercel.app/",
+    accent: "#8ea8f5",
+    accentSoft: "#bccbfa",
   },
 ];

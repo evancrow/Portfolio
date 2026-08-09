@@ -1,20 +1,32 @@
+import { FlutedGlass, presets } from "@/components/fluted-glass";
 import { site } from "@/content/site";
-import { AnimatedBlobs } from "./AnimatedBlobs";
 
-/** Full-height opening panel: name, one-line profile, animated backdrop. */
+/**
+ * Full-bleed opening panel. Geometry is transcribed from the 1512x982 design frame: text block
+ * at x=431 (28.5%), headline New York Bold 128px (8.466vw), both at 100% leading. Body runs
+ * smaller than the frame's literal 32px (2.116vw) — trimmed a size down against the headline.
+ * The periwinkle arch rises from the bottom edge rather than sitting beside the name — that's
+ * `presets.hero`, not this component.
+ */
 export function Hero() {
   return (
-    <div className="relative z-1 mx-auto mt-[20px] flex min-h-[calc(100vh-var(--header-height)*1.75)] w-[calc(100%-50px)] flex-col items-center justify-center gap-[75px] overflow-visible px-[25px] py-[30px] sm:mt-0 sm:min-h-[calc(100vh-var(--header-height))] sm:w-[calc(100%-100px)] sm:p-0">
-      <AnimatedBlobs />
-
-      <div className="mt-[calc(-1.1*var(--header-height))] flex flex-col items-center justify-center sm:mt-[calc(-0.5*var(--header-height))]">
-        <h1 className="m-0 text-center text-[5em] leading-none font-semibold sm:text-[4.5em]">
-          {site.name}
-        </h1>
-        <p className="w-[95%] text-center text-[1.1em] leading-[1.3] font-normal sm:w-[60%] sm:text-[1.3em] sm:leading-[1.4]">
-          {site.hero}
-        </p>
+    <FlutedGlass
+      {...presets.hero}
+      className="h-full"
+      fallback="linear-gradient(to top, #8ea8f5 0%, rgba(142,168,245,0) 55%)"
+    >
+      <div className="flex h-full flex-col justify-center">
+        <div className="fade-rise mx-auto w-full max-w-[1512px] px-[6vw] sm:px-[28.5%]">
+          <h1 className="font-display text-[clamp(2.75rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
+            {site.name}
+          </h1>
+          <p className="font-display mt-[1.6vw] text-[clamp(0.95rem,1.9vw,2.15rem)] leading-none">
+            Member of Technical Staff at Exa, builder,
+            <br />
+            and designer. Based in San Francisco, California.
+          </p>
+        </div>
       </div>
-    </div>
+    </FlutedGlass>
   );
 }

@@ -1,12 +1,19 @@
 import type { Metadata } from "next";
-import { DM_Sans } from "next/font/google";
+import { Newsreader } from "next/font/google";
 import "./globals.css";
 import { site } from "@/content/site";
 import { links } from "@/content/links";
 
-const dmSans = DM_Sans({
+/**
+ * Non-Apple fallback only: `--font-display` puts `ui-serif`/"New York" first, so Apple
+ * platforms never fetch this file. `preload: false` keeps it off the critical path everywhere
+ * else too, since it only ever paints after the system-font check fails.
+ */
+const newsreader = Newsreader({
   subsets: ["latin"],
-  variable: "--font-dm-sans",
+  variable: "--font-newsreader",
+  style: ["normal", "italic"],
+  preload: false,
   display: "swap",
 });
 
@@ -52,9 +59,9 @@ export default function RootLayout({
     <html
       lang="en"
       data-scroll-behavior="smooth"
-      className={`${dmSans.variable} antialiased`}
+      className={`h-full ${newsreader.variable} antialiased`}
     >
-      <body>
+      <body className="flex min-h-full flex-col">
         {children}
         <script
           type="application/ld+json"

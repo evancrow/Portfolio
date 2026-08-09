@@ -20,6 +20,17 @@ export type IconKey =
   | "resume";
 
 /**
+   One span of time an entry covers. An entry can carry more than one — a role held twice, or a
+   degree with a leave of absence — rather than only ever describing a single unbroken stretch.
+*/
+export interface DateRange {
+  /** Free-form, e.g. "2023" or "Jun 2023". */
+  start: string;
+  /** Omitted, or "Present", for an ongoing range. */
+  end?: string;
+}
+
+/**
    A single card entry — a work role, project, degree, award, or contact link.
    Shared by every section so one card component renders all of them.
 */
@@ -32,12 +43,20 @@ export interface Entry {
   platforms?: string[];
   languages?: string[];
   link?: string;
-  /** Work only — drives big vs. compact cards in the Phase 2 redesign. */
+  /** Work only — drives which roles show by default vs. behind "Show All". */
   tier?: "primary" | "legacy";
-  /** Follows `link` directly instead of opening the detail modal. */
-  disableModal?: boolean;
   /** Filename for the anchor's `download` attribute. */
   download?: string;
+  /** City, state/country. Work/Education only, feeds the row's meta line and the timeline. */
+  location?: string;
+  /** Work/Education only — one or more spans, feeds the row's meta line and the timeline. */
+  dates?: DateRange[];
+  /** Awards/Projects: the glass band's colour when this entry holds the stage. Work/Education:
+   * the Timeline's bar/dot colour for this entry. Hex. Falls back to the site's periwinkle when
+   * unset. */
+  accent?: string;
+  /** Lighter offset layer behind `accent`, for the band's soft second shape / bar glow. Hex. */
+  accentSoft?: string;
 }
 
 /** Visible length of a description, ignoring the `**bold**` markers. */

@@ -1,48 +1,46 @@
-import { Header } from "@/components/layout/Header";
+import { CrossfadeStage } from "@/components/crossfade-stage";
 import { Footer } from "@/components/layout/Footer";
-import { Section } from "@/components/layout/Section";
-import { SectionSpacer } from "@/components/layout/SectionSpacer";
 import { Hero } from "@/components/hero/Hero";
-import { EntryGrid } from "@/components/cards/EntryGrid";
-import { site } from "@/content/site";
-import { work } from "@/content/work";
-import { projects } from "@/content/projects";
-import { education } from "@/content/education";
-import { awards } from "@/content/awards";
-import { links } from "@/content/links";
+import { About } from "@/components/about/About";
+import { Work, WorkIntro } from "@/components/work/Work";
+import { AwardsProjects } from "@/components/awards-projects/AwardsProjects";
 
 export default function Home() {
   return (
-    <div className="relative flex min-h-screen w-full flex-col items-center justify-center overflow-x-hidden">
-      <Header />
-      <Hero />
+    <div id="page-root" className="relative flex min-h-screen w-full flex-col">
+      {/*
+        `page-lift` is the page's half of the footer's overscroll reveal: everything above the
+        footer rides up by the pull, and the footer's own glass slab grows into the strip it
+        vacates.
 
-      <Section id="work" primary="Work" secondary="Experience">
-        <EntryGrid entries={work} showMetadata={false} />
-        <SectionSpacer />
-      </Section>
+        No `overflow-x-hidden` here: it computes `overflow-y: auto`, turning this div into a
+        scroll container that `CrossfadeStage`'s `position: sticky` pins against instead of the
+        viewport — the pin never engages and the hero just scrolls away. `html { overflow-x:
+        hidden }` in globals.css is the page-wide horizontal guard and doesn't have this problem
+        (the root's overflow propagates to the viewport, not to a box the pin sticks inside).
+      */}
+      <div className="page-lift flex w-full flex-col">
+        {/*
+          `WorkIntro` is blank paper, so `gap`/`in`/`tail` are crushed to a nearly instant beat
+          rather than the defaults tuned for fading *into* something: there's nothing on the `to`
+          side for those phases to reveal, so holding them at their normal length was just more
+          scroll with nothing happening on screen. `hold`/`out` stay put — that's Hero's own
+          fade-out, the animation this stage exists to show. The unavoidable last viewport of
+          scroll (`CrossfadeStage`'s own `+1`, needed for the sticky pin to physically release) is
+          where `Work` actually slides up into view, so it isn't dead time either.
+        */}
+        <CrossfadeStage
+          from={<Hero />}
+          to={<WorkIntro />}
+          phases={{ gap: 0.05, in: 0.05, tail: 0.05 }}
+        />
 
-      <Section id="projects" primary="Projects">
-        <EntryGrid entries={projects} />
-        <SectionSpacer />
-      </Section>
+        <Work />
 
-      <Section id="about" primary="About">
-        <p className="max-w-[1000px] px-[25px] text-left text-[1.1em] leading-[1.3] sm:px-[50px] sm:text-[1.3em] sm:leading-[1.4]">
-          {site.bio}
-        </p>
+        <AwardsProjects />
 
-        <div className="flex w-full flex-col gap-[55px]">
-          <EntryGrid title="Education" entries={education} />
-          <EntryGrid title="Awards" entries={awards} />
-        </div>
-
-        <SectionSpacer variant="scribble" />
-      </Section>
-
-      <Section id="connect" primary="Connect">
-        <EntryGrid entries={links} minColumn={250} />
-      </Section>
+        <About />
+      </div>
 
       <Footer />
     </div>

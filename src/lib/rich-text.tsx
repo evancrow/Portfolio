@@ -19,12 +19,3 @@ export function renderRichText(text: string): ReactNode {
     )
   );
 }
-
-/**
-   Splits a description into sentences for the modal's paragraph layout.
-   @param text - Description string.
-   @returns One entry per sentence.
-*/
-export function splitSentences(text: string): string[] {
-  return text.split(/(?<=[\w*]{3,}\.)\s+(?=[A-Z])/);
-}
