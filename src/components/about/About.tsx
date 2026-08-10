@@ -5,7 +5,7 @@ const northeastern = education.find((entry) => entry.icon === "northeastern")!;
 
 export function About() {
   return (
-    <section id="about" className="min-h-screen w-full">
+    <section id="about" className="min-h-screen w-full pt-[16vh]">
       <div className="flex min-h-screen flex-col justify-end pr-[6vw] pb-[10vh] pl-[var(--gutter-left)] text-ink">
         <div className="max-w-[45rem]">
           <h2 className="font-display text-[clamp(3rem,6vw,5.5rem)] leading-none italic">Hi,</h2>

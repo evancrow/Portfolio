@@ -74,6 +74,7 @@ function Row({
   return (
     <li
       data-active={live}
+      data-index={index}
       className="mt-[clamp(1.5rem,2.6vw,2.25rem)] border-l border-transparent pl-4 transition-colors duration-500 first:mt-0 data-[active=true]:border-ink motion-reduce:transition-none"
     >
       <button
@@ -130,6 +131,8 @@ function Row({
 export function AwardsProjects() {
   const trackRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
+  const listRef = useRef<HTMLDivElement>(null);
+  const innerRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
 
   // Keyed on the active index, so the array identity changes exactly when the item does and the
@@ -142,7 +145,9 @@ export function AwardsProjects() {
   useEffect(() => {
     const track = trackRef.current;
     const pin = pinRef.current;
-    if (!track || !pin) return;
+    const list = listRef.current;
+    const inner = innerRef.current;
+    if (!track || !pin || !list || !inner) return;
 
     let queued = 0;
     // The overhang, in px, so the DWELL unit stays one viewport even though the pin is taller than
@@ -164,6 +169,36 @@ export function AwardsProjects() {
       pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
     };
 
+    const rowCenter = (index: number) => {
+      const row = inner.querySelector<HTMLElement>(`[data-index="${index}"]`);
+      return row ? row.offsetTop + row.offsetHeight / 2 : 0;
+    };
+
+    // Keeps the live item centred in the list's own box by sliding `inner` under a clipped,
+    // fixed-height `list` — a transform tied straight to `continuous` below, not a nested
+    // `overflow-y-auto`, so it's the same one physical scroll as everything else in the stage
+    // rather than a separate scrollable region with its own scrollbar. A no-op whenever the list
+    // isn't actually taller than the pin, which is every viewport this design was built for.
+    const position = (continuous: number) => {
+      const overflow = inner.offsetHeight - list.clientHeight;
+      if (overflow <= 0) {
+        inner.style.transform = "";
+        return;
+      }
+      const lo = Math.floor(continuous);
+      const hi = Math.min(lo + 1, ITEMS.length - 1);
+      const frac = continuous - lo;
+      const center = rowCenter(lo) + (rowCenter(hi) - rowCenter(lo)) * frac;
+      // The floor stays 0 — the very first item sits flush with the box's own top rather than
+      // pulled down to center it, which is what keeps the section landing right below Work instead
+      // of opening mid-list. The ceiling gets an extra half-height of slack past the true content
+      // end, since without it the last item is clamped hard against the bottom the moment its own
+      // center would otherwise need to scroll past where content actually stops, landing it low in
+      // the box instead of centered like every other item.
+      const offset = clamp(center - list.clientHeight / 2, 0, overflow + list.clientHeight / 2);
+      inner.style.transform = `translate3d(0, ${(-offset).toFixed(1)}px, 0)`;
+    };
+
     const apply = () => {
       // Measured from the track's own rect rather than scrollY, so this is correct wherever the
       // section sits and after anything that moves it, the footer's overscroll lift included.
@@ -175,7 +210,9 @@ export function AwardsProjects() {
       // disagree, which they do for the whole of an iOS URL bar collapse.
       const unit = pin.offsetHeight - bleed || 1;
       const p = -track.getBoundingClientRect().top / unit;
-      setActive(clamp(Math.floor(p / DWELL), 0, ITEMS.length - 1));
+      const continuous = clamp(p / DWELL, 0, ITEMS.length - 1);
+      setActive(Math.floor(continuous));
+      position(continuous);
     };
 
     const onScroll = () => {
@@ -276,23 +313,37 @@ export function AwardsProjects() {
             mobile the band is full-bleed, so there is nothing to clear: the copy takes the ordinary
             gutter and sits over the faint left tail of the glow, which is the room a description
             needs on a narrow phone. */}
-        <div className="relative w-full pl-[var(--gutter-left)] pr-[24vw] sm:pr-[calc(46%+2vw)]">
-          {GROUPS.map(({ group, items }) => (
-            <div key={group} className="mt-[clamp(2.5rem,5vw,4.5rem)] first:mt-0">
-              <h2 className="font-display text-[clamp(1.75rem,2.4vw,2.25rem)]">{group}</h2>
-              <ul className="mt-[clamp(1.5rem,3vw,2.5rem)]">
-                {items.map(({ item, index }) => (
-                  <Row
-                    key={item.key}
-                    item={item}
-                    index={index}
-                    live={index === active}
-                    onActivate={goTo}
-                  />
-                ))}
-              </ul>
-            </div>
-          ))}
+        <div
+          ref={listRef}
+          className="relative max-h-full w-full overflow-hidden pl-[var(--gutter-left)] pr-[24vw] sm:pr-[calc(46%+2vw)]"
+        >
+          {/*
+            The clip lives on the wrapper above; this is what actually moves. Shifted by a plain
+            transform driven straight off the same scroll listener that picks `active`, rather
+            than a nested `overflow-y-auto` — one continuous physical scroll, not a separate
+            scrollable region with its own scrollbar sitting inside the page's.
+          */}
+          <div
+            ref={innerRef}
+            className="transition-transform duration-300 ease-out motion-reduce:transition-none"
+          >
+            {GROUPS.map(({ group, items }) => (
+              <div key={group} className="mt-[clamp(2.5rem,5vw,4.5rem)] first:mt-0">
+                <h2 className="font-display text-[clamp(1.75rem,2.4vw,2.25rem)]">{group}</h2>
+                <ul className="mt-[clamp(1.5rem,3vw,2.5rem)]">
+                  {items.map(({ item, index }) => (
+                    <Row
+                      key={item.key}
+                      item={item}
+                      index={index}
+                      live={index === active}
+                      onActivate={goTo}
+                    />
+                  ))}
+                </ul>
+              </div>
+            ))}
+          </div>
         </div>
       </div>
     </section>
