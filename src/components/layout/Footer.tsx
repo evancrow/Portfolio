@@ -102,6 +102,32 @@ const foldRamp = () =>
 const SURFACE = 1.25;
 
 /**
+ * Below `sm`, the beam's crest reads taller than the dome under it.
+ *
+ * The dome's blur feather scales as `blur * reveal^0.75 * fh` in the shader (`passes.ts`), where `fh`
+ * is the panel's own pixel height — so for the same raw overscroll, a shorter mobile footer feathers
+ * a shorter reach. The beam's crest has no such term: it is `pull * SURFACE` alone, blind to the
+ * panel it is meant to ride above. So on a short footer the line arcs above where the glass has
+ * actually reached.
+ *
+ * Tapered rather than stepped, so there is no seam at the breakpoint, and flat at 1 from `sm` up, so
+ * desktop is untouched. The floor is a rough match to the feather's own `fh^0.25` falloff between a
+ * phone-width and a desktop-width footer, not a measured one — nudge `MOBILE_SURFACE` if it still
+ * reads tall on a narrow device.
+ */
+const MOBILE_SURFACE = 0.3;
+const MOBILE_WIDTH = 375;
+const SM_WIDTH = 640;
+
+const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
+
+function surfaceFor(width: number): number {
+  if (width >= SM_WIDTH || width <= 0) return SURFACE;
+  const t = clamp01((width - MOBILE_WIDTH) / (SM_WIDTH - MOBILE_WIDTH));
+  return SURFACE * (MOBILE_SURFACE + (1 - MOBILE_SURFACE) * t);
+}
+
+/**
  * The beam's own width, in half-footers, measured to where its parabola would come back to rest.
  *
  * Above 1 on purpose: the ends sit off the window, so what crosses the page is the gentle middle of
@@ -142,7 +168,7 @@ const CONNECT_LINKS = links.filter((entry) => entry.title !== "Download Resume")
  * would show up as a letter snapping round.
  */
 function beamPath(pull: number, width: number): string {
-  const crest = pull * SURFACE;
+  const crest = pull * surfaceFor(width);
   const gutter = width * GUTTER;
   // Up is negative here, since the beam sits on the baseline at y = 0.
   const ends = -(crest * EDGE);
@@ -246,7 +272,7 @@ export function Footer() {
 
       <div
         ref={nameRef}
-        className="relative flex min-h-[clamp(20rem,33vw,34rem)] flex-col justify-end px-[8.7vw] pb-[clamp(5rem,11.5vw,11rem)]"
+        className="relative flex min-h-[clamp(20rem,33vw,34rem)] flex-col justify-end px-[8.7vw] pb-[clamp(9rem,11.5vw,11rem)] sm:pb-[clamp(5rem,11.5vw,11rem)]"
       >
         <div className="flex flex-wrap items-center justify-between gap-x-[clamp(2.5rem,5vw,4.5rem)] gap-y-10 sm:items-start">
           <h2 className="font-display text-[clamp(2.75rem,7.5vw,7rem)] leading-none font-bold tracking-[-0.02em]">
@@ -286,8 +312,7 @@ export function Footer() {
         any other text and the `em` in the offset below has to resolve against the same one.
       */}
       <svg
-        className="font-display pointer-events-none absolute inset-x-0 h-px w-full overflow-visible text-[clamp(0.8rem,1.15vw,1.05rem)] text-mute"
-        style={{ bottom: "calc(clamp(2rem, 4.5vw, 4rem) + 0.24em)" }}
+        className="font-display pointer-events-none absolute inset-x-0 bottom-[calc(5rem+0.24em)] h-px w-full overflow-visible text-[clamp(0.8rem,1.15vw,1.05rem)] text-mute sm:bottom-[calc(clamp(2rem,4.5vw,4rem)+0.24em)]"
       >
         {/* No stroke and no fill, so it paints nothing and needs no `defs` to hide it in. */}
         <path
