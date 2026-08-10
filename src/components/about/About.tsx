@@ -14,7 +14,7 @@ export function About() {
           </p>
           <p className="font-display mt-[clamp(1.75rem,4vw,1.5rem)] text-[clamp(1.1rem,1.6vw,1.35rem)] leading-[1.4]">
             Graduating from <b>{northeastern.title}</b> in{" "}
-            {northeastern.description?.replace("Graduating ", "")}
+            {northeastern.description?.replace("Graduating ", "")}.
             <br />
             {northeastern.subheader}
           </p>
