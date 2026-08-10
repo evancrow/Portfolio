@@ -22,7 +22,7 @@
  *   through a word tears it in half.
  */
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
 import { FlutedGlass, presets } from "@/components/fluted-glass";
 import { site } from "@/content/site";
@@ -50,6 +50,40 @@ const ARC_FALLBACK = 225;
  * that preset pays for it.
  */
 const OVERHEAD = 2;
+
+/**
+ * How much of the panel's bottom dissolves into the fold, as a share of its own height.
+ *
+ * iOS Safari's floating URL bar paints over the last stretch of the document rather than beside it,
+ * and there is no remaining scroll at the footer to give the panel overhang the way the hero's bleed
+ * does — this is the true end of the page. So the panel doesn't reach for the fold, it dissolves
+ * before it: masked out over its own last `FOLD_FADE` share, so what would otherwise be a hard cut
+ * where the bar's strip begins is instead paper meeting paper, since `body`'s background already
+ * propagates to the viewport canvas underneath.
+ *
+ * Only this long because the ramp below is eased; on a linear one it would make the band worse rather
+ * than better. Past ~0.35 it starts eating the dome.
+ */
+const FOLD_FADE = 0.26;
+
+/** Smoothstep segments in the mask below. More changes nothing — the browser interpolates linearly
+ *  between stops, and past this many each straight piece is shorter than the banding it would cause. */
+const FOLD_STEPS = 8;
+
+/**
+ * Smoothstep, as gradient stops along a ramp of `--fold-ramp`.
+ *
+ * A plain linear gradient leaves a visible line where the fade starts: nothing in the image is a
+ * line, but the slope changes in one step where the ramp meets the solid part, and the eye's edge
+ * detection amplifies that discontinuity into a Mach band. Lengthening a linear ramp only relocates
+ * the line, it does not remove it. Smoothstep (`t²(3−2t)`) leaves and arrives with zero slope instead.
+ */
+const foldRamp = () =>
+  Array.from({ length: FOLD_STEPS + 1 }, (_, i) => {
+    const t = i / FOLD_STEPS;
+    const a = t * t * (3 - 2 * t);
+    return `rgba(0,0,0,${a.toFixed(3)}) calc(var(--fold-ramp) * ${t.toFixed(3)})`;
+  }).join(", ");
 
 /**
  * Where the beam rides, as a share of the pull.
@@ -88,9 +122,12 @@ const EDGE = 1 - ((2 * (0.5 - GUTTER)) / BEAM_SPAN) ** 2;
 /** One footer to a page, so a fixed id is enough for the two `textPath` references. */
 const BEAM_ID = "credit-beam";
 
+/** Split so the name can force-break to "Evan / Crow" on mobile without hardcoding either word. */
+const [FIRST_NAME, LAST_NAME] = site.name.split(" ");
+
 const CREDIT = [
-  { line: "Designed & Developed.", at: "0%", anchor: "start" },
-  { line: `Copyright ${new Date().getFullYear()}`, at: "100%", anchor: "end" },
+  { line: "Designed & Developed by Evan.", at: "0%", anchor: "start" },
+  { line: `© ${new Date().getFullYear()}`, at: "100%", anchor: "end" },
 ] as const;
 
 /** Everything but the résumé download — the footer's Connect column is outbound links only. */
@@ -183,11 +220,26 @@ export function Footer() {
       {/* A wrapper for the height, since the panel carries its own `relative` and the two would be
           one specificity apart with nothing to say which wins. Taller than the dome by `OVERHEAD`,
           so it reaches well up behind the name, which is why it comes first: everything after it in
-          here paints over it. Never resized either way, so the renderer allocates its targets once. */}
+          here paints over it. Never resized either way, so the renderer allocates its targets once.
+
+          The mask is gated on the overhang, and by taking the shorter of the two rather than by a
+          second condition anything could disagree with. `--bleed` is 0 wherever the window's bottom
+          edge really is the bottom edge, which zeroes the ramp and collapses every stop below onto
+          the same place: a mask that hides nothing, so the dome runs to the edge untouched, which is
+          right, since there is no bar in front of it to stand clear of. Where there is chrome the
+          bleed is far longer than the ramp, so the fade is the full one. Only `maskImage` is set —
+          also setting the `-webkit-` spelling visibly weakens the glass on iOS, a different
+          compositing path for the masked layer. */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0"
-        style={{ height: box.arc * OVERHEAD }}
+        style={
+          {
+            height: box.arc * OVERHEAD,
+            "--fold-ramp": `min(${(FOLD_FADE * box.arc * OVERHEAD).toFixed(0)}px, calc(var(--bleed) * 99))`,
+            maskImage: `linear-gradient(to top, ${foldRamp()})`,
+          } as CSSProperties
+        }
       >
         <FlutedGlass {...presets.footer} reveal={revealRef} className="h-full w-full" />
       </div>
@@ -196,9 +248,12 @@ export function Footer() {
         ref={nameRef}
         className="relative flex min-h-[clamp(20rem,33vw,34rem)] flex-col justify-end px-[8.7vw] pb-[clamp(5rem,11.5vw,11rem)]"
       >
-        <div className="flex flex-wrap items-start justify-between gap-x-[clamp(2.5rem,5vw,4.5rem)] gap-y-10">
-          <h2 className="font-display text-[clamp(2rem,7.5vw,7rem)] leading-none font-bold tracking-[-0.02em]">
-            {site.name}
+        <div className="flex flex-wrap items-center justify-between gap-x-[clamp(2.5rem,5vw,4.5rem)] gap-y-10 sm:items-start">
+          <h2 className="font-display text-[clamp(2.75rem,7.5vw,7rem)] leading-none font-bold tracking-[-0.02em]">
+            {FIRST_NAME}
+            <br className="sm:hidden" />
+            <span className="hidden sm:inline"> </span>
+            {LAST_NAME}
           </h2>
           <div className="flex gap-[clamp(2.5rem,5vw,4.5rem)] text-[clamp(0.95rem,1.3vw,1.15rem)]">
             <div className="flex flex-col gap-[0.4em]">

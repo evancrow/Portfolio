@@ -215,8 +215,15 @@ export const presets = {
     //
     // A `reach` well past the default, because this panel is a slice down the right of a section
     // whose left half is the list. At 0.35 the margin stops short of the copy, so the lean died the
-    // moment the cursor settled on the thing the reader came to read.
-    interaction: { pull: 0.03, reach: 1.2, shimmer: { radius: 160, gain: 0 } },
+    // moment the cursor settled on the thing the reader came to read — presence eases out, the pull
+    // goes to zero, and the band snaps back to rest until the cursor returns. 2 clears the margin
+    // over even the far (left) edge of the list at ordinary window widths, so presence never drops
+    // and the lean never resets while the cursor is anywhere in the section. The travel itself is
+    // reined in on the shapes' own `pull`, not here — narrowing the reach only trades the snap for a
+    // dead zone over the copy, which is the wrong fix for "leans too far".
+    // pullY a touch above the default 0.35, so the vertical lean reads a little more clearly
+    // alongside the horizontal one instead of trailing far behind it.
+    interaction: { pull: 0.03, reach: 2, pullY: 0.45, shimmer: { radius: 160, gain: 0 } },
   },
 
   // The about section's glow. Held still rather than curved and scroll-driven like `accent`: this

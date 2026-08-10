@@ -140,9 +140,20 @@ export function useGlassRenderer(
       // targets down and then straight back up again on the next real frame.
       if (rect.width === 0 || rect.height === 0) return;
       const dpr = Math.min(window.devicePixelRatio || 1, config.quality.maxDpr);
-      const before = renderer.width;
-      renderer.resize(rect.width, rect.height, dpr, config.quality.fieldScale);
-      if (renderer.width !== before) dirty = true;
+      // Layout geometry, not the rect. The panels can sit inside a box a scroll timeline is
+      // transforming, and a rect reports the transformed box: interpolating that transform leaves
+      // ten-thousandths of a pixel of noise on the height, which measures as 894.0000 / 894.0001 /
+      // 893.9999 from one frame to the next. `resize` reallocates both field targets on any change at
+      // all and hands back cleared ones, so that noise was tearing down and rebuilding the field
+      // mid-scroll and the glass visibly jumped. Offsets ignore transforms and hold still.
+      //
+      // Both dimensions, because either one reallocates. A height-only resize is what a URL bar
+      // collapse or a rotation is, so watching width alone parks the loop three frames later on an
+      // empty field.
+      const beforeW = renderer.width;
+      const beforeH = renderer.height;
+      renderer.resize(host.offsetWidth, host.offsetHeight, dpr, config.quality.fieldScale);
+      if (renderer.width !== beforeW || renderer.height !== beforeH) dirty = true;
 
       pointer.step(
         rect,

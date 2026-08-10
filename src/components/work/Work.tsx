@@ -43,9 +43,7 @@ export function WorkRow({
 }) {
   const [expanded, setExpanded] = useState(false);
   const [height, setHeight] = useState<string>(COLLAPSED_HEIGHT);
-  // Measured off the wrapper, not the paragraph: the paragraph's own scrollHeight excludes its
-  // `mt-4` margin, which would otherwise leave the collapse a few pixels short of the last line.
-  const wrapperRef = useRef<HTMLDivElement>(null);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const isLong =
     entry.description !== undefined &&
     visibleLength(entry.description) > CLAMP_THRESHOLD;
@@ -53,10 +51,10 @@ export function WorkRow({
 
   /** Expand/collapse smoothly by animating `height` to a measured pixel value. Collapsing away
    *  from `height: auto` needs a concrete pixel start first, since a transition can't animate
-   *  from `auto`. `scrollHeight` reflects the paragraph's natural size regardless of the wrapper's
-   *  current clipped height, so it's safe to measure from either direction. */
+   *  from `auto`. `scrollHeight` reflects the paragraph's natural size regardless of its current
+   *  clipped height, so it's safe to measure from either direction. */
   const toggle = () => {
-    const full = wrapperRef.current?.scrollHeight;
+    const full = descriptionRef.current?.scrollHeight;
     if (full) setHeight(`${full}px`);
     if (expanded) {
       requestAnimationFrame(() => setHeight(COLLAPSED_HEIGHT));
@@ -102,13 +100,19 @@ export function WorkRow({
 
         <div className={entry.icon ? "pl-12" : undefined}>
           {entry.description && (
-            <div
-              ref={isLong ? wrapperRef : undefined}
-              className={
+            // The clip/measure element *is* the paragraph now, not a wrapper around it: `em` in
+            // `COLLAPSED_HEIGHT` needs to resolve against this element's own font-size, and on a
+            // separate wrapper (inheriting the ambient, larger font-size instead) it didn't, which
+            // is why 3 lines of small mobile type used to get clipped a line short. Keeping `mt-4`
+            // on this same element is safe — margin sits outside the border box, so it's never
+            // touched by `overflow-hidden`/`height`/`scrollHeight` either way.
+            <p
+              ref={isLong ? descriptionRef : undefined}
+              className={`font-display mt-4 text-[clamp(0.95rem,1.3vw,1.1rem)] leading-[1.4] ${
                 isLong
                   ? "overflow-hidden transition-[height] duration-500 ease-[cubic-bezier(0.65,0,0.35,1)] motion-reduce:transition-none"
-                  : undefined
-              }
+                  : ""
+              }`}
               style={isLong ? { height } : undefined}
               onTransitionEnd={
                 isLong
@@ -120,10 +124,8 @@ export function WorkRow({
                   : undefined
               }
             >
-              <p className="font-display mt-4 text-[clamp(0.95rem,1.3vw,1.1rem)] leading-[1.4]">
-                {renderRichText(entry.description)}
-              </p>
-            </div>
+              {renderRichText(entry.description)}
+            </p>
           )}
 
           <div

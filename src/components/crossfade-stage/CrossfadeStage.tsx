@@ -93,6 +93,28 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
     if (supported) history.scrollRestoration = "manual";
 
     let queued = 0;
+    // The overhang, in px, so the phase unit stays one viewport even though the pin is taller than
+    // one. Read live rather than once: a value published at runtime by another script has to be
+    // re-read on every measurement, or an orientation change that changes it goes stale here.
+    let bleed = 0;
+
+    // The scroll timeline runs on the document, so the pin's range is where the track sits in it.
+    // Written on every resize as well as at mount, because both ends move with the viewport.
+    const range = () => {
+      bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
+      const start = track.getBoundingClientRect().top + window.scrollY;
+      // The *full* pin height, bleed included — this is a physical release distance, not a phase
+      // unit. The pin's actual box is `pin.offsetHeight` tall regardless of how much of that is
+      // overhang; translating it up by anything less leaves exactly that much of its bottom edge
+      // still overlapping whatever comes after the track once released. Subtracting `bleed` here
+      // (matching the `unit` below) was tried and measured wrong: the pin let go early by that
+      // many pixels and sat over the next section's top edge instead of clearing it.
+      const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
+      pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
+      pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
+      pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
+    };
+
     // Seeded from what the markup actually says. Both layers ship displayed and only `to` ships
     // transparent, so at the top of the stage its opacity is already right and its `display` is
     // not, which is exactly the case a single "last value" would miss.
@@ -116,10 +138,15 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
     const apply = () => {
       // Measured every frame rather than cached, and from the track's own rect rather than
       // scrollY, so the stage is correct wherever it sits on the page and after anything that
-      // moves it: resize, orientation, a late font swap. Dividing by the pin's measured height
-      // rather than innerHeight is what keeps the phases honest when a vh and the real viewport
+      // moves it: resize, orientation, a late font swap. Dividing by the pin's own height rather
+      // than innerHeight is what keeps the phases honest when a vh and the real viewport
       // disagree, which they do for the whole of an iOS URL bar collapse.
-      const unit = pin.getBoundingClientRect().height || 1;
+      //
+      // `offsetHeight` rather than a rect, because the pin is the element the scroll timeline may
+      // be transforming, and a rect reports the transformed box: mid-fling that height wobbles by
+      // whatever the pin has moved since, and every layer's opacity would be computed against a
+      // moving unit. Offsets ignore transforms and hold still.
+      const unit = pin.offsetHeight - bleed || 1;
       const p = -track.getBoundingClientRect().top / unit;
       write(fromRef.current, fromState, 1 - smoothstep(stops.outStart, stops.outEnd, p));
       write(toRef.current, toState, smoothstep(stops.inStart, stops.inEnd, p));
@@ -133,22 +160,41 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
       });
     };
 
+    const onResize = () => {
+      range();
+      onScroll();
+    };
+
+    range();
     apply();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       cancelAnimationFrame(queued);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
       if (supported) history.scrollRestoration = restoration;
     };
   }, [stops]);
 
   return (
-    <div ref={trackRef} className="relative w-full" style={{ height: `${stops.height}vh` }}>
-      {/* Sticky is already a containing block, so the layers need nothing else to position against. */}
-      <div ref={pinRef} className={["sticky top-0 h-dvh", className].filter(Boolean).join(" ")}>
+    <div ref={trackRef} style={{ height: `${stops.height}vh` }}>
+      {/*
+        Held by `sticky` where the viewport has no chrome overlapping it, and by the transform
+        `.stage-pin` defines in `globals.css` where it does — see that rule for why. Exactly one
+        viewport tall plus `--bleed`, since that's the unit every phase above is measured in; the
+        overhang belongs to the layers below, not to this box.
+
+        `relative` for the layers to position against (sticky provides this too, but the
+        scroll-timeline path does not), and `isolate` so the stage composites as one stacking
+        context either way.
+      */}
+      <div
+        ref={pinRef}
+        className={["stage-pin relative isolate", className].filter(Boolean).join(" ")}
+        style={{ height: "calc(100vh + var(--bleed))" }}
+      >
         <div ref={fromRef} className="absolute inset-0" style={LAYER_FROM}>
           {from}
         </div>

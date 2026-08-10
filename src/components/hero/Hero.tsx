@@ -1,5 +1,5 @@
-import { FlutedGlass, presets } from "@/components/fluted-glass";
 import { site } from "@/content/site";
+import { HeroPanel } from "./HeroPanel";
 
 /**
  * Full-bleed opening panel. Geometry is transcribed from the 1512x982 design frame: text block
@@ -10,12 +10,10 @@ import { site } from "@/content/site";
  */
 export function Hero() {
   return (
-    <FlutedGlass
-      {...presets.hero}
-      className="h-full"
-      fallback="linear-gradient(to top, #8ea8f5 0%, rgba(142,168,245,0) 55%)"
-    >
-      <div className="flex h-full flex-col justify-center">
+    <HeroPanel>
+      {/* The bleed is padding here, so the lockup centres in the viewport while the glass
+          behind it carries on under the URL bar. */}
+      <div className="flex h-full flex-col justify-center pb-[var(--bleed)]">
         <div className="fade-rise mx-auto w-full max-w-[1512px] px-[6vw] sm:px-[28.5%]">
           <h1 className="font-display text-[clamp(3rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
             {site.name}
@@ -25,6 +23,6 @@ export function Hero() {
           </p>
         </div>
       </div>
-    </FlutedGlass>
+    </HeroPanel>
   );
 }

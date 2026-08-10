@@ -145,13 +145,35 @@ export function AwardsProjects() {
     if (!track || !pin) return;
 
     let queued = 0;
+    // The overhang, in px, so the DWELL unit stays one viewport even though the pin is taller than
+    // one. Read live, same reasoning as `CrossfadeStage`'s own `range()`.
+    let bleed = 0;
+
+    // The scroll timeline runs on the document, so the pin's range is where the track sits in it —
+    // same mechanism `CrossfadeStage` uses, for the same reason: a canvas clips at the visible
+    // viewport inside any `position: sticky` subtree, so this band needs the sticky→scroll-timeline
+    // swap on touch too, not just a taller sticky box.
+    const range = () => {
+      bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
+      const start = track.getBoundingClientRect().top + window.scrollY;
+      // The *full* pin height, bleed included — a physical release distance, not the DWELL unit
+      // below. See CrossfadeStage's identical `range()` for why subtracting bleed here is wrong.
+      const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
+      pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
+      pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
+      pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
+    };
 
     const apply = () => {
       // Measured from the track's own rect rather than scrollY, so this is correct wherever the
-      // section sits and after anything that moves it, the footer's overscroll lift included. The
-      // pin's measured height rather than innerHeight is what keeps a dwell honest when a vh and
-      // the real viewport disagree, which they do for the whole of an iOS URL bar collapse.
-      const unit = pin.getBoundingClientRect().height || 1;
+      // section sits and after anything that moves it, the footer's overscroll lift included.
+      //
+      // `offsetHeight` rather than a rect, because the pin is the element the scroll timeline may
+      // be transforming, and a rect reports the transformed box — same reasoning as
+      // `CrossfadeStage`'s `apply()`. Subtracting bleed keeps the DWELL unit at one plain viewport
+      // regardless of overhang, which is what keeps a dwell honest when a vh and the real viewport
+      // disagree, which they do for the whole of an iOS URL bar collapse.
+      const unit = pin.offsetHeight - bleed || 1;
       const p = -track.getBoundingClientRect().top / unit;
       setActive(clamp(Math.floor(p / DWELL), 0, ITEMS.length - 1));
     };
@@ -164,14 +186,20 @@ export function AwardsProjects() {
       });
     };
 
+    const onResize = () => {
+      range();
+      onScroll();
+    };
+
+    range();
     apply();
     window.addEventListener("scroll", onScroll, { passive: true });
-    window.addEventListener("resize", onScroll, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
 
     return () => {
       cancelAnimationFrame(queued);
       window.removeEventListener("scroll", onScroll);
-      window.removeEventListener("resize", onScroll);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -183,7 +211,10 @@ export function AwardsProjects() {
     const track = trackRef.current;
     const pin = pinRef.current;
     if (!track || !pin) return;
-    const unit = pin.getBoundingClientRect().height || 1;
+    // Same unit `apply()` uses to pick the active index — has to agree, or a click could land on a
+    // scroll position `apply()` reads back as a different item.
+    const bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
+    const unit = pin.offsetHeight - bleed || 1;
     // The middle of the item's dwell, not its start, so where this lands is unambiguously that
     // item instead of a boundary a pixel of scroll could tip either way.
     const top = track.getBoundingClientRect().top + window.scrollY + (index + 0.5) * DWELL * unit;
@@ -202,18 +233,50 @@ export function AwardsProjects() {
         style={{ top: `${PROJECTS_START * DWELL * 100}vh` }}
       />
 
-      {/* Sticky is already a containing block, so the band needs nothing else to position against. */}
-      <div ref={pinRef} className="sticky top-0 flex h-dvh items-center">
-        <div aria-hidden className="pointer-events-none absolute inset-y-0 right-0 w-[38%] sm:w-[46%]">
+      {/*
+        `.stage-pin` (see `globals.css`) rather than a plain `sticky top-0`: the same canvas-clips-
+        inside-any-sticky-subtree issue the hero had applies here too, since this band is a WebGL
+        panel in a sticky pin. Height grows by `--bleed`, and `pb-[var(--bleed)]` reserves that same
+        amount so `items-center` still centers the copy within the original (non-bled) box — the
+        canvas reaches the extra height through `inset-y-0` on its own host (which resolves against
+        the pin's full padding box, padding included), the copy doesn't visually move.
+      */}
+      <div
+        ref={pinRef}
+        className="stage-pin relative isolate flex items-center pb-[var(--bleed)]"
+        style={{ height: "calc(100vh + var(--bleed))" }}
+      >
+        {/*
+          Full-bleed on mobile, and taller than the pin, which is one fix rather than two.
+
+          A shape's `w` is a fraction of the panel's width and its `blur` a fraction of the panel's
+          height, and an ellipse's distance field scales with its *minor* radius — so on a narrow
+          panel every distance in the field shrinks while the feather it is measured against does
+          not. The band's own falloff then never finishes inside the box, and the canvas cuts it off
+          at a hard line. Desktop's 46% is wide enough that the field is down to a thousandth by the
+          top edge; a phone-width column is not, and narrowing it further only makes it worse. So the
+          panel takes the whole width here, which also gives the copy beside it its gutter back.
+
+          Full pin height rather than taller, which is the part that is easy to get backwards. Hanging
+          the panel past the pin does move its own edges off screen, but the window's top row is a
+          boundary too — the page does not paint under the status bar — and all the overhang does is
+          put a stronger part of the field against it. The field has to finish inside the window, not
+          somewhere past it.
+        */}
+        <div
+          aria-hidden
+          className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-[46%]"
+        >
           <FlutedGlass {...presets.accent} shapes={shapes} className="h-full w-full" />
         </div>
 
         {/* Same left gutter as every other body section (Work, About), so copy lines up down the
-            page regardless of which section it's in. The band's own width plus a gap on the
-            right, so a long line runs out of room before it runs under the band at any window
-            size. Narrower band share on mobile — a flat 46% left too little room for the
-            description text on a narrow phone. */}
-        <div className="relative w-full pl-[var(--gutter-left)] pr-[calc(38%+2vw)] sm:pr-[calc(46%+2vw)]">
+            page regardless of which section it's in. On desktop the right padding is the band's own
+            width plus a gap, so a long line runs out of room before it runs under the band. On
+            mobile the band is full-bleed, so there is nothing to clear: the copy takes the ordinary
+            gutter and sits over the faint left tail of the glow, which is the room a description
+            needs on a narrow phone. */}
+        <div className="relative w-full pl-[var(--gutter-left)] pr-[24vw] sm:pr-[calc(46%+2vw)]">
           {GROUPS.map(({ group, items }) => (
             <div key={group} className="mt-[clamp(2.5rem,5vw,4.5rem)] first:mt-0">
               <h2 className="font-display text-[clamp(1.75rem,2.4vw,2.25rem)]">{group}</h2>
