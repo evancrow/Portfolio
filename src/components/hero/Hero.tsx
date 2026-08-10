@@ -15,10 +15,10 @@ export function Hero() {
           behind it carries on under the URL bar. */}
       <div className="flex h-full flex-col justify-center pb-[var(--bleed)]">
         <div className="fade-rise mx-auto w-full max-w-[1512px] px-[6vw] sm:px-[28.5%]">
-          <h1 className="font-display text-[clamp(3rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
+          <h1 className="font-display text-[clamp(3.3rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
             {site.name}
           </h1>
-          <p className="font-display mt-[1.6vw] text-[clamp(1.05rem,1.9vw,2.15rem)] leading-none">
+          <p className="font-display mt-[1.6vw] text-[clamp(1.15rem,1.9vw,2.15rem)] leading-none">
             {site.hero}
           </p>
         </div>

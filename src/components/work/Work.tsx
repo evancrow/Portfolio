@@ -21,6 +21,32 @@ const CLAMP_THRESHOLD = 180;
 /** Collapsed description height: 3 lines at the paragraph's own `leading-[1.4]`. */
 const COLLAPSED_HEIGHT = "4.2em";
 
+/** Keeps `el` fixed on screen while a layout transition it just triggered plays out, by scrolling
+ *  to cancel out any change in its *document*-space position (`rect.top + scrollY`) — not its
+ *  viewport-space one. Plain user scrolling moves `rect.top` too, but leaves document-space
+ *  position untouched, so tracking the raw viewport rect would fight the user's own scroll for the
+ *  life of the loop; document space only moves when the content above `el` actually reflows.
+ *
+ *  Every correction passes `behavior: "auto"` explicitly — `html` sets `scroll-behavior: smooth`
+ *  globally, and the two-argument form of `scrollBy` inherits that, so ~30 corrections over the
+ *  transition would each kick off their own overlapping smooth scroll and compound into a visible
+ *  overshoot-then-snap-back instead of the instant per-frame nudge this needs. */
+function pinDuringTransition(el: HTMLElement | null, durationMs = 520) {
+  if (!el || window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+  const docTop = () => el.getBoundingClientRect().top + window.scrollY;
+  let prev = docTop();
+  const start = performance.now();
+  const step = (now: number) => {
+    const current = docTop();
+    if (current !== prev) {
+      window.scrollBy({ top: current - prev, behavior: "auto" });
+      prev = docTop();
+    }
+    if (now - start < durationMs) requestAnimationFrame(step);
+  };
+  requestAnimationFrame(step);
+}
+
 /** Work/Education only — omits itself entirely until `location`/`dates` are filled in on the
  *  entry. */
 function Meta({ entry }: { entry: Entry }) {
@@ -44,6 +70,7 @@ export function WorkRow({
   const [expanded, setExpanded] = useState(false);
   const [height, setHeight] = useState<string>(COLLAPSED_HEIGHT);
   const descriptionRef = useRef<HTMLParagraphElement>(null);
+  const buttonRef = useRef<HTMLButtonElement>(null);
   const isLong =
     entry.description !== undefined &&
     visibleLength(entry.description) > CLAMP_THRESHOLD;
@@ -60,6 +87,7 @@ export function WorkRow({
       requestAnimationFrame(() => setHeight(COLLAPSED_HEIGHT));
     }
     setExpanded((v) => !v);
+    pinDuringTransition(buttonRef.current);
   };
 
   return (
@@ -138,6 +166,7 @@ export function WorkRow({
           </div>
 
           <button
+            ref={buttonRef}
             type="button"
             onClick={toggle}
             className="mt-2 inline-flex items-center gap-1 text-[0.9em] transition-colors duration-300 hover:text-mute"
@@ -188,6 +217,19 @@ export function Work() {
   const firstVisibleTitle = visible[0]?.title;
   const lastVisibleTitle = visible[visible.length - 1]?.title;
 
+  /** Collapsing removes rows above the fold, which would otherwise strand the viewport over blank
+   *  page; scroll back to the section's own top so "Show Less" lands somewhere with content. */
+  const toggleShowAll = () => {
+    const collapsing = showAll;
+    setShowAll((v) => !v);
+    if (collapsing) {
+      const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      document
+        .getElementById("work")
+        ?.scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "start" });
+    }
+  };
+
   return (
     <section id="work" className="w-full pt-[8vh] pb-[6vh]">
       <h2 className="sr-only">Work</h2>
@@ -217,7 +259,7 @@ export function Work() {
             </em>{" "}
             <button
               type="button"
-              onClick={() => setShowAll((v) => !v)}
+              onClick={toggleShowAll}
               className="-my-2 inline-flex items-center gap-1 py-2 transition-colors duration-300 hover:text-mute"
             >
               {showAll ? "Show Less" : "Show All"}

@@ -233,10 +233,21 @@ export function AwardsProjects() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
 
+    // `range()`'s `start` is the track's document-absolute position, which shifts whenever
+    // anything above it resizes — Work's "Show All"/"Show More" toggles, most concretely. A
+    // window resize is the only thing that recomputed it before, so any of those toggles left
+    // `--pin-start`/`--pin-end` pointing at the pre-toggle layout: the scroll-timeline then
+    // engages/releases at the wrong scroll offset, which reads as a blank gap that only clears
+    // once an actual resize (or, on some browsers, enough scroll-driven relayout) forces a
+    // fresh `range()` call. Body height covers every such case in one place, generically.
+    const bodyObserver = new ResizeObserver(onResize);
+    bodyObserver.observe(document.body);
+
     return () => {
       cancelAnimationFrame(queued);
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      bodyObserver.disconnect();
     };
   }, []);
 
