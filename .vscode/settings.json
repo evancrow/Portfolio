@@ -1,17 +1,19 @@
 {
   "files.exclude": {
-    ".firebase": true,
+    ".claude": true,
     ".vscode": true,
-    "tsconfig.json": true,
-    "firebase.json": true,
-    "Portfolio.code-workspace": true,
+    ".next": true,
     "node_modules": true,
-    "build": true,
-    ".firebaserc": true,
-    ".gitignore": true,
-    ".storybook": true,
-    "yarn.lock": true,
-    "src/stories": true,
-    "package-lock.json": true
+    "tsconfig.tsbuildinfo": true,
+    "tsconfig.json": true,
+    "postcss.config.mjs": true,
+    "Portfolio.code-workspace": true,
+    "package-lock.json": true,
+    "next.config.ts": true,
+    "next-env.d.ts": true,
+    "eslint.config.mjs": true,
+    ".prettierrc": true,
+    ".nvmrc": true,
+    ".gitignore": true
   }
 }

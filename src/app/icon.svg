@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <defs>
+    <radialGradient id="glow" cx="50%" cy="112%" r="62%">
+      <stop offset="0%" stop-color="#8ea8f5" stop-opacity="0.85"/>
+      <stop offset="55%" stop-color="#8ea8f5" stop-opacity="0.35"/>
+      <stop offset="100%" stop-color="#8ea8f5" stop-opacity="0"/>
+    </radialGradient>
+    <radialGradient id="glowAccent" cx="72%" cy="108%" r="46%">
+      <stop offset="0%" stop-color="#c48af0" stop-opacity="0.45"/>
+      <stop offset="100%" stop-color="#c48af0" stop-opacity="0"/>
+    </radialGradient>
+    <filter id="soften" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2.5"/>
+    </filter>
+  </defs>
+  <rect width="64" height="64" fill="#f9f9f9"/>
+  <g filter="url(#soften)">
+    <rect x="0" y="0" width="64" height="64" fill="url(#glow)"/>
+    <rect x="0" y="0" width="64" height="64" fill="url(#glowAccent)"/>
+  </g>
+  <text x="32" y="38" text-anchor="middle"
+        font-family="ui-serif, 'New York', 'Iowan Old Style', Palatino, Georgia, serif"
+        font-weight="600" font-size="25" letter-spacing="-0.3" fill="#0a0a0c">EC</text>
+</svg>
