@@ -1,5 +1,6 @@
 import { site } from "@/content/site";
 import { HeroPanel } from "./HeroPanel";
+import { renderRichText } from "@/lib/rich-text";
 
 /**
  * Full-bleed opening panel. Geometry is transcribed from the 1512x982 design frame: text block
@@ -19,7 +20,7 @@ export function Hero() {
             {site.name}
           </h1>
           <p className="font-display mt-[1.6vw] text-[clamp(1.15rem,1.9vw,2.15rem)] leading-none">
-            {site.hero}
+            {renderRichText(site.hero)}
           </p>
         </div>
       </div>

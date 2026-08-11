@@ -37,7 +37,7 @@ export interface DateRange {
 export interface Entry {
   title: string;
   subheader?: string;
-  /** Supports `**bold**` markers, rendered by `lib/rich-text`. */
+  /** Supports `**bold**`, `*italic*`, and `\n` line breaks, rendered by `lib/rich-text`. */
   description?: string;
   icon?: IconKey;
   platforms?: string[];
@@ -59,7 +59,7 @@ export interface Entry {
   accentSoft?: string;
 }
 
-/** Visible length of a description, ignoring the `**bold**` markers. */
+/** Visible length of a description, ignoring the `**bold**`/`*italic*` markers. */
 export function visibleLength(description: string): number {
-  return description.replace(/\*\*/g, "").length;
+  return description.replace(/\*/g, "").length;
 }

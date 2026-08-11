@@ -8,7 +8,7 @@ export const work: Entry[] = [
     tier: "primary",
     accent: "rgb(19, 52, 200)",
     description:
-      "Built Exa's /answer endpoint, the **first RAG system to clear 90%+ on SimpleQA, beating OpenAI**, Perplexity, and DeepSeek. Engineered crawling infrastructure indexing billions of URLs. Led fullstack on Exa Websets, a platform for AI-driven sourcing and verification. Drove **multi-million-dollar** enterprise deals.",
+      "I work on Search Research & Development.\n\nIn the past, I built Exa's /answer endpoint, the **first RAG system to clear 90%+ on SimpleQA, beating OpenAI**, Perplexity, and DeepSeek. Engineered crawling infrastructure that indexes billions of URLs. Led fullstack on Exa Websets, a platform for AI-driven sourcing and verification. Drove **multi-million-dollar** enterprise deals.",
     link: "https://exa.ai/",
     platforms: ["Web", "Cloud"],
     languages: ["Python", "TypeScript", "Rust"],
@@ -26,6 +26,7 @@ export const work: Entry[] = [
     link: "https://apple.com/",
     location: "Cupertino, California",
     dates: [{ start: "May 2024", end: "Aug 2024" }, { start: "May 2025", end: "Dec 2025" }, { start: "May 2026", end: "Aug 2026" }],
+    description: "Engineering on Apple's Home app team, with work spanning app and system experience, Siri, Vision Pro, and more."
   },
   {
     icon: "stealth",

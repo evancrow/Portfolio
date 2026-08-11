@@ -19,7 +19,7 @@ export const awards: Entry[] = [
       "Built Oculi, an accessibility framework enabling motor-impaired users to control Apple devices with head and eye movements. Publicly released with **iOS & iPadOS 18**.",
     languages: ["Swift", "SwiftUI", "CoreML", "Vision"],
     link: "https://github.com/evancrow/Oculi",
-    accent: "#52c6e0",
-    accentSoft: "#b86fe2",
+    accent: "#EDAD54",
+    accentSoft: "#EB4E38",
   },
 ];
