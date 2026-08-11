@@ -83,7 +83,7 @@ export class RotationMotion {
       return target;
     }
 
-    return this.settle(target, 400 * Math.exp(-3.5 * curve.damping), 0.78, dt);
+    return -this.settle(target, 400 * Math.exp(-3.5 * curve.damping), 0.78, dt);
   }
 
   /** Called when the render loop resumes, so the next frame snaps rather than springs. */
