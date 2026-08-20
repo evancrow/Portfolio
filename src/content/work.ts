@@ -8,7 +8,7 @@ export const work: Entry[] = [
     tier: "primary",
     accent: "rgb(19, 52, 200)",
     description:
-      "I work on Search Research & Development.\n\nIn the past, I built Exa's /answer endpoint, the **first RAG system to clear 90%+ on SimpleQA, beating OpenAI**, Perplexity, and DeepSeek. Engineered crawling infrastructure that indexes billions of URLs. Led fullstack on Exa Websets, a platform for AI-driven sourcing and verification. Drove **multi-million-dollar** enterprise deals.",
+      "I work on Product Research & Development.\n\nIn the past, I built Exa's /answer endpoint, the **first RAG system to clear 90%+ on SimpleQA, beating OpenAI**, Perplexity, and DeepSeek. Engineered crawling infrastructure that indexes billions of URLs. Led fullstack on Exa Websets, a platform for AI-driven sourcing and verification. Drove **multi-million-dollar** enterprise deals.",
     link: "https://exa.ai/",
     platforms: ["Web", "Cloud"],
     languages: ["Python", "TypeScript", "Rust"],
