@@ -49,9 +49,7 @@ export const metadata: Metadata = {
 /** Measures the strip of screen the layout viewport does not cover (iOS Safari's floating URL
  *  bar), and publishes it as `--bleed`/`--fold`. Inline/blocking and gated to avoid forced-layout
  *  storms during a toolbar-fold `resize` on iOS.
- *  Rationale: docs/ios-viewport-bleed.md § MEASURE_BLEED: measuring the strip
- *  TEMP DEBUG: has a console.log — remove once the top-of-scroll jitter in Hero/AwardsProjects
- *  is diagnosed. */
+ *  Rationale: docs/ios-viewport-bleed.md § MEASURE_BLEED: measuring the strip */
 const MEASURE_BLEED = `(function(){
 var s=document.createElement('style');document.head.appendChild(s);var last=-1,lastW=innerWidth;
 function px(v){var p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;visibility:hidden;pointer-events:none;height:'+v;document.body.appendChild(p);var h=p.getBoundingClientRect().height;p.remove();return h}
@@ -60,7 +58,6 @@ var w=innerWidth;if(!force&&w===lastW)return;lastW=w;
 var lvh=px('100lvh'),svh=px('100svh'),screenH=(window.screen&&screen.height)||0,fold=Math.max(0,Math.round(lvh-svh));
 var strip=fold>1&&screenH>lvh?Math.min(screenH-lvh-px('env(safe-area-inset-top)'),2*fold):0;
 strip=Math.max(0,Math.round(strip));
-console.log('[MEASURE_BLEED] force='+force+' scrollY='+window.scrollY+' innerW='+w+' lvh='+lvh+' svh='+svh+' screenH='+screenH+' fold='+fold+' strip='+strip+' last='+last+' changed='+(strip!==last));
 if(strip===last)return;last=strip;
 s.textContent=strip>0?':root{--bleed:'+strip+'px;--fold:'+fold+'px;--pin-position:static;--pin-anim:stage-pin}':':root{--bleed:'+strip+'px;--fold:'+fold+'px}'}
 apply(true);addEventListener('resize',function(){apply(false)});addEventListener('orientationchange',function(){apply(true)})})()`;
