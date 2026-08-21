@@ -1,14 +1,8 @@
 "use client";
 
-/**
- * Two panels stacked in one pinned viewport, crossfaded by scroll position.
- *
- * Nothing moves geometrically while the handoff runs, so the eye reads a dissolve between two
- * scenes rather than one sliding over the other. Opacity is a pure function of scroll position,
- * never of elapsed time: park the wheel and the picture parks with it, scroll back up and it
- * retraces exactly, and jumping straight to a position (scroll restoration, End, an anchor) is
- * correct on the first frame instead of catching up.
- */
+/** Two panels stacked in one pinned viewport, crossfaded by scroll position — never time, so the
+ *  picture is always exactly where the scroll position says it should be.
+ *  Rationale: docs/crossfade-stage.md § Position, not time */
 
 import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
 import { registerStage, requestStageFrame } from "@/components/scroll-stage/useScrollStage";
@@ -153,20 +147,8 @@ export function CrossfadeStage({
         ? touchStops
         : stops;
 
-    // `range()`'s job: turn the handful of things that force a synchronous layout to read
-    // (`getBoundingClientRect()`, `offsetHeight`, `getComputedStyle()`) into plain numbers cached
-    // here, so `measure()` — which runs on every scroll frame, not just the occasional resize —
-    // never has to force one itself. `window.scrollY` is the one read `measure()` keeps doing
-    // live, and it's cheap: the browser already tracks it continuously and it forces nothing.
-    //
-    // This split is what actually matters on iOS specifically: the URL bar animates the viewport
-    // height *during* an active scroll gesture, not just at rest between them, so there is a
-    // layout-affecting change genuinely pending on or near every scroll frame — which is exactly
-    // what a forced-layout read has to resolve synchronously before it can return anything.
-    // Desktop never has anything pending mid-scroll (nothing resizes while scrolling), so the same
-    // per-frame reads that are nearly free there were forcing real work on every mobile scroll
-    // frame, more of them the faster the scroll — a strong match for "smooth slow, stepping at
-    // normal speed, desktop unaffected either way."
+    // `range()` caches the forced-layout reads so `measure()` (runs every scroll frame) never
+    // has to force one itself. Rationale: docs/pinned-scroll-stages.md § range()'s cache
     let trackTop = 0;
     let unit = 1;
 
@@ -185,24 +167,16 @@ export function CrossfadeStage({
       // events that call `range()` in the first place — so this is the only place it needs
       // reading at all, unlike the per-frame read `measure()` used to do for the same number.
       unit = pin.offsetHeight - bleed - fold || 1;
-      // The *full* pin height, bleed included — this is a physical release distance, not a phase
-      // unit. The pin's actual box is `pin.offsetHeight` tall regardless of how much of that is
-      // overhang; translating it up by anything less leaves exactly that much of its bottom edge
-      // still overlapping whatever comes after the track once released. Subtracting `bleed` here
-      // (matching `unit` above) was tried and measured wrong: the pin let go early by that many
-      // pixels and sat over the next section's top edge instead of clearing it.
+      // Full pin height, bleed included — a physical release distance, not a phase unit.
+      // Rationale: docs/pinned-scroll-stages.md § Full pin height vs. bleed, in range()
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
       pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
       pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
       pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
     };
 
-    // iOS fires `resize` all through a scroll as the URL bar folds — same behaviour `layout.tsx`
-    // documents for `--bleed` — and none of those change the viewport's width. Gating `range()`
-    // on a real width change is what tells an actual resize (rotation, an actual window resize)
-    // apart from that noise, so `--pin-start`/`--pin-end` stay put through a toolbar fold instead
-    // of being rewritten mid-gesture, which is what let the scroll-timeline's range drift under a
-    // stationary scroll position and snap the pin.
+    // Width-gated so an iOS toolbar-fold resize storm doesn't rewrite the pin range mid-gesture.
+    // Rationale: docs/pinned-scroll-stages.md § Width-gated resize handling
     let lastWidth = window.innerWidth;
 
     // Seeded from what the markup actually says. Both layers ship displayed and only `to` ships
@@ -235,14 +209,8 @@ export function CrossfadeStage({
       // `range()`. `window.scrollY` is the only per-frame read, and it never forces layout.
       const p = (window.scrollY - trackTop) / unit;
       pending.fromFade = 1 - smoothstep(fadeStops.outStart, fadeStops.outEnd, p);
-      // In cover mode `to`'s opacity mirrors `from`'s own fade-out curve directly, rather than
-      // riding its own `gap`/`in` window: the visible transition was always `out` (`from`'s own
-      // fadeout — "the animation this stage exists to show", per `page.tsx`), and covering with an
-      // opaque `to` should use that same window, not require `phases` to be separately retuned
-      // for `in` every time a usage switches mode (a `gap`/`in` sized for a disjoint dissolve — a
-      // deliberate blank beat between two translucent scenes — left `to` a near-instant snap here
-      // instead of a dissolve). This also makes the two opacities complementary, which is exactly
-      // a cross-dissolve: no gap where neither layer covers the point being looked at.
+      // Cover mode: `to`'s opacity mirrors `from`'s own fade-out curve directly, complementary,
+      // rather than riding its own gap/in window. Rationale: docs/crossfade-stage.md § Dissolve vs. cover mode
       pending.toFade =
         mode === "cover" ? 1 - pending.fromFade : smoothstep(fadeStops.inStart, fadeStops.inEnd, p);
     };
@@ -265,10 +233,7 @@ export function CrossfadeStage({
       onScroll();
     };
 
-    // A real recompute regardless of width: a rotation can keep the shorter dimension unchanged on
-    // some devices, `scrollend` is free since the page is already stationary when it fires and
-    // catches anything the width gate above was too narrow for, and fonts are the one thing that
-    // resizes the page with no resize event at all.
+    // Real recompute regardless of width. Rationale: docs/pinned-scroll-stages.md § Orientation / scrollend
     const onOrientation = () => {
       lastWidth = window.innerWidth;
       range();
@@ -300,16 +265,8 @@ export function CrossfadeStage({
 
   return (
     <div ref={trackRef} style={{ height: `calc(${stops.travel}svh + 100vh + var(--bleed))` }}>
-      {/*
-        Held by `sticky` where the viewport has no chrome overlapping it, and by the transform
-        `.stage-pin` defines in `globals.css` where it does — see that rule for why. Exactly one
-        viewport tall plus `--bleed`, since that's the unit every phase above is measured in; the
-        overhang belongs to the layers below, not to this box.
-
-        `relative` for the layers to position against (sticky provides this too, but the
-        scroll-timeline path does not), and `isolate` so the stage composites as one stacking
-        context either way.
-      */}
+      {/* .stage-pin: sticky or scroll-timeline transform depending on --bleed.
+          Rationale: docs/ios-viewport-bleed.md § .stage-pin: sticky vs. scroll-timeline swap */}
       <div
         ref={pinRef}
         className={["stage-pin relative isolate", className].filter(Boolean).join(" ")}

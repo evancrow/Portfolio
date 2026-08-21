@@ -1,24 +1,9 @@
 "use client";
 
-/**
- * One shared per-frame scheduler for every pinned scroll stage on the page.
- *
- * Each stage (`CrossfadeStage`, `AwardsProjects`) used to run its own independent
- * `requestAnimationFrame` loop: read live geometry (`getBoundingClientRect`, `offsetHeight`),
- * then immediately write styles from it. With two stages mounted, the browser had to run stage
- * A's read, stage A's write (dirties layout), stage B's read (forces the layout stage A just
- * dirtied), stage B's write — a forced synchronous layout wedged into every single scroll frame,
- * for as long as both were on screen.
- *
- * Registering a `measure` (reads only) and a `commit` (writes only) here instead means every
- * stage's reads run before any stage's writes, every frame — eliminating that interleave by
- * construction rather than by accident.
- *
- * Deliberately narrow: `range()` (each stage's occasional, resize-driven pin-geometry write) and
- * the scroll/resize listeners that trigger it stay on each stage — neither runs every frame, so
- * neither was contributing to the per-frame interleave this exists to remove. Centralizing only
- * the part that actually runs on every frame of a scroll gesture is what keeps this small.
- */
+/** One shared per-frame scheduler for every pinned scroll stage (`CrossfadeStage`,
+ *  `AwardsProjects`): runs every registered `measure` before any `commit`, every frame, so two
+ *  stages mounted at once can't force a synchronous layout off of each other.
+ *  Rationale: docs/pinned-scroll-stages.md § Why a shared scheduler */
 
 type Callback = () => void;
 

@@ -1,26 +1,8 @@
 "use client";
 
-/**
- * Footer, with a fluted glass dome that grows out of its bottom edge on overscroll.
- *
- * One number drives all of it, and everything here is a share of that one number, which is the whole
- * of why it reads as one movement:
- *
- * - The page above and the name ride up by the full pull, through `--lift` and a matching transform.
- *   Two writes, one value, no second rate to keep in step. The strip the page vacates is the footer's
- *   own paper, so paper slides over paper and the seam between them never shows.
- * - The dome is a fixed-size glass panel whose field grows out of its bottom edge, through the
- *   renderer's own `reveal`. Fixed, because the renderer sizes its render targets from the panel's
- *   rect and they are immutable textures, so animating the panel itself would reallocate both of
- *   them every frame. Grown rather than uncovered: a mask over it would cut every flute off along
- *   one contour, where scaling the field leaves each one dissolving at its own height, which is
- *   what the hero looks like and the whole reason the panel is here.
- * - The credit line is the one thing that moves on its own account, because it is not moving on its
- *   own account: it is lying on a beam the dome bends. The beam is one path and each half of the line
- *   is one string laid along it, so a phrase bends from the middle as a whole and keeps its kerning.
- *   Not a box per letter: letters set individually come apart, and the rim of a curve sweeping
- *   through a word tears it in half.
- */
+/** Footer, with a fluted glass dome that grows out of its bottom edge on overscroll — one number
+ *  (the pull) drives the page lift, the dome's reveal, and the credit line's beam together.
+ *  Rationale: docs/footer.md § One number drives all of it */
 
 import { useCallback, useEffect, useRef, useState, type CSSProperties } from "react";
 import { ArrowUpRight } from "lucide-react";
@@ -36,48 +18,22 @@ const ARC_RATIO = 0.45;
 /** Fallback until the first measurement lands, so the very first frame has somewhere to go. */
 const ARC_FALLBACK = 225;
 
-/**
- * The glass panel's height, in domes.
- *
- * The reveal is a fraction of the panel, and so is the field's feather, so a reveal approaching 1 is
- * a falloff as long as the panel it has to die inside. It does not make it: it meets the top of the
- * canvas still at strength and rules a hard horizontal line across the page, which is the one thing
- * nothing downstream can soften, since a canvas has no outside. So the panel is built taller than the
- * dome ever opens to and the reveal only ever uses the bottom of it. Two is enough to leave the tail
- * at a few ten-thousandths by the top edge.
- *
- * The footer preset's `blur` is paired with this number: the room costs a slightly wider feather, and
- * that preset pays for it.
- */
+/** The glass panel's height, in domes — taller than the dome ever opens to, so the reveal's tail
+ *  finishes inside the panel instead of hitting the canvas edge as a hard line.
+ *  Rationale: docs/footer.md § OVERHEAD */
 const OVERHEAD = 2;
 
-/**
- * How much of the panel's bottom dissolves into the fold, as a share of its own height.
- *
- * iOS Safari's floating URL bar paints over the last stretch of the document rather than beside it,
- * and there is no remaining scroll at the footer to give the panel overhang the way the hero's bleed
- * does — this is the true end of the page. So the panel doesn't reach for the fold, it dissolves
- * before it: masked out over its own last `FOLD_FADE` share, so what would otherwise be a hard cut
- * where the bar's strip begins is instead paper meeting paper, since `body`'s background already
- * propagates to the viewport canvas underneath.
- *
- * Only this long because the ramp below is eased; on a linear one it would make the band worse rather
- * than better. Past ~0.35 it starts eating the dome.
- */
+/** How much of the panel's bottom dissolves into the fold, as a share of its own height, so the
+ *  iOS URL-bar strip meets paper rather than a hard-clipped edge.
+ *  Rationale: docs/footer.md § FOLD_FADE */
 const FOLD_FADE = 0.26;
 
 /** Smoothstep segments in the mask below. More changes nothing — the browser interpolates linearly
  *  between stops, and past this many each straight piece is shorter than the banding it would cause. */
 const FOLD_STEPS = 8;
 
-/**
- * Smoothstep, as gradient stops along a ramp of `--fold-ramp`.
- *
- * A plain linear gradient leaves a visible line where the fade starts: nothing in the image is a
- * line, but the slope changes in one step where the ramp meets the solid part, and the eye's edge
- * detection amplifies that discontinuity into a Mach band. Lengthening a linear ramp only relocates
- * the line, it does not remove it. Smoothstep (`t²(3−2t)`) leaves and arrives with zero slope instead.
- */
+/** Smoothstep gradient stops along `--fold-ramp`, to avoid a Mach band at a linear fade's edge.
+ *  Rationale: docs/footer.md § Fold ramp (Mach banding) */
 const foldRamp = () =>
   Array.from({ length: FOLD_STEPS + 1 }, (_, i) => {
     const t = i / FOLD_STEPS;
@@ -85,36 +41,13 @@ const foldRamp = () =>
     return `rgba(0,0,0,${a.toFixed(3)}) calc(var(--fold-ramp) * ${t.toFixed(3)})`;
   }).join(", ");
 
-/**
- * Where the beam rides, as a share of the pull.
- *
- * Above 1, which reads wrong until you look at what the dome is made of. Its crest is parked on the
- * panel's bottom edge and everything visible is the Gaussian tail above that, so the blue reaches
- * well past the height the reveal nominally opens to. A beam on that nominal height is small grey
- * text laid inside the glass with flutes running through it, which is the one place it cannot go, so
- * the beam clears the dome rather than sitting on it: at a full pull the ends of the line ride a
- * little over one pull above the seam, where the field is down to a few percent and the paper is
- * white again.
- *
- * Bounded at the top by the name, which rides up by exactly the pull. Much past 1.4 and the inner end
- * of the longer phrase starts arriving under its descenders.
- */
+/** Where the beam rides, as a share of the pull — above 1, since the dome's crest sits on the
+ *  panel's bottom edge and the visible blue reaches well past the reveal's nominal height.
+ *  Rationale: docs/footer.md § SURFACE */
 const SURFACE = 1.25;
 
-/**
- * Below `sm`, the beam's crest reads taller than the dome under it.
- *
- * The dome's blur feather scales as `blur * reveal^0.75 * fh` in the shader (`passes.ts`), where `fh`
- * is the panel's own pixel height — so for the same raw overscroll, a shorter mobile footer feathers
- * a shorter reach. The beam's crest has no such term: it is `pull * SURFACE` alone, blind to the
- * panel it is meant to ride above. So on a short footer the line arcs above where the glass has
- * actually reached.
- *
- * Tapered rather than stepped, so there is no seam at the breakpoint, and flat at 1 from `sm` up, so
- * desktop is untouched. The floor is a rough match to the feather's own `fh^0.25` falloff between a
- * phone-width and a desktop-width footer, not a measured one — nudge `MOBILE_SURFACE` if it still
- * reads tall on a narrow device.
- */
+/** Below `sm`, tapers `SURFACE` down so the beam's crest doesn't read taller than the shorter
+ *  mobile dome under it. Rationale: docs/footer.md § MOBILE_SURFACE */
 const MOBILE_SURFACE = 0.3;
 const MOBILE_WIDTH = 375;
 const SM_WIDTH = 640;
@@ -127,14 +60,9 @@ function surfaceFor(width: number): number {
   return SURFACE * (MOBILE_SURFACE + (1 - MOBILE_SURFACE) * t);
 }
 
-/**
- * The beam's own width, in half-footers, measured to where its parabola would come back to rest.
- *
- * Above 1 on purpose: the ends sit off the window, so what crosses the page is the gentle middle of
- * the arc rather than the steep shoulders where it turns over. It also means the beam has no rim on
- * screen for a phrase to straddle, which is the thing that cannot be made to look like anything but
- * a fault.
- */
+/** The beam's own width, in half-footers, measured to where its parabola would come back to rest —
+ *  above 1 so the ends (and the parabola's steep shoulders) sit off the window.
+ *  Rationale: docs/footer.md § BEAM_SPAN */
 const BEAM_SPAN = 1.35;
 
 /** The page's side gutter, matching the `px-[8.7vw]` the rest of the footer is laid out on. The beam
@@ -243,19 +171,8 @@ export function Footer() {
       ref={footerRef}
       className="relative isolate bg-paper pb-[env(safe-area-inset-bottom)] text-ink"
     >
-      {/* A wrapper for the height, since the panel carries its own `relative` and the two would be
-          one specificity apart with nothing to say which wins. Taller than the dome by `OVERHEAD`,
-          so it reaches well up behind the name, which is why it comes first: everything after it in
-          here paints over it. Never resized either way, so the renderer allocates its targets once.
-
-          The mask is gated on the overhang, and by taking the shorter of the two rather than by a
-          second condition anything could disagree with. `--bleed` is 0 wherever the window's bottom
-          edge really is the bottom edge, which zeroes the ramp and collapses every stop below onto
-          the same place: a mask that hides nothing, so the dome runs to the edge untouched, which is
-          right, since there is no bar in front of it to stand clear of. Where there is chrome the
-          bleed is far longer than the ramp, so the fade is the full one. Only `maskImage` is set —
-          also setting the `-webkit-` spelling visibly weakens the glass on iOS, a different
-          compositing path for the masked layer. */}
+      {/* Height wrapper, taller than the dome by OVERHEAD; mask gated on the overhang (--bleed).
+          Rationale: docs/footer.md § Dome wrapper & fold mask */}
       <div
         aria-hidden
         className="pointer-events-none absolute inset-x-0 bottom-0"

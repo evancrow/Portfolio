@@ -1,75 +1,28 @@
 "use client";
 
-/**
- * Turns overscroll at the bottom of the page into one number.
- *
- * There is nothing left to scroll down there, so there is no position to read and the gesture has to
- * be assembled out of raw wheel and touch deltas. That is the whole difficulty of this file: a wheel
- * event is a chunk rather than a place, momentum arrives as more of the same chunks with nothing
- * marking where the hand stopped, and a finger resting still on a trackpad sends nothing at all.
- * Every one of those gaps is a timer in here.
- *
- * The alternative, giving the page real scroll room past its own end and reading the position out of
- * it, was tried and taken back out. The browser owns that position, and it will not share it: the
- * return has to be a programmatic scroll, Safari holds the wheel gesture's own target offset for a
- * while past the `scrollend` it has already fired, and it puts the page back where it wanted it. Which
- * our return reads as a hand, stands down for, and tries again. The two of them trade the page back and
- * forth for a second or more. Owning the whole gesture is more code than that was, and it is the only
- * version of this that cannot be argued with.
- *
- * Nothing pulls back while the gesture is still going. The band holds wherever the hand left it and
- * only starts home once the finger lifts or the wheel goes quiet, because anything that reels it in
- * mid-pull is felt as the page arguing with the hand rather than as resistance. The resistance lives in
- * the accumulator instead, which is what `RESIST` sets.
- *
- * The value is handed to a callback rather than to React state. It changes every frame, and a number
- * that only ever lands in a style property has no business going through a render.
- */
+/** Turns overscroll at the bottom of the page into one number, assembled from raw wheel/touch
+ *  deltas since there's no scroll position left to read once the page is at its end.
+ *  Rationale: docs/footer.md § Overscroll reveal: why a custom gesture */
 
 import { useEffect, useRef } from "react";
 import { expEase, spring, stepSpring } from "@/components/fluted-glass/spring";
 
-/**
- * TUNE ME. How firm the pull is: how much gesture a full dome costs, against the dome's own height.
- *
- * The accumulator is asymptotic, so this is resistance rather than a rate. At 1 the first pixels track
- * the gesture exactly and it takes about three domes of scrolling to arrive within a few percent of a
- * full one. Raising it multiplies that: the reveal never quite finishes, which is the point, and the
- * last of it costs far more than the first.
- *
- * The one thing it costs is the opening, since the first pixels track at `1 / RESIST` of the gesture.
- * That softens the start but never delays it, which is the line that matters: glass that arrives late
- * was the original complaint about this whole effect. Much above 2 and it is soft enough off the mark
- * to read as lag.
- */
+/** TUNE ME. How firm the pull is: how much gesture a full dome costs, against the dome's own
+ *  height. Rationale: docs/footer.md § RESIST */
 const RESIST = 1.6;
 
-/**
- * Quiet that counts as the gesture being over.
- *
- * Momentum keeps wheel events coming after the fingers lift, so this is waiting out the momentum
- * rather than the fingers. Long enough to cover a slow deliberate scroll, whose events are sparse and
- * whose gaps a short window reads as a release: the reader pushes a notch, the spring takes it back,
- * and the reveal is stuck. Worst at the top of the travel, where the spring pulls hardest.
- */
+/** Quiet that counts as the gesture being over — waits out wheel momentum, not just the fingers.
+ *  Rationale: docs/footer.md § IDLE_MS */
 const IDLE_MS = 240;
 
-/**
- * The return. Critically damped, since an overshoot here would be the band pushing past shut and the
- * page moving down under a reader who is already on their way up.
- *
- * Soft on purpose: it only ever runs with the hand off, so it has nothing to hurry back for, and a
- * stiff one reads as the band being yanked out from under the gesture that just finished. Around a
- * third of a second to settle from a full pull.
- */
+/** The return spring. Critically damped, soft on purpose since it only ever runs with the hand
+ *  off. Rationale: docs/footer.md § STIFFNESS / ZETA */
 const STIFFNESS = 110;
 const ZETA = 1;
 
-/**
- * How quickly the measured pull velocity is allowed to change while the hand is on it. Smoothed
- * because it is a difference of two frames of chunked wheel deltas, and the spring inherits it at
- * release: unsmoothed, whichever notch happened to land last would decide how the return leaves.
- */
+/** How quickly the measured pull velocity is allowed to change while the hand is on it, so the
+ *  spring doesn't inherit whichever chunked wheel delta happened to land last.
+ *  Rationale: docs/footer.md § VEL_RATE */
 const VEL_RATE = 30;
 
 /** Below this the band is shut as far as anyone can see. */
@@ -78,13 +31,9 @@ const EPSILON = 0.05;
 /** Slack on the bottom of the page, for fractional device pixels and zoom. */
 const BOTTOM_SLOP = 4;
 
-/**
- * Slack on a wheel delta going the other way.
- *
- * A trackpad drag is not monotonic: it emits the odd zero and the odd pixel the wrong way while the
- * fingers are still moving down. Treating those as a release starts the return home under the hand,
- * which is felt as the band stuttering. A genuine scroll back up still lets go on the spot.
- */
+/** Slack on a wheel delta going the other way — a trackpad drag isn't monotonic, and treating its
+ *  odd notch as a release starts the return home under the hand.
+ *  Rationale: docs/footer.md § UP_SLOP */
 const UP_SLOP = 2;
 
 const clamp = (v: number, lo: number, hi: number) => (v < lo ? lo : v > hi ? hi : v);

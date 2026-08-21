@@ -1,19 +1,8 @@
 "use client";
 
-/**
- * The Timeline's real content, mounted by `Timeline.tsx` once its dissolve transition is under
- * way. The model is two numbers, held in refs and written imperatively so panning never costs a
- * React render: `centerRef` (the date at the vertical center of the view — the cursor) and
- * `pxPerMonthRef` (pixels per month, `BASE_PX_PER_MONTH * zoom`). `useTimelineWindow` owns the
- * cursor's bounded elastic pan; `useTimelineZoom` owns the continuous zoom. Both funnel into
- * `renderFrame`, the one function that writes every mounted flute's `transform`, every label's
- * `textContent`, and — rarely, since it only changes as flutes cross the viewport's edge — the
- * mounted (visible) flute set as React state.
- *
- * Flutes are culled to the visible set plus a margin — cheap now that a flute is a plain CSS
- * fill, but the column can still run to dozens of entries at once, and there's no reason to keep
- * DOM nodes and per-frame writes going for ones nowhere near the viewport.
- */
+/** The Timeline's real content: `centerRef`/`pxPerMonthRef` held in refs and written imperatively
+ *  so panning never costs a React render, funneled into `renderFrame`.
+ *  Rationale: docs/timeline.md § The model */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { education } from "@/content/education";
@@ -44,32 +33,25 @@ const BASE_PX_PER_MONTH = 64;
 const MIN_ZOOM = 0.2;
 const MAX_ZOOM = 3.5;
 
-/** Where the top/bottom edge date labels sit, as a fraction of the view's height — and, so the
- *  flute column's feather lines up with them exactly, also where its mask finishes fading to
- *  nothing. A flute is gone by the time it reaches a label, not just starting to fade there: from
- *  the label out to the true edge is empty, not a continuing dissolve. One number driving both,
- *  rather than two that happened to agree. */
+/** Where the top/bottom edge date labels sit, as a fraction of the view's height — also where the
+ *  flute column's feather mask finishes fading to nothing, so the two stay in lockstep.
+ *  Rationale: docs/timeline.md § Feather mask */
 const EDGE_INSET_TOP = 0.12;
 const EDGE_INSET_BOTTOM = 0.88;
 
-/** How much room the fade itself needs, in percentage points, anchored so it finishes exactly at
- *  `EDGE_INSET_TOP`/`BOTTOM` and runs inward from there — not outward from the label toward the
- *  true edge, which is what left the old version fading past where the labels sat. */
+/** How much room the fade itself needs, in percentage points, anchored inward from
+ *  `EDGE_INSET_TOP`/`BOTTOM`. Rationale: docs/timeline.md § Feather mask */
 const FEATHER_SPAN = 8;
-/** Where the mask reaches full opacity, moving inward from the label. Also the band flute title
- *  labels are allowed to sit in — inside the ramp itself, a label would be sitting on partially
- *  faded glass, which reads as broken rather than as part of the dissolve. */
+/** Where the mask reaches full opacity, moving inward from the label — also the band flute title
+ *  labels are allowed to sit in. */
 const FEATHER_OPAQUE_TOP = EDGE_INSET_TOP + FEATHER_SPAN / 100;
 const FEATHER_OPAQUE_BOTTOM = EDGE_INSET_BOTTOM - FEATHER_SPAN / 100;
 
-/** How far into the ramp the eased midpoint sits, as a fraction of `FEATHER_SPAN` — tuned so it
- *  reads as a soft dissolve rather than a flat linear wipe. */
+/** How far into the ramp the eased midpoint sits, as a fraction of `FEATHER_SPAN`. */
 const FEATHER_EASE = 0.45;
 
-/** The flute column's fade, built once from the constants above rather than hand-tuned
- *  separately, so it can't drift out of step with the labels it has to line up against. Computed
- *  here, not in a global stylesheet, since a static CSS class has no way to share these numbers
- *  with the component that also positions those labels. */
+/** The flute column's fade, built once from the constants above so it can't drift out of step
+ *  with the labels it has to line up against. */
 const FEATHER_MASK = `linear-gradient(to bottom, transparent, transparent ${EDGE_INSET_TOP * 100}%, rgba(0, 0, 0, 0.55) ${EDGE_INSET_TOP * 100 + FEATHER_SPAN * FEATHER_EASE}%, #000 ${FEATHER_OPAQUE_TOP * 100}%, #000 ${FEATHER_OPAQUE_BOTTOM * 100}%, rgba(0, 0, 0, 0.55) ${EDGE_INSET_BOTTOM * 100 - FEATHER_SPAN * FEATHER_EASE}%, transparent ${EDGE_INSET_BOTTOM * 100}%, transparent)`;
 /** Extra viewport-heights of margin, each side, before a flute is unmounted. */
 const CULL_MARGIN = 0.5;
