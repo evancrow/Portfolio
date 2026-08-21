@@ -39,14 +39,8 @@
     scrollbar-width: none;
     -ms-overflow-style: none;
 
-    /*
-     * No scroll anchoring. `CrossfadeStage` takes a faded-out layer out of the page with
-     * `display: none`, which the browser reads as content changing under the viewport and
-     * answers by correcting the scroll position to keep what you were looking at in place.
-     * There is nothing to keep in place here: every layer is `absolute inset-0` in a pinned box,
-     * so the correction is pure error. Safari does not implement `overflow-anchor` at all, so
-     * this is a Chrome/Firefox-only fix.
-     */
+    /* No scroll anchoring — CrossfadeStage's display:none layers would otherwise trigger a
+       scroll-position correction with nothing to correct for. Rationale: docs/crossfade-stage.md § overflow-anchor: none */
     overflow-anchor: none;
   }
 
@@ -104,43 +98,14 @@
   transform: var(--lift, none);
 }
 
-/*
- * How far the pinned panels reach past the bottom of the viewport.
- *
- * iOS Safari keeps a strip of the screen for its URL bar, and page content does paint into it, but only
- * ordinary in-flow content that carries on below the viewport. A `position: sticky` box is bounded by
- * the viewport and stops dead on that line, which is what left a band of paper under the glass.
- *
- * Zero here and measured from the screen at runtime, by the script in `layout.tsx`. It cannot be
- * written as a length: the strip is the part of the screen the layout viewport does not cover, which is
- * a different size on every device and is not exposed to CSS at all, `env(safe-area-inset-bottom)`
- * included. Zero is also the right answer everywhere the strip does not exist, which is every browser
- * but this one, so nothing else has to know the difference.
- */
+/* How far the pinned panels reach past the bottom of the viewport, measured at runtime by
+   layout.tsx's MEASURE_BLEED script. Rationale: docs/ios-viewport-bleed.md § The --bleed custom property */
 :root {
   --bleed: 0px;
 }
 
-/*
- * The pin: `position: sticky` wherever it can be afforded, and a scroll-driven transform where it
- * cannot.
- *
- * Sticky is held by the compositor, so it never jitters, and it is bounded by the layout viewport, so
- * its bottom edge lands on the URL bar and the glass stops there. A scroll timeline is the other way
- * round on both counts: the box stays ordinary in-flow content and paints past the viewport into the
- * strip behind the bar, and Safari interpolates the transform at scroll offsets that fall between
- * frames, which reads as the whole stage shaking.
- *
- * Gated on `--pin-position`/`--pin-anim` rather than a media query: `layout.tsx`'s measuring script
- * only ever writes them alongside a non-zero `--bleed`, so the mechanism is driven by the same
- * measurement that says a strip is really there, not by a second guess (device type, pointer coarseness)
- * that could disagree with it — a touch-capable desktop or a large window measures a zero strip and
- * keeps `sticky`, which also keeps it clear of the transform's trackpad-only shake.
- *
- * Unlayered on purpose: Tailwind v4 puts `.relative` in `@layer utilities`, and an unlayered rule beats
- * a layered one regardless of source order, which is what lets `position: static` win here over the
- * `relative` utility on the same element.
- */
+/* The pin: sticky wherever it can be afforded, a scroll-driven transform where it cannot.
+   Rationale: docs/ios-viewport-bleed.md § .stage-pin: sticky vs. scroll-timeline swap */
 .stage-pin {
   position: sticky;
   top: 0;
@@ -159,21 +124,9 @@
   }
 
   .stage-pin {
-    /* Both `position` and `animation-name` default to sticky's values, so an element with neither
-       var written (the desktop case) is untouched. Longhands rather than the `animation` shorthand:
-       a `var()` standing in for one token of a compound shorthand value is exactly the kind of thing
-       WebKit's shorthand parser can fail to resolve, and when it does the whole declaration is
-       dropped silently — no console error, just an animation that never attaches. `transform` stays
-       `none` in that failure case, and `position: static` with no transform gives the panel no
-       containing block at all for its `absolute inset-0` layers, which is a blank hero, not a
-       clipped one. Each of these as its own longhand can only ever fail on its own value. */
+    /* Longhand properties, not the `animation` shorthand — a WebKit shorthand-parse failure drops
+       the whole declaration silently. Rationale: docs/ios-viewport-bleed.md § Why longhand, not the animation shorthand */
     position: var(--pin-position, sticky);
-    /* A static, non-animated baseline. `position: static` gives the panel no containing block for
-       its `absolute inset-0` layers unless `transform` is something other than `none` — and this
-       holds that regardless of whether the animation below actually engages, so a failure in the
-       animation degrades to an unpinned (but still visible, still sized) panel rather than a blank
-       one. The 0%-keyframe transform is the same value, so this is inert whenever the animation
-       does run. */
     transform: translate3d(0, 0, 0);
     animation-name: var(--pin-anim, none);
     animation-timing-function: linear;

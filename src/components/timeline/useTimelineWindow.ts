@@ -1,27 +1,16 @@
 "use client";
 
-/**
- * Bounded elastic pan for the Timeline's date cursor: an absolute ms-since-epoch `centerMs`,
- * nothing scrolls in DOM terms. Wheel and touch deltas accumulate into a raw position that can
- * give a little past either bound during a gesture — a small, viewport-relative squish rather
- * than the whole content, so panning never reveals more than a sliver of blank timeline — and a
- * critically damped spring, always starting from rest, decelerates it back once the gesture ends.
- * No overshoot: the bound it settles to often sits exactly on a month boundary (`parseDate`
- * resolves "Mon YYYY" to day 1, midnight), so it's a knife-edge for the cursor label — any
- * overshoot there, however small, crosses the label's transition and comes back, reading as the
- * month flickering rather than as a bounce. Starting the spring from rest every time (`ZETA >= 1`
- * guarantees no overshoot only when the initial velocity is zero) is what actually makes that
- * guarantee hold.
- */
+/** Bounded elastic pan for the Timeline's date cursor: wheel/touch deltas accumulate into a raw
+ *  position that can give a little past either bound, and a critically damped spring — always
+ *  starting from rest, guaranteeing no overshoot — decelerates it back once the gesture ends.
+ *  Rationale: docs/timeline.md § Bounded elastic pan */
 
 import { useEffect, useRef, type RefObject } from "react";
 import { spring, stepSpring, type Spring } from "@/components/fluted-glass/spring";
 import { MS_PER_MONTH } from "./timeline-data";
 
-/** How far a pull can push past a bound, as a fraction of one viewport's worth of months — small
- *  on purpose, so the give reads as a squish rather than scrolling into blank timeline. Capped by
- *  `MAX_GIVE_MONTHS` below regardless of zoom, since at a wide-out zoom this fraction alone can
- *  still be well over a month. */
+/** How far a pull can push past a bound, as a fraction of one viewport's worth of months.
+ *  Rationale: docs/timeline.md § ELASTIC_FRACTION / MAX_GIVE_MONTHS */
 const ELASTIC_FRACTION = 0.1;
 /** Absolute ceiling on the give, in months, however many months the viewport shows. */
 const MAX_GIVE_MONTHS = 0.3;
@@ -29,11 +18,8 @@ const MAX_GIVE_MONTHS = 0.3;
 /** Quiet that counts as a wheel/touch gesture being over. */
 const IDLE_MS = 160;
 
-/** Below this px, a wheel tick while already overscrolled doesn't count as a live pull — it's what
- *  a trackpad's decaying momentum tail looks like (a real, deliberate scroll or drag keeps feeding
- *  deltas well above this). Ignoring them, rather than just timing them out, means a long tail
- *  can't hold the bounce open or interrupt it: the pull already ends on schedule after the last
- *  *meaningful* tick, and nothing past that point re-engages it. */
+/** Below this px, a wheel tick while already overscrolled doesn't count as a live pull.
+ *  Rationale: docs/timeline.md § OVERSCROLL_IGNORE_PX */
 const OVERSCROLL_IGNORE_PX = 3;
 
 /** Spring back to a bound. Critically damped — see the module doc for why this needs to be exact,

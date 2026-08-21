@@ -1,16 +1,8 @@
 "use client";
 
-/**
- * Awards and Projects, as one pinned stage whose glass band retints to the item holding it.
- *
- * The list itself never moves. Scroll position through the track picks which item is live, and the
- * only things that change are that item's own treatment and the colour of the band bleeding off the
- * right edge, so the retint is the whole event rather than a detail on top of a scroll.
- *
- * Position, not time: the index is a pure function of where the track sits against the viewport, so
- * parking the wheel parks the list, scrolling back up retraces it exactly, and landing partway in
- * (an anchor, End, scroll restoration) is right on the first frame instead of catching up.
- */
+/** Awards and Projects, as one pinned stage whose glass band retints to the item holding it —
+ *  position, not time, same as CrossfadeStage.
+ *  Rationale: docs/awards-projects.md § Position, not time */
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
@@ -150,35 +142,23 @@ export function AwardsProjects() {
     const inner = innerRef.current;
     if (!track || !pin || !list || !inner) return;
 
-    // `range()`'s cache for `measure()`'s hot path — see `CrossfadeStage`'s identical `range()`
-    // for why this matters more than it looks like it should: `getBoundingClientRect()`/
-    // `offsetHeight` force a synchronous layout flush of whatever's pending, and on iOS the URL
-    // bar animates the viewport height *during* an active scroll, so something is genuinely
-    // pending on or near every scroll frame — reading either of those every frame was forcing
-    // real work specifically on mobile, more of it the faster the scroll.
+    // Same range()/measure() split as CrossfadeStage, same reason: forced-layout reads cached
+    // here so measure() never has to force one on iOS mid-scroll.
+    // Rationale: docs/pinned-scroll-stages.md § range()'s cache
     let trackTop = 0;
     let unit = 1;
     // Kept outside `range()` too — `onBodyResize` below needs it as a standing tolerance, not
     // just as an input to `unit`.
     let bleed = 0;
 
-    // Same fix as `CrossfadeStage`'s `range()`: iOS fires `resize` all through a scroll as the URL
-    // bar folds, and none of those change the viewport's width, so gating the window listener on
-    // a real width change tells an actual resize apart from that noise. The body observer below
-    // needs its own tolerance instead, since the "Show All"/"Show More" case it exists for is
-    // itself a height-only change — see there for why.
+    // Same width-gated fix as CrossfadeStage's range(). Rationale: docs/pinned-scroll-stages.md § Width-gated resize handling
     let lastWidth = window.innerWidth;
 
     // The scroll timeline runs on the document, so the pin's range is where the track sits in it —
-    // same mechanism `CrossfadeStage` uses, for the same reason: a canvas clips at the visible
-    // viewport inside any `position: sticky` subtree, so this band needs the sticky→scroll-timeline
-    // swap on touch too, not just a taller sticky box.
-    // One entry per item (`offsetTop + offsetHeight / 2`), plus the list's own height and how much
-    // of `inner` overflows it — recomputed only where `range()` already is (an occasional,
-    // resize-driven event), not on every scroll frame. `position()` used to `querySelector` and
-    // read all of these straight from the DOM on every single frame, which is a forced layout
-    // read wedged into the one function meant to be a pure write; caching them here is what lets
-    // `position()` become a write-only `commit()`.
+    // same mechanism CrossfadeStage uses; see docs/ios-viewport-bleed.md for why a sticky subtree
+    // needs the scroll-timeline swap at all.
+    // Cached list geometry so position() (below) can become a write-only commit().
+    // Rationale: docs/pinned-scroll-stages.md § range()'s cache
     let rowCenters: number[] = [];
     let listHeight = 0;
     let overflow = 0;
@@ -199,8 +179,8 @@ export function AwardsProjects() {
       // The pin's own height is fixed between resizes, so this is the only place the DWELL unit
       // needs reading at all — `measure()` used to re-read it, forcing a layout, every frame.
       unit = pin.offsetHeight - bleed - fold || 1;
-      // The *full* pin height, bleed included — a physical release distance, not the DWELL unit
-      // above. See CrossfadeStage's identical `range()` for why subtracting bleed here is wrong.
+      // Full pin height, bleed included — a physical release distance, not the DWELL unit above.
+      // Rationale: docs/pinned-scroll-stages.md § Full pin height vs. bleed, in range()
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
       pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
       pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
@@ -211,10 +191,7 @@ export function AwardsProjects() {
     const rowCenter = (index: number) => rowCenters[index] ?? 0;
 
     // Keeps the live item centred in the list's own box by sliding `inner` under a clipped,
-    // fixed-height `list` — a transform tied straight to `continuous` below, not a nested
-    // `overflow-y-auto`, so it's the same one physical scroll as everything else in the stage
-    // rather than a separate scrollable region with its own scrollbar. A no-op whenever the list
-    // isn't actually taller than the pin, which is every viewport this design was built for.
+    // fixed-height `list`. Rationale: docs/awards-projects.md § List centering (position())
     const position = (continuous: number) => {
       if (overflow <= 0) {
         inner.style.transform = "";
@@ -224,12 +201,6 @@ export function AwardsProjects() {
       const hi = Math.min(lo + 1, ITEMS.length - 1);
       const frac = continuous - lo;
       const center = rowCenter(lo) + (rowCenter(hi) - rowCenter(lo)) * frac;
-      // The floor stays 0 — the very first item sits flush with the box's own top rather than
-      // pulled down to center it, which is what keeps the section landing right below Work instead
-      // of opening mid-list. The ceiling gets an extra half-height of slack past the true content
-      // end, since without it the last item is clamped hard against the bottom the moment its own
-      // center would otherwise need to scroll past where content actually stops, landing it low in
-      // the box instead of centered like every other item.
       const offset = clamp(center - listHeight / 2, 0, overflow + listHeight / 2);
       inner.style.transform = `translate3d(0, ${(-offset).toFixed(1)}px, 0)`;
     };
@@ -270,19 +241,9 @@ export function AwardsProjects() {
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
 
-    // `range()`'s `start` is the track's document-absolute position, which shifts whenever
-    // anything above it resizes — Work's "Show All"/"Show More" toggles, most concretely. A
-    // window resize is the only thing that recomputed it before, so any of those toggles left
-    // `--pin-start`/`--pin-end` pointing at the pre-toggle layout: the scroll-timeline then
-    // engages/releases at the wrong scroll offset, which reads as a blank gap that only clears
-    // once an actual resize (or, on some browsers, enough scroll-driven relayout) forces a
-    // fresh `range()` call. Body height covers every such case in one place, generically.
-    //
-    // But body height is also exactly what wobbles, by up to `bleed`, on every iOS toolbar fold
-    // during a scroll — the same noise `onResize` above filters by width. Width doesn't apply to
-    // a body observer, so the tolerance is `bleed` itself instead: a genuine content reflow moves
-    // the body by much more than the toolbar strip ever does, so only changes past that band
-    // trigger `range()`, and the toolbar's own wobble is left alone.
+    // Retriggers range() when Work's "Show All"/"Show More" resizes the page above this section
+    // (no `resize` event fires for that). Tolerance-gated on `bleed` to ignore the iOS toolbar's
+    // own body-height wobble. Rationale: docs/awards-projects.md § Body-resize retrigger
     let lastBodyHeight = document.body.getBoundingClientRect().height;
     const onBodyResize = () => {
       const height = document.body.getBoundingClientRect().height;
@@ -295,10 +256,7 @@ export function AwardsProjects() {
     const bodyObserver = new ResizeObserver(onBodyResize);
     bodyObserver.observe(document.body);
 
-    // Same reasoning as `CrossfadeStage`'s identical listeners: a real recompute regardless of
-    // width for a rotation that doesn't change it, and fonts resize the page with no resize event
-    // at all. `scrollend` is already effectively covered by the body observer above, but costs
-    // nothing extra to also catch here directly.
+    // Same as CrossfadeStage's identical listeners. Rationale: docs/pinned-scroll-stages.md § Orientation / scrollend
     const onOrientation = () => {
       lastWidth = window.innerWidth;
       range();
@@ -358,36 +316,15 @@ export function AwardsProjects() {
         style={{ top: `${PROJECTS_START * DWELL * 100}svh` }}
       />
 
-      {/*
-        `.stage-pin` (see `globals.css`) rather than a plain `sticky top-0`: the same canvas-clips-
-        inside-any-sticky-subtree issue the hero had applies here too, since this band is a WebGL
-        panel in a sticky pin. Height grows by `--bleed`, and `pb-[var(--bleed)]` reserves that same
-        amount so `items-center` still centers the copy within the original (non-bled) box — the
-        canvas reaches the extra height through `inset-y-0` on its own host (which resolves against
-        the pin's full padding box, padding included), the copy doesn't visually move.
-      */}
+      {/* .stage-pin, not a plain sticky top-0 — canvas-clips-inside-sticky-subtree issue.
+          Rationale: docs/ios-viewport-bleed.md § .stage-pin: sticky vs. scroll-timeline swap */}
       <div
         ref={pinRef}
         className="stage-pin relative isolate flex items-center pb-[var(--bleed)]"
         style={{ height: "calc(100vh + var(--bleed))" }}
       >
-        {/*
-          Full-bleed on mobile, and taller than the pin, which is one fix rather than two.
-
-          A shape's `w` is a fraction of the panel's width and its `blur` a fraction of the panel's
-          height, and an ellipse's distance field scales with its *minor* radius — so on a narrow
-          panel every distance in the field shrinks while the feather it is measured against does
-          not. The band's own falloff then never finishes inside the box, and the canvas cuts it off
-          at a hard line. Desktop's 46% is wide enough that the field is down to a thousandth by the
-          top edge; a phone-width column is not, and narrowing it further only makes it worse. So the
-          panel takes the whole width here, which also gives the copy beside it its gutter back.
-
-          Full pin height rather than taller, which is the part that is easy to get backwards. Hanging
-          the panel past the pin does move its own edges off screen, but the window's top row is a
-          boundary too — the page does not paint under the status bar — and all the overhang does is
-          put a stronger part of the field against it. The field has to finish inside the window, not
-          somewhere past it.
-        */}
+        {/* Full-bleed on mobile, full pin height rather than taller — one fix rather than two.
+            Rationale: docs/awards-projects.md § Retint band sizing (mobile full-bleed) */}
         <div
           aria-hidden
           className="pointer-events-none absolute inset-y-0 right-0 w-full sm:w-[46%]"
@@ -395,26 +332,14 @@ export function AwardsProjects() {
           <FlutedGlass {...presets.accent} shapes={shapes} className="h-full w-full" />
         </div>
 
-        {/* Same left gutter as every other body section (Work, About), so copy lines up down the
-            page regardless of which section it's in. On desktop the right padding is the band's own
-            width plus a gap, so a long line runs out of room before it runs under the band. On
-            mobile the band is full-bleed, so there is nothing to clear: the copy takes the ordinary
-            gutter and sits over the faint left tail of the glow, which is the room a description
-            needs on a narrow phone. */}
+        {/* Same left gutter as every other body section (Work, About).
+            Rationale: docs/awards-projects.md § Layout gutters */}
         <div
           ref={listRef}
           className="relative max-h-full w-full overflow-hidden pl-[var(--gutter-left)] pr-[24vw] sm:pr-[calc(46%+2vw)]"
         >
-          {/*
-            The clip lives on the wrapper above; this is what actually moves. Shifted by a plain
-            transform driven straight off the same scroll listener that picks `active`, rather
-            than a nested `overflow-y-auto` — one continuous physical scroll, not a separate
-            scrollable region with its own scrollbar sitting inside the page's.
-
-            No CSS transition here on purpose: the transform is already a continuous, every-frame
-            value straight from scroll position, not a discrete state change — a transition on it
-            only restarts itself every frame and adds a permanent lag behind the finger/wheel.
-          */}
+          {/* The clip lives on the wrapper above; this is what actually moves.
+              Rationale: docs/awards-projects.md § List centering (position()) */}
           <div ref={innerRef}>
             {GROUPS.map(({ group, items }) => (
               <div key={group} className="mt-[clamp(2.5rem,5vw,4.5rem)] first:mt-0">
