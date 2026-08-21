@@ -1,9 +1,5 @@
 "use client";
 
-/** Awards and Projects, as one pinned stage whose glass band retints to the item holding it —
- *  position, not time, same as CrossfadeStage.
- *  Rationale: docs/awards-projects.md § Position, not time */
-
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { ArrowUpRight } from "lucide-react";
 import type { Entry } from "@/content/types";
