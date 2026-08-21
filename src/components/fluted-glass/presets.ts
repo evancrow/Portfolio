@@ -73,6 +73,9 @@ export const presets = {
     light: { angle: 108, intensity: 0.2, sharpness: 7, ambient: 0.03 },
     // No cursor light here. The blob's lean toward the pointer is the only interaction.
     interaction: { pull: 0.03, shimmer: { radius: 160, gain: 0 } },
+    // Below the default 2x: this is the one panel that's guaranteed full-bleed on every phone, and
+    // the field has no detail sharp enough for the extra resolution to read as anything but cost.
+    quality: { maxDpr: 1.5 },
   },
 
   /**

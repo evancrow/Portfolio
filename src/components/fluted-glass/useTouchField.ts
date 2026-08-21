@@ -52,8 +52,18 @@ export function useTouchField(shapes: GlassShape[]): GlassShape[] {
 
   useEffect(() => {
     const mq = window.matchMedia(TOUCH);
+    // `measure()` appends a probe to the body to read `100vh` — a forced layout. iOS fires
+    // `resize` all through a scroll as the URL bar folds, and none of those change the viewport's
+    // width, so gating the probe on a real width change is what keeps this free during a scroll
+    // instead of adding a forced layout to every one of those events, same fix as `layout.tsx`'s
+    // `MEASURE_BLEED` and the stage components' own `range()`.
+    let lastWidth = window.innerWidth;
 
-    const sync = () => {
+    const sync = (force: boolean) => {
+      const width = window.innerWidth;
+      const widthChanged = width !== lastWidth;
+      lastWidth = width;
+      if (!force && !widthChanged) return;
       const next = { keep: measure(), touch: mq.matches };
       // Same numbers, same object, or every resize is a new array and the renderer rebuilds its
       // springs for a field that did not move.
@@ -62,12 +72,14 @@ export function useTouchField(shapes: GlassShape[]): GlassShape[] {
       );
     };
 
-    sync();
-    mq.addEventListener("change", sync);
-    window.addEventListener("resize", sync, { passive: true });
+    sync(true);
+    const onChange = () => sync(true);
+    const onResize = () => sync(false);
+    mq.addEventListener("change", onChange);
+    window.addEventListener("resize", onResize, { passive: true });
     return () => {
-      mq.removeEventListener("change", sync);
-      window.removeEventListener("resize", sync);
+      mq.removeEventListener("change", onChange);
+      window.removeEventListener("resize", onResize);
     };
   }, []);
 
@@ -83,5 +95,11 @@ export function useTouchField(shapes: GlassShape[]): GlassShape[] {
     w: s.w,
     h: s.h * keep * grow,
     blur: (s.blur ?? 0) * keep * feather,
+    // Drift exists to make an idle panel breathe for a cursor that's resting on it. There is no
+    // cursor on a touch device, and while scrolling the wobble is invisible under the motion
+    // anyway — but it still counts as `busy` in the render loop and holds the shader open every
+    // frame for as long as the panel is on screen. Zeroing it here is what lets the hero's loop
+    // (which has no scroll-driven `curve` to also hold it busy) actually park while scrolling.
+    ...(touch ? { drift: { amp: 0, speed: 0 } } : null),
   }));
 }

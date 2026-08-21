@@ -68,7 +68,20 @@
  * and goes soft on the way through.
  */
 .fade-rise {
-  transform: translate3d(0, calc((1 - var(--fade, 1)) * var(--rise, 1) * 16px), 0);
+  --fade-rise-distance: 16px;
+  transform: translate3d(0, calc((1 - var(--fade, 1)) * var(--rise, 1) * var(--fade-rise-distance)), 0);
+}
+
+/*
+ * On a coarse pointer the crossfade's own timing is compressed into roughly one thumb-swipe (see
+ * `CrossfadeStage`'s `touchPhases`), and motion is most of what tells a reader the page is
+ * responding to their scroll at all — 16px read as a token flourish sized for a much slower
+ * desktop transition, not as movement proportional to the swipe driving it.
+ */
+@media (hover: none) and (pointer: coarse) {
+  .fade-rise {
+    --fade-rise-distance: 7vh;
+  }
 }
 
 /*

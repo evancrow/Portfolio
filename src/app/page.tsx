@@ -33,6 +33,16 @@ export default function Home() {
           from={<Hero />}
           to={<WorkIntro />}
           phases={{ gap: 0.05, in: 0.05, tail: 0.05 }}
+          // Same total scroll room as `phases` above budgets (`touchPhases` never touches the
+          // track's height), but the fade itself starts almost immediately and finishes within
+          // about one thumb-swipe, instead of `hold`/`out`'s desktop-tuned pace spending most of
+          // a first swipe on motion too subtle to read as anything happening.
+          touchPhases={{ hold: 0.08, out: 0.45 }}
+          // `WorkIntro` is opaque paper on an already-paper-backgrounded page, so only it needs to
+          // animate in — `Hero` wraps a full-screen WebGL canvas, and an animated `opacity` over
+          // one forces an expensive translucent composite for the whole transition. See
+          // `CrossfadeStage`'s `mode` prop.
+          mode="cover"
         />
 
         <Work />

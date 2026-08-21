@@ -20,6 +20,7 @@ import { FlutedGlass, presets, type GlassShape } from "@/components/fluted-glass
 import { awards } from "@/content/awards";
 import { projects } from "@/content/projects";
 import { accentShapes } from "./accents";
+import { registerStage, requestStageFrame } from "@/components/scroll-stage/useScrollStage";
 
 /** Scroll each item holds the stage for, in pin-heights. Under one, so a single flick carries the
  *  list a whole item instead of stalling it between two. */
@@ -34,10 +35,10 @@ const ITEMS: Item[] = [
 
 const TRAVEL = ITEMS.length * DWELL;
 
-/** The pin holds for `TRAVEL` and the track is one viewport taller, the same relationship
- *  CrossfadeStage's height has to its phases. Rounded, or the multiply lands a float tail in the
- *  markup. */
-const TRACK_HEIGHT = Math.round((TRAVEL + 1) * 1e4) / 100;
+/** The pin holds for `TRAVEL`, past its own one-viewport height, the same relationship
+ *  CrossfadeStage's track height has to its phases — see that file's `stops.travel` for why
+ *  it's `svh` and not `vh`/`lvh`. Rounded, or the multiply lands a float tail in the markup. */
+const TRACK_HEIGHT = Math.round(TRAVEL * 1e4) / 100;
 
 /** Where the Projects group starts in the flat list, for the `#projects` anchor — the section's
  *  own top is Awards' first item, not the group the link names. */
@@ -149,30 +150,65 @@ export function AwardsProjects() {
     const inner = innerRef.current;
     if (!track || !pin || !list || !inner) return;
 
-    let queued = 0;
-    // The overhang, in px, so the DWELL unit stays one viewport even though the pin is taller than
-    // one. Read live, same reasoning as `CrossfadeStage`'s own `range()`.
+    // `range()`'s cache for `measure()`'s hot path — see `CrossfadeStage`'s identical `range()`
+    // for why this matters more than it looks like it should: `getBoundingClientRect()`/
+    // `offsetHeight` force a synchronous layout flush of whatever's pending, and on iOS the URL
+    // bar animates the viewport height *during* an active scroll, so something is genuinely
+    // pending on or near every scroll frame — reading either of those every frame was forcing
+    // real work specifically on mobile, more of it the faster the scroll.
+    let trackTop = 0;
+    let unit = 1;
+    // Kept outside `range()` too — `onBodyResize` below needs it as a standing tolerance, not
+    // just as an input to `unit`.
     let bleed = 0;
+
+    // Same fix as `CrossfadeStage`'s `range()`: iOS fires `resize` all through a scroll as the URL
+    // bar folds, and none of those change the viewport's width, so gating the window listener on
+    // a real width change tells an actual resize apart from that noise. The body observer below
+    // needs its own tolerance instead, since the "Show All"/"Show More" case it exists for is
+    // itself a height-only change — see there for why.
+    let lastWidth = window.innerWidth;
 
     // The scroll timeline runs on the document, so the pin's range is where the track sits in it —
     // same mechanism `CrossfadeStage` uses, for the same reason: a canvas clips at the visible
     // viewport inside any `position: sticky` subtree, so this band needs the sticky→scroll-timeline
     // swap on touch too, not just a taller sticky box.
+    // One entry per item (`offsetTop + offsetHeight / 2`), plus the list's own height and how much
+    // of `inner` overflows it — recomputed only where `range()` already is (an occasional,
+    // resize-driven event), not on every scroll frame. `position()` used to `querySelector` and
+    // read all of these straight from the DOM on every single frame, which is a forced layout
+    // read wedged into the one function meant to be a pure write; caching them here is what lets
+    // `position()` become a write-only `commit()`.
+    let rowCenters: number[] = [];
+    let listHeight = 0;
+    let overflow = 0;
+    const measureList = () => {
+      rowCenters = ITEMS.map((_, i) => {
+        const row = inner.querySelector<HTMLElement>(`[data-index="${i}"]`);
+        return row ? row.offsetTop + row.offsetHeight / 2 : 0;
+      });
+      listHeight = list.clientHeight;
+      overflow = inner.offsetHeight - listHeight;
+    };
+
     const range = () => {
       bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
+      const fold = parseFloat(getComputedStyle(pin).getPropertyValue("--fold")) || 0;
       const start = track.getBoundingClientRect().top + window.scrollY;
+      trackTop = start;
+      // The pin's own height is fixed between resizes, so this is the only place the DWELL unit
+      // needs reading at all — `measure()` used to re-read it, forcing a layout, every frame.
+      unit = pin.offsetHeight - bleed - fold || 1;
       // The *full* pin height, bleed included — a physical release distance, not the DWELL unit
-      // below. See CrossfadeStage's identical `range()` for why subtracting bleed here is wrong.
+      // above. See CrossfadeStage's identical `range()` for why subtracting bleed here is wrong.
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
       pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
       pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
       pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
+      measureList();
     };
 
-    const rowCenter = (index: number) => {
-      const row = inner.querySelector<HTMLElement>(`[data-index="${index}"]`);
-      return row ? row.offsetTop + row.offsetHeight / 2 : 0;
-    };
+    const rowCenter = (index: number) => rowCenters[index] ?? 0;
 
     // Keeps the live item centred in the list's own box by sliding `inner` under a clipped,
     // fixed-height `list` — a transform tied straight to `continuous` below, not a nested
@@ -180,7 +216,6 @@ export function AwardsProjects() {
     // rather than a separate scrollable region with its own scrollbar. A no-op whenever the list
     // isn't actually taller than the pin, which is every viewport this design was built for.
     const position = (continuous: number) => {
-      const overflow = inner.offsetHeight - list.clientHeight;
       if (overflow <= 0) {
         inner.style.transform = "";
         return;
@@ -195,41 +230,43 @@ export function AwardsProjects() {
       // end, since without it the last item is clamped hard against the bottom the moment its own
       // center would otherwise need to scroll past where content actually stops, landing it low in
       // the box instead of centered like every other item.
-      const offset = clamp(center - list.clientHeight / 2, 0, overflow + list.clientHeight / 2);
+      const offset = clamp(center - listHeight / 2, 0, overflow + listHeight / 2);
       inner.style.transform = `translate3d(0, ${(-offset).toFixed(1)}px, 0)`;
     };
 
-    const apply = () => {
-      // Measured from the track's own rect rather than scrollY, so this is correct wherever the
-      // section sits and after anything that moves it, the footer's overscroll lift included.
-      //
-      // `offsetHeight` rather than a rect, because the pin is the element the scroll timeline may
-      // be transforming, and a rect reports the transformed box — same reasoning as
-      // `CrossfadeStage`'s `apply()`. Subtracting bleed keeps the DWELL unit at one plain viewport
-      // regardless of overhang, which is what keeps a dwell honest when a vh and the real viewport
-      // disagree, which they do for the whole of an iOS URL bar collapse.
-      const unit = pin.offsetHeight - bleed || 1;
-      const p = -track.getBoundingClientRect().top / unit;
-      const continuous = clamp(p / DWELL, 0, ITEMS.length - 1);
-      setActive(Math.floor(continuous));
-      position(continuous);
+    // What `measure()` found, for `commit()` to write — same split as `CrossfadeStage`'s, and for
+    // the same reason: this stage's reads and every other stage's reads all happen before either
+    // one's writes. See `useScrollStage`'s own comment.
+    let pendingContinuous = 0;
+
+    const measure = () => {
+      // `trackTop`/`unit` are `range()`'s cache — see the comment above it. `window.scrollY` is
+      // the only per-frame read, and unlike a rect or an offset, it never forces layout.
+      const p = (window.scrollY - trackTop) / unit;
+      pendingContinuous = clamp(p / DWELL, 0, ITEMS.length - 1);
     };
 
-    const onScroll = () => {
-      if (queued) return;
-      queued = requestAnimationFrame(() => {
-        queued = 0;
-        apply();
-      });
+    const commit = () => {
+      setActive(Math.floor(pendingContinuous));
+      position(pendingContinuous);
     };
+
+    const unregister = registerStage(measure, commit);
+
+    const onScroll = () => requestStageFrame();
 
     const onResize = () => {
-      range();
+      const width = window.innerWidth;
+      if (width !== lastWidth) {
+        lastWidth = width;
+        range();
+      }
       onScroll();
     };
 
     range();
-    apply();
+    measure();
+    commit();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
 
@@ -240,13 +277,47 @@ export function AwardsProjects() {
     // engages/releases at the wrong scroll offset, which reads as a blank gap that only clears
     // once an actual resize (or, on some browsers, enough scroll-driven relayout) forces a
     // fresh `range()` call. Body height covers every such case in one place, generically.
-    const bodyObserver = new ResizeObserver(onResize);
+    //
+    // But body height is also exactly what wobbles, by up to `bleed`, on every iOS toolbar fold
+    // during a scroll — the same noise `onResize` above filters by width. Width doesn't apply to
+    // a body observer, so the tolerance is `bleed` itself instead: a genuine content reflow moves
+    // the body by much more than the toolbar strip ever does, so only changes past that band
+    // trigger `range()`, and the toolbar's own wobble is left alone.
+    let lastBodyHeight = document.body.getBoundingClientRect().height;
+    const onBodyResize = () => {
+      const height = document.body.getBoundingClientRect().height;
+      if (Math.abs(height - lastBodyHeight) > bleed) {
+        lastBodyHeight = height;
+        range();
+      }
+      onScroll();
+    };
+    const bodyObserver = new ResizeObserver(onBodyResize);
     bodyObserver.observe(document.body);
 
+    // Same reasoning as `CrossfadeStage`'s identical listeners: a real recompute regardless of
+    // width for a rotation that doesn't change it, and fonts resize the page with no resize event
+    // at all. `scrollend` is already effectively covered by the body observer above, but costs
+    // nothing extra to also catch here directly.
+    const onOrientation = () => {
+      lastWidth = window.innerWidth;
+      range();
+      onScroll();
+    };
+    const onScrollEnd = () => {
+      range();
+      onScroll();
+    };
+    window.addEventListener("orientationchange", onOrientation);
+    window.addEventListener("scrollend", onScrollEnd, { passive: true });
+    document.fonts?.ready.then(onScrollEnd);
+
     return () => {
-      cancelAnimationFrame(queued);
+      unregister();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onOrientation);
+      window.removeEventListener("scrollend", onScrollEnd);
       bodyObserver.disconnect();
     };
   }, []);
@@ -262,7 +333,8 @@ export function AwardsProjects() {
     // Same unit `apply()` uses to pick the active index — has to agree, or a click could land on a
     // scroll position `apply()` reads back as a different item.
     const bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
-    const unit = pin.offsetHeight - bleed || 1;
+    const fold = parseFloat(getComputedStyle(pin).getPropertyValue("--fold")) || 0;
+    const unit = pin.offsetHeight - bleed - fold || 1;
     // The middle of the item's dwell, not its start, so where this lands is unambiguously that
     // item instead of a boundary a pixel of scroll could tip either way.
     const top = track.getBoundingClientRect().top + window.scrollY + (index + 0.5) * DWELL * unit;
@@ -271,14 +343,19 @@ export function AwardsProjects() {
   }, []);
 
   return (
-    <section ref={trackRef} className="relative w-full" style={{ height: `${TRACK_HEIGHT}vh` }}>
+    <section
+      ref={trackRef}
+      className="relative w-full"
+      style={{ height: `calc(${TRACK_HEIGHT}svh + 100vh + var(--bleed))` }}
+    >
       {/* Invisible marker at the start of the Projects group, since the section's own top is
-          Awards' first item and `#projects` should land on the group the link names. */}
+          Awards' first item and `#projects` should land on the group the link names. `svh`, not
+          `vh`: has to agree with `apply()`'s runtime `unit`, which is `100svh` after `--fold`. */}
       <span
         id="projects"
         aria-hidden="true"
         className="absolute inset-x-0 h-px"
-        style={{ top: `${PROJECTS_START * DWELL * 100}vh` }}
+        style={{ top: `${PROJECTS_START * DWELL * 100}svh` }}
       />
 
       {/*
@@ -333,11 +410,12 @@ export function AwardsProjects() {
             transform driven straight off the same scroll listener that picks `active`, rather
             than a nested `overflow-y-auto` — one continuous physical scroll, not a separate
             scrollable region with its own scrollbar sitting inside the page's.
+
+            No CSS transition here on purpose: the transform is already a continuous, every-frame
+            value straight from scroll position, not a discrete state change — a transition on it
+            only restarts itself every frame and adds a permanent lag behind the finger/wheel.
           */}
-          <div
-            ref={innerRef}
-            className="transition-transform duration-300 ease-out motion-reduce:transition-none"
-          >
+          <div ref={innerRef}>
             {GROUPS.map(({ group, items }) => (
               <div key={group} className="mt-[clamp(2.5rem,5vw,4.5rem)] first:mt-0">
                 <h2 className="font-display text-[clamp(1.75rem,2.4vw,2.25rem)]">{group}</h2>

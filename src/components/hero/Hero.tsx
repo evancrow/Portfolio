@@ -13,8 +13,10 @@ export function Hero() {
   return (
     <HeroPanel>
       {/* The bleed is padding here, so the lockup centres in the viewport while the glass
-          behind it carries on under the URL bar. */}
-      <div className="flex h-full flex-col justify-center pb-[var(--bleed)]">
+          behind it carries on under the URL bar. Extra mobile-only padding biases the lockup
+          above dead-center, since true center reads low against the chrome-visible viewport a
+          phone actually shows (e.g. Safari's tab-switcher snapshot). */}
+      <div className="flex h-full flex-col justify-center pb-[calc(var(--bleed)+8vh)] sm:pb-[var(--bleed)]">
         <div className="fade-rise mx-auto w-full max-w-[1512px] px-[6vw] sm:px-[28.5%]">
           <h1 className="font-display text-[clamp(3.3rem,8.466vw,9.5rem)] leading-none font-bold tracking-[-0.01em]">
             {site.name}
