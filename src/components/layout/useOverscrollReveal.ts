@@ -129,6 +129,17 @@ export function useOverscrollReveal(max: number, write: (px: number) => void) {
     const remeasure = () => {
       docHeight = document.documentElement.scrollHeight;
     };
+    // iOS fires `resize` all through a scroll as the URL bar folds, and none of those change the
+    // viewport's width or the document's real height — just a forced-layout read for nothing, same
+    // fix as `layout.tsx`'s `MEASURE_BLEED`. `scrollend`'s own `remeasure` stays unconditioned: it
+    // only fires once the page is already stationary, so it's free either way.
+    let lastWidth = window.innerWidth;
+    const onResize = () => {
+      const width = window.innerWidth;
+      if (width === lastWidth) return;
+      lastWidth = width;
+      remeasure();
+    };
     const atBottom = () => window.scrollY + window.innerHeight >= docHeight - BOTTOM_SLOP;
 
     const frame = (now: number) => {
@@ -249,7 +260,7 @@ export function useOverscrollReveal(max: number, write: (px: number) => void) {
     window.addEventListener("touchmove", onTouchMove, { passive: true });
     window.addEventListener("touchend", onTouchEnd, { passive: true });
     window.addEventListener("touchcancel", onTouchEnd, { passive: true });
-    window.addEventListener("resize", remeasure, { passive: true });
+    window.addEventListener("resize", onResize, { passive: true });
     window.addEventListener("scrollend", remeasure, { passive: true });
 
     return () => {
@@ -260,7 +271,7 @@ export function useOverscrollReveal(max: number, write: (px: number) => void) {
       window.removeEventListener("touchmove", onTouchMove);
       window.removeEventListener("touchend", onTouchEnd);
       window.removeEventListener("touchcancel", onTouchEnd);
-      window.removeEventListener("resize", remeasure);
+      window.removeEventListener("resize", onResize);
       window.removeEventListener("scrollend", remeasure);
       // Nothing is going to put this back on its own once the loop is gone.
       if (shown !== 0) writeRef.current(0);

@@ -78,17 +78,31 @@ export const metadata: Metadata = {
  * a stutter. `resize` fires all through a scroll on iOS as the bar folds, and assigning to the sheet
  * invalidates style for the whole document whether or not the text differs: every panel on the page was
  * being laid out again mid-fling.
+ *
+ * The measurement itself is gated the same way, on top of that: every one of `px()`'s four probes is a
+ * forced layout, and none of `lvh`/`svh`/`screen.height`/the safe-area inset can change from the bar
+ * folding alone — only a real width change or a rotation moves any of them. Without this, a toolbar-fold
+ * `resize` storm mid-scroll was forcing this many synchronous layouts of the *whole document* on every
+ * one of its events, which is what read as content elsewhere on the page (About's text, with no scroll
+ * logic of its own) visibly jutting.
+ *
+ * `--fold` (`lvh - svh`, i.e. how much shorter the always-visible viewport is than the collapsed-bar
+ * one) is published unconditionally alongside `--bleed` rather than gated behind the same screen-height
+ * sanity check: the stage components use it to size their scroll-progress unit off the viewport that's
+ * actually always on screen, which is a real correction on any browser where the bar collapses, not only
+ * the ones that also get pin overhang.
  */
 const MEASURE_BLEED = `(function(){
-var s=document.createElement('style');document.head.appendChild(s);var last=-1;
+var s=document.createElement('style');document.head.appendChild(s);var last=-1,lastW=innerWidth;
 function px(v){var p=document.createElement('div');p.style.cssText='position:fixed;top:0;left:0;width:0;visibility:hidden;pointer-events:none;height:'+v;document.body.appendChild(p);var h=p.getBoundingClientRect().height;p.remove();return h}
-function apply(){
-var lvh=px('100lvh'),svh=px('100svh'),screenH=(window.screen&&screen.height)||0,fold=lvh-svh;
+function apply(force){
+var w=innerWidth;if(!force&&w===lastW)return;lastW=w;
+var lvh=px('100lvh'),svh=px('100svh'),screenH=(window.screen&&screen.height)||0,fold=Math.max(0,Math.round(lvh-svh));
 var strip=fold>1&&screenH>lvh?Math.min(screenH-lvh-px('env(safe-area-inset-top)'),2*fold):0;
 strip=Math.max(0,Math.round(strip));
 if(strip===last)return;last=strip;
-s.textContent=strip>0?':root{--bleed:'+strip+'px;--pin-position:static;--pin-anim:stage-pin}':':root{--bleed:'+strip+'px}'}
-apply();addEventListener('resize',apply);addEventListener('orientationchange',apply)})()`;
+s.textContent=strip>0?':root{--bleed:'+strip+'px;--fold:'+fold+'px;--pin-position:static;--pin-anim:stage-pin}':':root{--bleed:'+strip+'px;--fold:'+fold+'px}'}
+apply(true);addEventListener('resize',function(){apply(false)});addEventListener('orientationchange',function(){apply(true)})})()`;
 
 /** Schema.org Person, built from the same content the page renders. */
 const personJsonLd = {

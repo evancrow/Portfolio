@@ -11,6 +11,7 @@
  */
 
 import { useEffect, useMemo, useRef, type CSSProperties, type ReactNode } from "react";
+import { registerStage, requestStageFrame } from "@/components/scroll-stage/useScrollStage";
 
 /** Scroll distance in pin-heights. Never time. */
 export type CrossfadePhases = {
@@ -42,8 +43,36 @@ export type CrossfadeStageProps = {
   /** Takes over. */
   to: ReactNode;
   phases?: Partial<CrossfadePhases>;
+  /**
+   * Overrides `phases` on a coarse pointer, for the fade's timing only — `hold`/`out`/`gap`/`in`
+   * pick where within the scroll the fade sits, same as `phases`, but never feed the track's
+   * height (that's `phases` alone, via `stops.travel` below), so this can't desync what the
+   * server rendered from what a touch client measures.
+   *
+   * Exists because the same fraction of scroll costs far more gestures on a thumb-swipe than a
+   * trackpad flick: a `hold`/`out` tuned so the fade reads calmly under a mouse leaves a phone
+   * scrolling through most of a swipe before anything visibly moves. Retuned smaller here so the
+   * fade both starts and finishes within roughly the one swipe that budget actually buys on a
+   * phone; whatever scroll room `phases`' own total leaves beyond that plays out as `tail` always
+   * has, holding the pin over an already-settled `to`.
+   */
+  touchPhases?: Partial<CrossfadePhases>;
   /** Extra classes for the pinned viewport. The track owns its own height. */
   className?: string;
+  /**
+   * `"dissolve"` (default): both layers' opacity animate independently across their own
+   * `out`/`in` windows, with `gap` a deliberate blank beat between them — right for two
+   * translucent scenes, where overlapping them mid-transition would show a muddy blend of both.
+   * `"cover"`: `from` stays at full opacity and `to`'s opacity is tied directly to `from`'s own
+   * `out` curve instead (see `apply()`) — complementary, so there's no gap, which is what a plain
+   * cross-dissolve wants once `to` is already opaque: `gap`/`in` stop affecting the crossfade
+   * itself in this mode (though `phases`' total still sets the track's height as always).
+   * `from` never getting an animated `opacity` matters when it wraps a full-screen WebGL canvas:
+   * an animated `opacity` over one forces an expensive translucent composite every frame for the
+   * whole transition, where a canvas at a constant opacity composites directly. `--fade`/
+   * `.fade-rise` drift on `from` is identical either way — only what drives visible opacity does.
+   */
+  mode?: "dissolve" | "cover";
 };
 
 /**
@@ -51,7 +80,9 @@ export type CrossfadeStageProps = {
  * `.fade-rise`, so `from` leaves upward and `to` arrives from below. Both are set here rather
  * than on first paint of the effect, so server-rendered HTML is already the top of the stage.
  */
-const LAYER_FROM = { "--fade": 1, "--rise": -1, opacity: "var(--fade)" } as CSSProperties;
+const LAYER_FROM_DISSOLVE = { "--fade": 1, "--rise": -1, opacity: "var(--fade)" } as CSSProperties;
+/** `mode="cover"`'s `from`: `--fade` still published for `.fade-rise`, opacity pinned at 1. */
+const LAYER_FROM_COVER = { "--fade": 1, "--rise": -1, opacity: 1 } as CSSProperties;
 const LAYER_TO = { "--fade": 0, "--rise": 1, opacity: "var(--fade)" } as CSSProperties;
 
 /** Below this a layer is indistinguishable from absent, so it gets taken out of the page. */
@@ -62,7 +93,14 @@ const smoothstep = (a: number, b: number, x: number) => {
   return t * t * (3 - 2 * t);
 };
 
-export function CrossfadeStage({ from, to, phases, className }: CrossfadeStageProps) {
+export function CrossfadeStage({
+  from,
+  to,
+  phases,
+  touchPhases,
+  className,
+  mode = "dissolve",
+}: CrossfadeStageProps) {
   const trackRef = useRef<HTMLDivElement>(null);
   const pinRef = useRef<HTMLDivElement>(null);
   const fromRef = useRef<HTMLDivElement>(null);
@@ -74,12 +112,27 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
     const outEnd = outStart + p.out;
     const inStart = outEnd + p.gap;
     const inEnd = inStart + p.in;
-    // The pin holds for `travel` and the track is one viewport taller, so the height is a
+    // The pin holds for `travel`, past its own one-viewport height, so the track's height is a
     // function of the phases. Passing it in separately would desync the moment one changes.
-    // Rounded, because summing the phases otherwise lands a float tail in the markup.
-    const travel = inEnd + p.tail;
-    return { outStart, outEnd, inStart, inEnd, height: Math.round((travel + 1) * 1e4) / 100 };
+    // In `svh` — the viewport that's always visible, not `100vh`/`lvh`'s bar-collapsed one — so
+    // this is the scroll distance a phase actually costs a reader's thumb, not a browser chrome
+    // state. Rounded, because summing the phases otherwise lands a float tail in the markup.
+    const travel = Math.round((inEnd + p.tail) * 1e4) / 100;
+    return { outStart, outEnd, inStart, inEnd, travel };
   }, [phases]);
+
+  // Deliberately excludes `travel`/`tail`: this reshapes where the fade sits, never how much
+  // track it's given, which is what keeps it free of the SSR/touch-client height mismatch a
+  // device-conditional `phases` would risk.
+  const touchStops = useMemo(() => {
+    if (!touchPhases) return null;
+    const p = { ...DEFAULT_PHASES, ...phases, ...touchPhases };
+    const outStart = p.hold;
+    const outEnd = outStart + p.out;
+    const inStart = outEnd + p.gap;
+    const inEnd = inStart + p.in;
+    return { outStart, outEnd, inStart, inEnd };
+  }, [phases, touchPhases]);
 
   useEffect(() => {
     const track = trackRef.current;
@@ -92,28 +145,65 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
     const restoration = supported ? history.scrollRestoration : "auto";
     if (supported) history.scrollRestoration = "manual";
 
-    let queued = 0;
-    // The overhang, in px, so the phase unit stays one viewport even though the pin is taller than
-    // one. Read live rather than once: a value published at runtime by another script has to be
-    // re-read on every measurement, or an orientation change that changes it goes stale here.
-    let bleed = 0;
+    // Checked once — pointer type doesn't change mid-session on the devices this matters for, and
+    // this only ever picks which fixed set of numbers `apply()` reads below, so there's nothing
+    // to keep in sync if it did. Read-only; `stops` (server-rendered track height) never sees it.
+    const fadeStops =
+      touchStops && window.matchMedia("(hover: none) and (pointer: coarse)").matches
+        ? touchStops
+        : stops;
+
+    // `range()`'s job: turn the handful of things that force a synchronous layout to read
+    // (`getBoundingClientRect()`, `offsetHeight`, `getComputedStyle()`) into plain numbers cached
+    // here, so `measure()` — which runs on every scroll frame, not just the occasional resize —
+    // never has to force one itself. `window.scrollY` is the one read `measure()` keeps doing
+    // live, and it's cheap: the browser already tracks it continuously and it forces nothing.
+    //
+    // This split is what actually matters on iOS specifically: the URL bar animates the viewport
+    // height *during* an active scroll gesture, not just at rest between them, so there is a
+    // layout-affecting change genuinely pending on or near every scroll frame — which is exactly
+    // what a forced-layout read has to resolve synchronously before it can return anything.
+    // Desktop never has anything pending mid-scroll (nothing resizes while scrolling), so the same
+    // per-frame reads that are nearly free there were forcing real work on every mobile scroll
+    // frame, more of them the faster the scroll — a strong match for "smooth slow, stepping at
+    // normal speed, desktop unaffected either way."
+    let trackTop = 0;
+    let unit = 1;
 
     // The scroll timeline runs on the document, so the pin's range is where the track sits in it.
     // Written on every resize as well as at mount, because both ends move with the viewport.
     const range = () => {
-      bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
+      const bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
+      // How much shorter the always-visible viewport is than `100vh`/`lvh` (the URL-bar-collapsed
+      // one `pin.offsetHeight` is built from) — published by `layout.tsx` alongside `--bleed`.
+      // Subtracted from `unit` below so a phase costs the same scroll distance whether or not the
+      // bar happens to be showing, rather than the up-to-13%-larger bar-collapsed figure.
+      const fold = parseFloat(getComputedStyle(pin).getPropertyValue("--fold")) || 0;
       const start = track.getBoundingClientRect().top + window.scrollY;
+      trackTop = start;
+      // The pin's own height is fixed — it only ever changes on the same resize/orientation
+      // events that call `range()` in the first place — so this is the only place it needs
+      // reading at all, unlike the per-frame read `measure()` used to do for the same number.
+      unit = pin.offsetHeight - bleed - fold || 1;
       // The *full* pin height, bleed included — this is a physical release distance, not a phase
       // unit. The pin's actual box is `pin.offsetHeight` tall regardless of how much of that is
       // overhang; translating it up by anything less leaves exactly that much of its bottom edge
       // still overlapping whatever comes after the track once released. Subtracting `bleed` here
-      // (matching the `unit` below) was tried and measured wrong: the pin let go early by that
-      // many pixels and sat over the next section's top edge instead of clearing it.
+      // (matching `unit` above) was tried and measured wrong: the pin let go early by that many
+      // pixels and sat over the next section's top edge instead of clearing it.
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
       pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
       pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
       pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
     };
+
+    // iOS fires `resize` all through a scroll as the URL bar folds — same behaviour `layout.tsx`
+    // documents for `--bleed` — and none of those change the viewport's width. Gating `range()`
+    // on a real width change is what tells an actual resize (rotation, an actual window resize)
+    // apart from that noise, so `--pin-start`/`--pin-end` stay put through a toolbar fold instead
+    // of being rewritten mid-gesture, which is what let the scroll-timeline's range drift under a
+    // stationary scroll position and snap the pin.
+    let lastWidth = window.innerWidth;
 
     // Seeded from what the markup actually says. Both layers ship displayed and only `to` ships
     // transparent, so at the top of the stage its opacity is already right and its `display` is
@@ -135,51 +225,81 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
       s.fade = fade;
     };
 
-    const apply = () => {
-      // Measured every frame rather than cached, and from the track's own rect rather than
-      // scrollY, so the stage is correct wherever it sits on the page and after anything that
-      // moves it: resize, orientation, a late font swap. Dividing by the pin's own height rather
-      // than innerHeight is what keeps the phases honest when a vh and the real viewport
-      // disagree, which they do for the whole of an iOS URL bar collapse.
-      //
-      // `offsetHeight` rather than a rect, because the pin is the element the scroll timeline may
-      // be transforming, and a rect reports the transformed box: mid-fling that height wobbles by
-      // whatever the pin has moved since, and every layer's opacity would be computed against a
-      // moving unit. Offsets ignore transforms and hold still.
-      const unit = pin.offsetHeight - bleed || 1;
-      const p = -track.getBoundingClientRect().top / unit;
-      write(fromRef.current, fromState, 1 - smoothstep(stops.outStart, stops.outEnd, p));
-      write(toRef.current, toState, smoothstep(stops.inStart, stops.inEnd, p));
+    // What `measure()` found, for `commit()` to write. Split from a single `apply()` so this
+    // stage's reads and every other stage's reads all happen before any of either one's writes —
+    // see `useScrollStage`'s own comment for why that's not just tidiness.
+    const pending = { fromFade: fromState.fade, toFade: toState.fade };
+
+    const measure = () => {
+      // `trackTop` and `unit` are `range()`'s cache, not read live here — see the comment above
+      // `range()`. `window.scrollY` is the only per-frame read, and it never forces layout.
+      const p = (window.scrollY - trackTop) / unit;
+      pending.fromFade = 1 - smoothstep(fadeStops.outStart, fadeStops.outEnd, p);
+      // In cover mode `to`'s opacity mirrors `from`'s own fade-out curve directly, rather than
+      // riding its own `gap`/`in` window: the visible transition was always `out` (`from`'s own
+      // fadeout — "the animation this stage exists to show", per `page.tsx`), and covering with an
+      // opaque `to` should use that same window, not require `phases` to be separately retuned
+      // for `in` every time a usage switches mode (a `gap`/`in` sized for a disjoint dissolve — a
+      // deliberate blank beat between two translucent scenes — left `to` a near-instant snap here
+      // instead of a dissolve). This also makes the two opacities complementary, which is exactly
+      // a cross-dissolve: no gap where neither layer covers the point being looked at.
+      pending.toFade =
+        mode === "cover" ? 1 - pending.fromFade : smoothstep(fadeStops.inStart, fadeStops.inEnd, p);
     };
 
-    const onScroll = () => {
-      if (queued) return;
-      queued = requestAnimationFrame(() => {
-        queued = 0;
-        apply();
-      });
+    const commit = () => {
+      write(fromRef.current, fromState, pending.fromFade);
+      write(toRef.current, toState, pending.toFade);
     };
+
+    const unregister = registerStage(measure, commit);
+
+    const onScroll = () => requestStageFrame();
 
     const onResize = () => {
+      const width = window.innerWidth;
+      if (width !== lastWidth) {
+        lastWidth = width;
+        range();
+      }
+      onScroll();
+    };
+
+    // A real recompute regardless of width: a rotation can keep the shorter dimension unchanged on
+    // some devices, `scrollend` is free since the page is already stationary when it fires and
+    // catches anything the width gate above was too narrow for, and fonts are the one thing that
+    // resizes the page with no resize event at all.
+    const onOrientation = () => {
+      lastWidth = window.innerWidth;
+      range();
+      onScroll();
+    };
+    const onScrollEnd = () => {
       range();
       onScroll();
     };
 
     range();
-    apply();
+    measure();
+    commit();
     window.addEventListener("scroll", onScroll, { passive: true });
     window.addEventListener("resize", onResize, { passive: true });
+    window.addEventListener("orientationchange", onOrientation);
+    window.addEventListener("scrollend", onScrollEnd, { passive: true });
+    document.fonts?.ready.then(onScrollEnd);
 
     return () => {
-      cancelAnimationFrame(queued);
+      unregister();
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onOrientation);
+      window.removeEventListener("scrollend", onScrollEnd);
       if (supported) history.scrollRestoration = restoration;
     };
-  }, [stops]);
+  }, [stops, touchStops, mode]);
 
   return (
-    <div ref={trackRef} style={{ height: `${stops.height}vh` }}>
+    <div ref={trackRef} style={{ height: `calc(${stops.travel}svh + 100vh + var(--bleed))` }}>
       {/*
         Held by `sticky` where the viewport has no chrome overlapping it, and by the transform
         `.stage-pin` defines in `globals.css` where it does — see that rule for why. Exactly one
@@ -195,7 +315,11 @@ export function CrossfadeStage({ from, to, phases, className }: CrossfadeStagePr
         className={["stage-pin relative isolate", className].filter(Boolean).join(" ")}
         style={{ height: "calc(100vh + var(--bleed))" }}
       >
-        <div ref={fromRef} className="absolute inset-0" style={LAYER_FROM}>
+        <div
+          ref={fromRef}
+          className="absolute inset-0"
+          style={mode === "cover" ? LAYER_FROM_COVER : LAYER_FROM_DISSOLVE}
+        >
           {from}
         </div>
         <div ref={toRef} className="absolute inset-0" style={LAYER_TO}>

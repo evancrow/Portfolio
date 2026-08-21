@@ -26,7 +26,7 @@ export const work: Entry[] = [
     link: "https://apple.com/",
     location: "Cupertino, California",
     dates: [{ start: "May 2024", end: "Aug 2024" }, { start: "May 2025", end: "Dec 2025" }, { start: "May 2026", end: "Aug 2026" }],
-    description: "Engineering on Apple's Home app team, with work spanning app and system experience, Siri, Vision Pro, and more."
+    description: "Engineering on the Home app team, spanning app and system experience, Siri AI, and Vision Pro."
   },
   {
     icon: "stealth",

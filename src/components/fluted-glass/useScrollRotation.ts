@@ -5,6 +5,28 @@ import type { ResolvedConfig, ResolvedCurve } from "./types";
 
 const TAU = Math.PI * 2;
 
+// `window.innerHeight` tracks the *current* visible viewport, which genuinely shrinks and grows
+// as iOS's URL bar folds — using it as `scrollTarget`'s unit made the scroll-driven rotation's
+// target itself step by however much the bar had just reclaimed, every time it folded mid-scroll.
+// `100svh` (the viewport that's always visible, regardless of the bar) is the same stable
+// reference the pinned stages' own scroll-progress unit uses — see `CrossfadeStage`'s `apply()`.
+// Cached and only remeasured on a real width change, same reasoning as `layout.tsx`'s
+// `MEASURE_BLEED`: the probe is a forced layout, and nothing this reads can move without one.
+let cachedVh = 0;
+let cachedWidth = -1;
+function stableVh(): number {
+  if (typeof window === "undefined") return 1;
+  const width = window.innerWidth;
+  if (cachedVh > 0 && width === cachedWidth) return cachedVh;
+  cachedWidth = width;
+  const probe = document.createElement("div");
+  probe.style.cssText = "position:fixed;top:0;left:0;width:0;visibility:hidden;height:100svh";
+  document.body.appendChild(probe);
+  cachedVh = probe.offsetHeight || window.innerHeight || 1;
+  probe.remove();
+  return cachedVh;
+}
+
 /**
  * Advances the rotation of a curved sheet's flutes around their cylinder.
  *
@@ -103,7 +125,7 @@ export class RotationMotion {
       return externalProgress ?? 0;
     }
 
-    const vh = window.innerHeight || 1;
+    const vh = stableVh();
 
     if (curve.scrollSource === "section") {
       const travel = vh + rect.height;
