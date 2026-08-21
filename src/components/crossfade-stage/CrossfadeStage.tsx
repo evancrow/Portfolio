@@ -63,8 +63,7 @@ export type CrossfadeStageProps = {
    * itself in this mode (though `phases`' total still sets the track's height as always).
    * `from` never getting an animated `opacity` matters when it wraps a full-screen WebGL canvas:
    * an animated `opacity` over one forces an expensive translucent composite every frame for the
-   * whole transition, where a canvas at a constant opacity composites directly. `--fade`/
-   * `.fade-rise` drift on `from` is identical either way — only what drives visible opacity does.
+   * whole transition, where a canvas at a constant opacity composites directly.
    */
   mode?: "dissolve" | "cover";
 };
@@ -75,16 +74,50 @@ export type CrossfadeStageProps = {
  * than on first paint of the effect, so server-rendered HTML is already the top of the stage.
  */
 const LAYER_FROM_DISSOLVE = { "--fade": 1, "--rise": -1, opacity: "var(--fade)" } as CSSProperties;
-/** `mode="cover"`'s `from`: `--fade` still published for `.fade-rise`, opacity pinned at 1. */
+/** `mode="cover"`'s `from`: opacity pinned at 1, never animated; `--rise` still published for `.fade-rise`. */
 const LAYER_FROM_COVER = { "--fade": 1, "--rise": -1, opacity: 1 } as CSSProperties;
 const LAYER_TO = { "--fade": 0, "--rise": 1, opacity: "var(--fade)" } as CSSProperties;
 
-/** Below this a layer is indistinguishable from absent, so it gets taken out of the page. */
-const EPSILON = 1e-3;
+/**
+ * Extra slack (fraction of one `unit`) added to the show/hide boundary beyond the fade window
+ * itself. `display:none` stops a layer's scroll-timeline animation from tracking/painting at all,
+ * and the JS sample deciding when to undo that is the same one that lags behind true scroll
+ * position during a fast iOS flick — so a tight fade-based boundary can un-hide a layer late,
+ * revealing it already far into its curve with no frames in between to have painted the transition
+ * ("just appears" instead of fading). Widening the boundary itself (rather than retiming when it's
+ * decided — two prior attempts at that were reverted for worse regressions) gives the compositor a
+ * head start: the layer is back in the render tree well before its true opacity would meaningfully
+ * depart from its resting value. Rationale: docs/crossfade-stage.md § Compositor-driven fade
+ */
+const VISIBILITY_MARGIN = 0.2;
 
 const smoothstep = (a: number, b: number, x: number) => {
   const t = Math.min(Math.max((x - a) / (b - a), 0), 1);
   return t * t * (3 - 2 * t);
+};
+
+/**
+ * A `linear()` easing that holds flat outside `[start, end]` (fractions of the whole scroll-
+ * timeline range) and ramps through `smoothstep` inside it. This is what lets `.crossfade-from`/
+ * `.crossfade-to`'s `animation-range` span the entire pinned stage (`--pin-start`/`--pin-end`,
+ * never left during normal scrolling within it) instead of just the narrow fade window — a
+ * narrower range was found to freeze at a stale value once scroll left it and not reliably resume
+ * on re-entry, a real (not just cosmetic) discontinuity on-device.
+ * Rationale: docs/crossfade-stage.md § Compositor-driven fade
+ */
+const buildFadeEasing = (rawStart: number, rawEnd: number, samples = 24) => {
+  const start = Math.min(Math.max(rawStart, 0), 1);
+  const end = Math.min(Math.max(rawEnd, 0), 1);
+  const stops: string[] = ["0 0%"];
+  if (start > 0) stops.push(`0 ${(start * 100).toFixed(3)}%`);
+  for (let i = 1; i < samples; i++) {
+    const t = i / samples;
+    const x = start + t * (end - start);
+    stops.push(`${smoothstep(0, 1, t).toFixed(4)} ${(x * 100).toFixed(3)}%`);
+  }
+  if (end < 1) stops.push(`1 ${(end * 100).toFixed(3)}%`);
+  stops.push("1 100%");
+  return `linear(${stops.join(", ")})`;
 };
 
 export function CrossfadeStage({
@@ -146,15 +179,25 @@ export function CrossfadeStage({
       touchStops && window.matchMedia("(hover: none) and (pointer: coarse)").matches
         ? touchStops
         : stops;
+    // TEMP DEBUG — remove once we've confirmed which side is actually stepping on-device.
+    console.log("scroll-timeline supported:", CSS.supports("animation-timeline", "scroll()"));
 
     // `range()` caches the forced-layout reads so `measure()` (runs every scroll frame) never
     // has to force one itself. Rationale: docs/pinned-scroll-stages.md § range()'s cache
     let trackTop = 0;
     let unit = 1;
 
+    // What `range()` last actually wrote — skips redundant rewrites of a running scroll-linked
+    // animation's inputs, since `scrollend` fires repeatedly during a top-of-page bounce.
+    let lastPinStart = "";
+    let lastPinEnd = "";
+    let lastTravel = "";
+    let lastFromEasing = "";
+    let lastToEasing = "";
+
     // The scroll timeline runs on the document, so the pin's range is where the track sits in it.
     // Written on every resize as well as at mount, because both ends move with the viewport.
-    const range = () => {
+    const range = (reason: string) => {
       const bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
       // How much shorter the always-visible viewport is than `100vh`/`lvh` (the URL-bar-collapsed
       // one `pin.offsetHeight` is built from) — published by `layout.tsx` alongside `--bleed`.
@@ -170,9 +213,51 @@ export function CrossfadeStage({
       // Full pin height, bleed included — a physical release distance, not a phase unit.
       // Rationale: docs/pinned-scroll-stages.md § Full pin height vs. bleed, in range()
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
-      pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
-      pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
-      pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
+      // TEMP DEBUG — remove once the top-of-scroll jitter in Hero/AwardsProjects is diagnosed.
+      // Flat string, not an object: Safari's console collapses nested objects to "{…}" in a
+      // copy-paste unless each one is expanded by hand first.
+      console.log(
+        `[CrossfadeStage.range] ${reason} scrollY=${window.scrollY} innerW=${window.innerWidth} innerH=${window.innerHeight} bleed=${bleed} fold=${fold} pinH=${pin.offsetHeight} trackH=${track.offsetHeight} start=${start.toFixed(1)} unit=${unit.toFixed(1)} travel=${travel.toFixed(1)} pinStart=${start.toFixed(1)} pinEnd=${(start + travel).toFixed(1)}`,
+      );
+      const pinStartStr = start.toFixed(1);
+      const pinEndStr = (start + travel).toFixed(1);
+      const travelStr = travel.toFixed(1);
+      if (pinStartStr !== lastPinStart) {
+        pin.style.setProperty("--pin-start", `${pinStartStr}px`);
+        lastPinStart = pinStartStr;
+      }
+      if (pinEndStr !== lastPinEnd) {
+        pin.style.setProperty("--pin-end", `${pinEndStr}px`);
+        lastPinEnd = pinEndStr;
+      }
+      if (travelStr !== lastTravel) {
+        pin.style.setProperty("--travel", `${travelStr}px`);
+        lastTravel = travelStr;
+      }
+      // `.crossfade-from`/`.crossfade-to`'s own animation-range is this same `--pin-start`/
+      // `--pin-end` span (set above) — the fade windows within it are baked into a per-instance
+      // `linear()` easing instead, since a narrower animation-range was found to freeze on exit.
+      // Written as `--fade-ease` (a custom property, not the longhand directly) so `.fade-rise`
+      // children can pick up the identical easing through inheritance for their own separate
+      // `transform` animation, rather than needing their own ref for CrossfadeStage to write to.
+      // Rationale: docs/crossfade-stage.md § Compositor-driven fade
+      const safeTravel = travel || 1;
+      const outStartNorm = (fadeStops.outStart * unit) / safeTravel;
+      const outEndNorm = (fadeStops.outEnd * unit) / safeTravel;
+      const fromEasing = buildFadeEasing(outStartNorm, outEndNorm);
+      if (fromRef.current && fromEasing !== lastFromEasing) {
+        fromRef.current.style.setProperty("--fade-ease", fromEasing);
+        lastFromEasing = fromEasing;
+      }
+      const [toStartNorm, toEndNorm] =
+        mode === "cover"
+          ? [outStartNorm, outEndNorm]
+          : [(fadeStops.inStart * unit) / safeTravel, (fadeStops.inEnd * unit) / safeTravel];
+      const toEasing = buildFadeEasing(toStartNorm, toEndNorm);
+      if (toRef.current && toEasing !== lastToEasing) {
+        toRef.current.style.setProperty("--fade-ease", toEasing);
+        lastToEasing = toEasing;
+      }
     };
 
     // Width-gated so an iOS toolbar-fold resize storm doesn't rewrite the pin range mid-gesture.
@@ -185,39 +270,54 @@ export function CrossfadeStage({
     const fromState = { fade: 1, shown: true };
     const toState = { fade: 0, shown: true };
 
-    const write = (el: HTMLElement | null, s: { fade: number; shown: boolean }, fade: number) => {
+    const write = (
+      el: HTMLElement | null,
+      s: { fade: number; shown: boolean },
+      fade: number,
+      visible: boolean,
+    ) => {
       if (!el) return;
-      const show = fade > EPSILON;
-      if (show !== s.shown) {
-        s.shown = show;
+      if (visible !== s.shown) {
+        s.shown = visible;
         // `display` rather than `visibility`, because the panels pause their render loops on an
         // IntersectionObserver and a hidden element still has a box to intersect with. This is
         // also the only thing that stops a faded-out panel from tracking the pointer forever.
-        el.style.display = show ? "" : "none";
+        el.style.display = visible ? "" : "none";
       }
-      if (show && Math.abs(fade - s.fade) > 1e-4) el.style.setProperty("--fade", fade.toFixed(4));
+      if (visible && Math.abs(fade - s.fade) > 1e-4) el.style.setProperty("--fade", fade.toFixed(4));
       s.fade = fade;
     };
 
     // What `measure()` found, for `commit()` to write. Split from a single `apply()` so this
     // stage's reads and every other stage's reads all happen before any of either one's writes —
     // see `useScrollStage`'s own comment for why that's not just tidiness.
-    const pending = { fromFade: fromState.fade, toFade: toState.fade };
+    const pending = {
+      fromFade: fromState.fade,
+      toFade: toState.fade,
+      fromVisible: true,
+      toVisible: true,
+    };
 
     const measure = () => {
       // `trackTop` and `unit` are `range()`'s cache, not read live here — see the comment above
       // `range()`. `window.scrollY` is the only per-frame read, and it never forces layout.
       const p = (window.scrollY - trackTop) / unit;
       pending.fromFade = 1 - smoothstep(fadeStops.outStart, fadeStops.outEnd, p);
-      // Cover mode: `to`'s opacity mirrors `from`'s own fade-out curve directly, complementary,
+      // Cover mode: `to`'s fade mirrors `from`'s own fade-out curve directly, complementary,
       // rather than riding its own gap/in window. Rationale: docs/crossfade-stage.md § Dissolve vs. cover mode
       pending.toFade =
         mode === "cover" ? 1 - pending.fromFade : smoothstep(fadeStops.inStart, fadeStops.inEnd, p);
+      // Widened past the fade window itself by VISIBILITY_MARGIN — see its own comment above.
+      pending.fromVisible = p < fadeStops.outEnd + VISIBILITY_MARGIN;
+      pending.toVisible =
+        mode === "cover"
+          ? p > fadeStops.outStart - VISIBILITY_MARGIN
+          : p > fadeStops.inStart - VISIBILITY_MARGIN;
     };
 
     const commit = () => {
-      write(fromRef.current, fromState, pending.fromFade);
-      write(toRef.current, toState, pending.toFade);
+      write(fromRef.current, fromState, pending.fromFade, pending.fromVisible);
+      write(toRef.current, toState, pending.toFade, pending.toVisible);
     };
 
     const unregister = registerStage(measure, commit);
@@ -228,23 +328,23 @@ export function CrossfadeStage({
       const width = window.innerWidth;
       if (width !== lastWidth) {
         lastWidth = width;
-        range();
+        range("resize");
+        onScroll();
       }
-      onScroll();
     };
 
     // Real recompute regardless of width. Rationale: docs/pinned-scroll-stages.md § Orientation / scrollend
     const onOrientation = () => {
       lastWidth = window.innerWidth;
-      range();
+      range("orientation");
       onScroll();
     };
     const onScrollEnd = () => {
-      range();
+      range("scrollend");
       onScroll();
     };
 
-    range();
+    range("mount");
     measure();
     commit();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -264,22 +364,26 @@ export function CrossfadeStage({
   }, [stops, touchStops, mode]);
 
   return (
-    <div ref={trackRef} style={{ height: `calc(${stops.travel}svh + 100vh + var(--bleed))` }}>
+    <div ref={trackRef} style={{ height: `calc(${stops.travel}svh + 100lvh + var(--bleed))` }}>
       {/* .stage-pin: sticky or scroll-timeline transform depending on --bleed.
           Rationale: docs/ios-viewport-bleed.md § .stage-pin: sticky vs. scroll-timeline swap */}
       <div
         ref={pinRef}
         className={["stage-pin relative isolate", className].filter(Boolean).join(" ")}
-        style={{ height: "calc(100vh + var(--bleed))" }}
+        style={{ height: "calc(100lvh + var(--bleed))" }}
       >
         <div
           ref={fromRef}
-          className="absolute inset-0"
+          // `crossfade-from` only in dissolve mode — cover mode keeps opacity pinned to 1 via
+          // `LAYER_FROM_COVER` below and never wants it animated. Rationale: docs/crossfade-stage.md § Compositor-driven fade
+          className={["absolute inset-0", mode === "cover" ? "" : "crossfade-from"]
+            .filter(Boolean)
+            .join(" ")}
           style={mode === "cover" ? LAYER_FROM_COVER : LAYER_FROM_DISSOLVE}
         >
           {from}
         </div>
-        <div ref={toRef} className="absolute inset-0" style={LAYER_TO}>
+        <div ref={toRef} className="absolute inset-0 crossfade-to" style={LAYER_TO}>
           {to}
         </div>
       </div>

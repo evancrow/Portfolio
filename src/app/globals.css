@@ -55,36 +55,16 @@
   }
 }
 
-/*
- * Text drifts with the scroll while its layer crossfades: the outgoing block leaves upward, the
- * incoming one arrives from below. Both read the `--fade` and `--rise` CrossfadeStage writes, so
- * one value drives the whole transition. Translate only, since scaling live text re-rasterizes
- * and goes soft on the way through.
- */
+/* Outgoing content leaves upward, incoming arrives from below. `--rise` (±1) picks the direction. */
 .fade-rise {
   --fade-rise-distance: 16px;
   transform: translate3d(0, calc((1 - var(--fade, 1)) * var(--rise, 1) * var(--fade-rise-distance)), 0);
 }
 
-/*
- * On a coarse pointer the crossfade's own timing is compressed into roughly one thumb-swipe (see
- * `CrossfadeStage`'s `touchPhases`), and motion is most of what tells a reader the page is
- * responding to their scroll at all — 16px read as a token flourish sized for a much slower
- * desktop transition, not as movement proportional to the swipe driving it.
- */
+/* Bigger on touch, where the crossfade itself is compressed into about one swipe. */
 @media (hover: none) and (pointer: coarse) {
   .fade-rise {
     --fade-rise-distance: 7vh;
-  }
-}
-
-/*
- * The crossfade is scroll-position-driven, so parking the scroll parks the picture and there is
- * no animation there to reduce. The drift is the one thing that travels without being asked for.
- */
-@media (prefers-reduced-motion: reduce) {
-  .fade-rise {
-    transform: none;
   }
 }
 
@@ -133,6 +113,95 @@
     animation-fill-mode: both;
     animation-timeline: scroll(root block);
     animation-range: var(--pin-start) var(--pin-end);
+    /* Compositor-layer hints for the top-of-scroll jitter investigation — didn't measurably help,
+       kept pending a final call on whether to strip them. */
+    will-change: transform;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    contain: layout style;
+  }
+
+  /* CrossfadeStage's fade, driven by the compositor instead of JS reading window.scrollY per rAF
+     frame: iOS deprioritizes the page's main thread during momentum scrolling, so a JS-driven fade
+     steps at normal/fast scroll speeds even though the scroll itself stays smooth. These keyframes
+     animate `opacity` directly rather than a custom property — `opacity`/`transform` are the
+     properties a browser can hand entirely to the compositor thread; resolving an arbitrary custom
+     property back into `opacity` would still need a main-thread style recalculation, which is
+     exactly the thread this exists to get off of.
+
+     `animation-range` is the same `--pin-start`/`--pin-end` span as `.stage-pin` above — the whole
+     pinned stage, not just the narrow fade window — because a narrower range was found to freeze at
+     a stale value once scroll left it and not reliably resume on re-entry. `animation-timing-function`
+     is set per instance by CrossfadeStage instead of fixed here: a `linear()` easing that holds flat
+     outside the fade window and ramps through `smoothstep` inside it, so the range can stay this wide
+     while the visible timing still matches whatever `phases`/`touchPhases` that instance was given.
+     Rationale: docs/crossfade-stage.md § Compositor-driven fade */
+  @keyframes fade-out {
+    from {
+      opacity: 1;
+    }
+    to {
+      opacity: 0;
+    }
+  }
+  @keyframes fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  /* `from` only carries this class in `dissolve` mode — see CrossfadeStage, which leaves it off in
+     `cover` mode so opacity stays pinned at 1 (an animated opacity over a full-screen WebGL canvas
+     forces an expensive translucent composite every frame). `to` always fades in — whether it
+     rises across the in-window (dissolve) or the out-window (cover, complementary to `from`'s own
+     curve) is baked into the easing CrossfadeStage sets, not into which window is picked here.
+     `animation-timing-function` reads `--fade-ease` — CrossfadeStage writes it as a custom property
+     rather than the longhand directly so `.fade-rise` below can inherit the identical easing for
+     its own separate animation, without needing its own ref back to the component. */
+  .crossfade-from {
+    animation-name: fade-out;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+    animation-range: var(--pin-start) var(--pin-end);
+    animation-timing-function: var(--fade-ease, ease);
+  }
+  .crossfade-to {
+    animation-name: fade-in;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+    animation-range: var(--pin-start) var(--pin-end);
+    animation-timing-function: var(--fade-ease, ease);
+  }
+
+  /* `.fade-rise`'s compositor override, same reasoning as the fade above. One keyframe set serves
+     both directions via `--rise` (±1): `max`/`min` zero out whichever side doesn't apply, so `from`
+     goes 0 → -distance and `to` goes +distance → 0. */
+  @keyframes fade-rise {
+    from {
+      transform: translate3d(
+        0,
+        calc(max(var(--rise, 1), 0) * var(--fade-rise-distance, 16px)),
+        0
+      );
+    }
+    to {
+      transform: translate3d(
+        0,
+        calc(min(var(--rise, 1), 0) * var(--fade-rise-distance, 16px)),
+        0
+      );
+    }
+  }
+
+  .fade-rise {
+    animation-name: fade-rise;
+    animation-fill-mode: both;
+    animation-timeline: scroll(root block);
+    animation-range: var(--pin-start) var(--pin-end);
+    animation-timing-function: var(--fade-ease, ease);
   }
 }
 

@@ -29,8 +29,7 @@ curve instead — complementary, so there's no gap, which is what a plain cross-
 
 `from` never getting an animated `opacity` matters when it wraps a full-screen WebGL canvas: an
 animated `opacity` over one forces an expensive translucent composite every frame for the whole
-transition, where a canvas at a constant opacity composites directly. `--fade`/`.fade-rise` drift on
-`from` is identical either way — only what drives visible opacity does.
+transition, where a canvas at a constant opacity composites directly.
 
 In `cover` mode, `to`'s opacity mirrors `from`'s own fade-out curve directly, rather than riding its
 own `gap`/`in` window: the visible transition was always `out` (`from`'s own fadeout — "the
@@ -40,6 +39,42 @@ mode (a `gap`/`in` sized for a disjoint dissolve — a deliberate blank beat bet
 scenes — left `to` a near-instant snap here instead of a dissolve). This also makes the two
 opacities complementary, which is exactly a cross-dissolve: no gap where neither layer covers the
 point being looked at.
+
+## Compositor-driven fade (`globals.css`, `@supports (animation-timeline: scroll())`)
+
+`from`/`to`'s `opacity` is driven by a CSS scroll-timeline animation where supported, not by the JS
+`measure()`/`commit()` below — see `docs/pinned-scroll-stages.md` for that JS mechanism, which stays
+as the fallback where it isn't (and stays the only writer of `--fade` either way, see below).
+
+iOS deprioritizes the page's main thread during momentum scrolling, so a scroll gesture itself
+stays compositor-smooth while anything JS has to write per rAF frame (window.scrollY-driven or
+not) falls behind and steps — the picture scrolls smoothly, the fade doesn't. The fix has to
+animate `opacity` directly rather than through a custom property: `opacity` and `transform` are the
+properties a browser can hand entirely to the compositor thread, evaluated against the true scroll
+offset every compositor frame with no dependency on main-thread scheduling. A registered custom
+property doesn't get that — resolving `opacity: var(--fade)` back from an animated `--fade` still
+needs a main-thread style recalculation, which is exactly the thread this is trying to get off of,
+so an earlier version of this that animated `--fade` itself kept stepping despite the animation
+correctly running. No JS feature detection is needed to switch between the CSS and JS paths: CSS
+Animations override normal-priority declarations (including inline styles) regardless of
+specificity, so wherever the `@supports` block applies, the running animation simply wins over JS's
+own `opacity: var(--fade)`; wherever it doesn't, that block never applies and JS's write is what
+renders.
+
+`range()` writes `--fade-out-start`/`--fade-out-end`/`--fade-in-start`/`--fade-in-end` (document-
+relative pixels, same cache as `--pin-start`/`--pin-end`) for `.crossfade-from`/`.crossfade-to` to
+point their `animation-range` at. `from` only carries `.crossfade-from` in `dissolve` mode —
+`CrossfadeStage` leaves it off entirely in `cover` mode, since `cover` pins `from`'s `opacity` to 1
+via the existing static inline style and never wants it animated. `to` always animates `fade-in`, but `CrossfadeStage`
+points `--to-range-start`/`--to-range-end` at the in-window in `dissolve` mode or the out-window in
+`cover` mode, which is what makes `to` rise exactly as `from` falls without a third keyframe set.
+
+The easing is `cubic-bezier(1/3, 0, 2/3, 1)`, the exact closed-form equivalent of the same
+`smoothstep(3t² - 2t³)` shape the JS fallback uses — not an approximation: those control points
+make the curve's x-component reduce identically to linear time, and its y-component then works out
+to exactly `3t² - 2t³`. `animation-timing-function` can't call a function, so this is what stands in
+for it; the curve's shape doesn't depend on the actual pixel range (`animation-range` supplies that
+per element), so one fixed easing serves every window.
 
 ## `overflow-anchor: none` (`globals.css`)
 
