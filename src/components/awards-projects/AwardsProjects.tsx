@@ -154,6 +154,11 @@ export function AwardsProjects() {
     // Same width-gated fix as CrossfadeStage's range(). Rationale: docs/pinned-scroll-stages.md § Width-gated resize handling
     let lastWidth = window.innerWidth;
 
+    // What `range()` last actually wrote — same guard as CrossfadeStage's.
+    let lastPinStart = "";
+    let lastPinEnd = "";
+    let lastTravel = "";
+
     // The scroll timeline runs on the document, so the pin's range is where the track sits in it —
     // same mechanism CrossfadeStage uses; see docs/ios-viewport-bleed.md for why a sticky subtree
     // needs the scroll-timeline swap at all.
@@ -171,7 +176,7 @@ export function AwardsProjects() {
       overflow = inner.offsetHeight - listHeight;
     };
 
-    const range = () => {
+    const range = (reason: string) => {
       bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
       const fold = parseFloat(getComputedStyle(pin).getPropertyValue("--fold")) || 0;
       const start = track.getBoundingClientRect().top + window.scrollY;
@@ -182,9 +187,27 @@ export function AwardsProjects() {
       // Full pin height, bleed included — a physical release distance, not the DWELL unit above.
       // Rationale: docs/pinned-scroll-stages.md § Full pin height vs. bleed, in range()
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
-      pin.style.setProperty("--pin-start", `${start.toFixed(1)}px`);
-      pin.style.setProperty("--pin-end", `${(start + travel).toFixed(1)}px`);
-      pin.style.setProperty("--travel", `${travel.toFixed(1)}px`);
+      // TEMP DEBUG — remove once the top-of-scroll jitter in Hero/AwardsProjects is diagnosed.
+      // Flat string, not an object: Safari's console collapses nested objects to "{…}" in a
+      // copy-paste unless each one is expanded by hand first.
+      console.log(
+        `[AwardsProjects.range] ${reason} scrollY=${window.scrollY} innerW=${window.innerWidth} innerH=${window.innerHeight} bleed=${bleed} fold=${fold} pinH=${pin.offsetHeight} trackH=${track.offsetHeight} start=${start.toFixed(1)} unit=${unit.toFixed(1)} travel=${travel.toFixed(1)} pinStart=${start.toFixed(1)} pinEnd=${(start + travel).toFixed(1)}`,
+      );
+      const pinStartStr = start.toFixed(1);
+      const pinEndStr = (start + travel).toFixed(1);
+      const travelStr = travel.toFixed(1);
+      if (pinStartStr !== lastPinStart) {
+        pin.style.setProperty("--pin-start", `${pinStartStr}px`);
+        lastPinStart = pinStartStr;
+      }
+      if (pinEndStr !== lastPinEnd) {
+        pin.style.setProperty("--pin-end", `${pinEndStr}px`);
+        lastPinEnd = pinEndStr;
+      }
+      if (travelStr !== lastTravel) {
+        pin.style.setProperty("--travel", `${travelStr}px`);
+        lastTravel = travelStr;
+      }
       measureList();
     };
 
@@ -210,11 +233,42 @@ export function AwardsProjects() {
     // one's writes. See `useScrollStage`'s own comment.
     let pendingContinuous = 0;
 
+    // TEMP DEBUG — the reported Awards jitter left no `range()` log at all, so whatever's snapping
+    // must be in this per-scroll-frame path instead (`position()`'s `translate3d`, driven straight
+    // off `pendingContinuous`). Flags a frame where `continuous` moved by more than the actual
+    // `scrollY` delta explains — a real snap, not just a fast flick, and not just the ordinary
+    // clamp saturation `continuous` sits in for most of the page (below the pin, or past its end):
+    // the "expected" value is clamped the exact same way `continuous` itself is, from the
+    // *unclamped* running total, so sitting pinned at 0 or at `ITEMS.length - 1` while scrolling
+    // through the rest of the page no longer reads as a jump. Remove once the top-of-scroll/Awards
+    // jitter is diagnosed.
+    let lastScrollY = window.scrollY;
+    let rawContinuous = 0;
+    let lastMeasureTime = performance.now();
+
     const measure = () => {
       // `trackTop`/`unit` are `range()`'s cache — see the comment above it. `window.scrollY` is
       // the only per-frame read, and unlike a rect or an offset, it never forces layout.
-      const p = (window.scrollY - trackTop) / unit;
-      pendingContinuous = clamp(p / DWELL, 0, ITEMS.length - 1);
+      const scrollY = window.scrollY;
+      const p = (scrollY - trackTop) / unit;
+      const continuous = clamp(p / DWELL, 0, ITEMS.length - 1);
+
+      const now = performance.now();
+      const dt = now - lastMeasureTime;
+      const scrollDelta = scrollY - lastScrollY;
+      const expectedRawContinuous = rawContinuous + scrollDelta / unit / DWELL;
+      const expectedContinuous = clamp(expectedRawContinuous, 0, ITEMS.length - 1);
+      const jump = continuous - expectedContinuous;
+      if (Math.abs(jump) > 0.05) {
+        console.log(
+          `[AwardsProjects.measure] SNAP dt=${dt.toFixed(1)}ms scrollY=${scrollY} prevScrollY=${lastScrollY} scrollDelta=${scrollDelta} trackTop=${trackTop.toFixed(1)} unit=${unit.toFixed(1)} expectedContinuous=${expectedContinuous.toFixed(3)} continuous=${continuous.toFixed(3)} jump=${jump.toFixed(3)}`,
+        );
+      }
+      lastScrollY = scrollY;
+      rawContinuous = p / DWELL;
+      lastMeasureTime = now;
+
+      pendingContinuous = continuous;
     };
 
     const commit = () => {
@@ -230,12 +284,12 @@ export function AwardsProjects() {
       const width = window.innerWidth;
       if (width !== lastWidth) {
         lastWidth = width;
-        range();
+        range("resize");
       }
       onScroll();
     };
 
-    range();
+    range("mount");
     measure();
     commit();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -249,7 +303,7 @@ export function AwardsProjects() {
       const height = document.body.getBoundingClientRect().height;
       if (Math.abs(height - lastBodyHeight) > bleed) {
         lastBodyHeight = height;
-        range();
+        range("body-resize");
       }
       onScroll();
     };
@@ -259,11 +313,11 @@ export function AwardsProjects() {
     // Same as CrossfadeStage's identical listeners. Rationale: docs/pinned-scroll-stages.md § Orientation / scrollend
     const onOrientation = () => {
       lastWidth = window.innerWidth;
-      range();
+      range("orientation");
       onScroll();
     };
     const onScrollEnd = () => {
-      range();
+      range("scrollend");
       onScroll();
     };
     window.addEventListener("orientationchange", onOrientation);
@@ -304,7 +358,7 @@ export function AwardsProjects() {
     <section
       ref={trackRef}
       className="relative w-full"
-      style={{ height: `calc(${TRACK_HEIGHT}svh + 100vh + var(--bleed))` }}
+      style={{ height: `calc(${TRACK_HEIGHT}svh + 100lvh + var(--bleed))` }}
     >
       {/* Invisible marker at the start of the Projects group, since the section's own top is
           Awards' first item and `#projects` should land on the group the link names. `svh`, not
@@ -321,7 +375,7 @@ export function AwardsProjects() {
       <div
         ref={pinRef}
         className="stage-pin relative isolate flex items-center pb-[var(--bleed)]"
-        style={{ height: "calc(100vh + var(--bleed))" }}
+        style={{ height: "calc(100lvh + var(--bleed))" }}
       >
         {/* Full-bleed on mobile, full pin height rather than taller — one fix rather than two.
             Rationale: docs/awards-projects.md § Retint band sizing (mobile full-bleed) */}
