@@ -113,12 +113,6 @@
     animation-fill-mode: both;
     animation-timeline: scroll(root block);
     animation-range: var(--pin-start) var(--pin-end);
-    /* Compositor-layer hints for the top-of-scroll jitter investigation — didn't measurably help,
-       kept pending a final call on whether to strip them. */
-    will-change: transform;
-    backface-visibility: hidden;
-    -webkit-backface-visibility: hidden;
-    contain: layout style;
   }
 
   /* CrossfadeStage's fade, driven by the compositor instead of JS reading window.scrollY per rAF

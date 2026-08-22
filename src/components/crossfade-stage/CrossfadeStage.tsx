@@ -179,8 +179,6 @@ export function CrossfadeStage({
       touchStops && window.matchMedia("(hover: none) and (pointer: coarse)").matches
         ? touchStops
         : stops;
-    // TEMP DEBUG — remove once we've confirmed which side is actually stepping on-device.
-    console.log("scroll-timeline supported:", CSS.supports("animation-timeline", "scroll()"));
 
     // `range()` caches the forced-layout reads so `measure()` (runs every scroll frame) never
     // has to force one itself. Rationale: docs/pinned-scroll-stages.md § range()'s cache
@@ -197,7 +195,7 @@ export function CrossfadeStage({
 
     // The scroll timeline runs on the document, so the pin's range is where the track sits in it.
     // Written on every resize as well as at mount, because both ends move with the viewport.
-    const range = (reason: string) => {
+    const range = () => {
       const bleed = parseFloat(getComputedStyle(pin).getPropertyValue("--bleed")) || 0;
       // How much shorter the always-visible viewport is than `100vh`/`lvh` (the URL-bar-collapsed
       // one `pin.offsetHeight` is built from) — published by `layout.tsx` alongside `--bleed`.
@@ -213,12 +211,6 @@ export function CrossfadeStage({
       // Full pin height, bleed included — a physical release distance, not a phase unit.
       // Rationale: docs/pinned-scroll-stages.md § Full pin height vs. bleed, in range()
       const travel = Math.max(track.offsetHeight - pin.offsetHeight, 0);
-      // TEMP DEBUG — remove once the top-of-scroll jitter in Hero/AwardsProjects is diagnosed.
-      // Flat string, not an object: Safari's console collapses nested objects to "{…}" in a
-      // copy-paste unless each one is expanded by hand first.
-      console.log(
-        `[CrossfadeStage.range] ${reason} scrollY=${window.scrollY} innerW=${window.innerWidth} innerH=${window.innerHeight} bleed=${bleed} fold=${fold} pinH=${pin.offsetHeight} trackH=${track.offsetHeight} start=${start.toFixed(1)} unit=${unit.toFixed(1)} travel=${travel.toFixed(1)} pinStart=${start.toFixed(1)} pinEnd=${(start + travel).toFixed(1)}`,
-      );
       const pinStartStr = start.toFixed(1);
       const pinEndStr = (start + travel).toFixed(1);
       const travelStr = travel.toFixed(1);
@@ -328,7 +320,7 @@ export function CrossfadeStage({
       const width = window.innerWidth;
       if (width !== lastWidth) {
         lastWidth = width;
-        range("resize");
+        range();
         onScroll();
       }
     };
@@ -336,15 +328,15 @@ export function CrossfadeStage({
     // Real recompute regardless of width. Rationale: docs/pinned-scroll-stages.md § Orientation / scrollend
     const onOrientation = () => {
       lastWidth = window.innerWidth;
-      range("orientation");
+      range();
       onScroll();
     };
     const onScrollEnd = () => {
-      range("scrollend");
+      range();
       onScroll();
     };
 
-    range("mount");
+    range();
     measure();
     commit();
     window.addEventListener("scroll", onScroll, { passive: true });
