@@ -16,17 +16,17 @@ export const projects: Entry[] = [
     description:
       'Navigation app that integrates with your music library to build a queue synced to your trip duration. Recognized by Apple in "Our Favorites" and "Hot New Apps" and featured by media outlets such as Product Hunt and iMore.',
     platforms: ["iOS", "WatchOS", "CarPlay", "Web"],
-    accent: "#3572b3",
-    accentSoft: "#cad3d9",
+    accent: "#243546",
+    accentSoft: "#393f42",
   },
   {
-    title: "NUMacro",
+    title: "Dish Surfboards",
     description:
-      "Website for NUMacro, a global macro investing club I co-founded. Built from scratch to showcase research, strategy, and community. Deployed with Vercel and optimized for clarity, speed, and accessibility.",
+      "Handcrafted sustainable surfboards made in New England. Board member and advisor.",
     platforms: ["Web", "Cloud"],
     languages: ["Next.js", "TypeScript"],
-    link: "https://numacro.vercel.app/",
-    accent: "#bd6767",
-    accentSoft: "#f3d6ed",
+    link: "https://dishsurfboards.com",
+    accent: "#88aebf",
+    accentSoft: "#DDE0E3",
   },
 ];
